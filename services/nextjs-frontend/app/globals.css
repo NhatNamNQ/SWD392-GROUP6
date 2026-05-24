@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 33% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --primary: 206 100% 93%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 24 100% 93%;
+    --secondary-foreground: 222 47% 11%;
+    --accent: 148 63% 92%;
+    --accent-foreground: 146 60% 20%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 215 25% 27%;
+    --radius-lg: 1rem;
+    --radius-md: 0.8rem;
+    --radius-sm: 0.55rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Avenir Next", "Nunito Sans", "Trebuchet MS", sans-serif;
+    background-image:
+      radial-gradient(circle at top left, rgba(219, 234, 254, 0.85), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(254, 240, 138, 0.45), transparent 24%),
+      linear-gradient(180deg, #f8fafc 0%, #f8fafc 46%, #fafaf9 100%);
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .orbit-shell {
+    width: min(1120px, calc(100% - 2rem));
+    margin-inline: auto;
+  }
+
+  .orbit-frame {
+    @apply rounded-md border-2 border-slate-700 bg-white shadow-orbit;
+  }
+
+  .orbit-chip {
+    @apply rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 shadow-chip;
+  }
+
+  .orbit-panel-head {
+    @apply border-b-2 border-slate-700 px-4 py-3 text-sm font-extrabold;
+  }
+
+  .orbit-grid {
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+}

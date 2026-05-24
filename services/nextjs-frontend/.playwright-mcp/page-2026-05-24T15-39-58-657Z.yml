@@ -1,0 +1,100 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: OD
+          - generic [ref=e7]:
+            - paragraph [ref=e8]: OrbitDocs
+            - paragraph [ref=e9]: Student-friendly RAG workspace
+        - navigation [ref=e10]:
+          - link "Overview" [ref=e11] [cursor=pointer]:
+            - /url: "#overview"
+          - link "Features" [ref=e12] [cursor=pointer]:
+            - /url: "#features"
+          - link "How It Works" [ref=e13] [cursor=pointer]:
+            - /url: "#workflow"
+          - link "Knowledge Base" [ref=e14] [cursor=pointer]:
+            - /url: "#knowledge"
+        - link "Open Dashboard" [ref=e15] [cursor=pointer]:
+          - /url: /dashboard
+    - main [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - generic [ref=e20]: SWD392 Prototype
+            - heading "Ask course questions and get cited answers in one bright workspace." [level=1] [ref=e21]
+            - paragraph [ref=e22]: OrbitDocs helps students learn from course files using chat, while teachers manage uploaded documents in a separate knowledge base view.
+          - generic [ref=e23]:
+            - generic [ref=e24]: Inline citations
+            - generic [ref=e25]: Conversation history
+            - generic [ref=e26]: Teacher document space
+          - generic [ref=e27]:
+            - link "Launch workspace" [ref=e28] [cursor=pointer]:
+              - /url: /dashboard
+              - text: Launch workspace
+              - img [ref=e29]
+            - link "See the flow" [ref=e31] [cursor=pointer]:
+              - /url: "#workflow"
+        - generic [ref=e32]:
+          - generic [ref=e33]: Chat Preview
+          - generic [ref=e34]:
+            - generic [ref=e35]: What is a Use Case Model?
+            - generic [ref=e36]: Can you compare Sequence vs Communication diagrams?
+            - generic [ref=e37]: Sequence diagrams focus on time order, while communication diagrams focus on object collaboration [1].
+      - generic [ref=e38]:
+        - generic [ref=e39]: Core Features
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e43]:
+              - img [ref=e45]
+              - heading "Student Chat" [level=3] [ref=e57]
+            - generic [ref=e58]: Focused chat layout with prompt chips, clean message flow, and inline citation popovers.
+          - generic [ref=e59]:
+            - generic [ref=e61]:
+              - img [ref=e63]
+              - heading "Conversation History" [level=3] [ref=e67]
+            - generic [ref=e68]: Resume sessions like Use Case Diagrams Review or GoF Design Patterns from the sidebar.
+          - generic [ref=e69]:
+            - generic [ref=e71]:
+              - img [ref=e73]
+              - heading "Course Context" [level=3] [ref=e77]
+            - generic [ref=e78]: Every question stays scoped to the selected course so answers remain relevant.
+      - generic [ref=e79]:
+        - generic [ref=e80]: Knowledge Base for Teachers
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - heading "Upload Zone" [level=3] [ref=e84]
+            - generic [ref=e85]: Drag lecture slides or PDFs into a dedicated teacher workspace without crowding student chat.
+          - generic [ref=e86]:
+            - heading "Document Library" [level=3] [ref=e88]
+            - generic [ref=e89]: Browse files by course, tags, and indexing status such as Processing or Indexed.
+          - generic [ref=e90]:
+            - heading "Teacher Separation" [level=3] [ref=e92]
+            - generic [ref=e93]: Management actions stay separate from the study flow so students only see cited answers.
+      - generic [ref=e94]:
+        - generic [ref=e95]: How It Works
+        - generic [ref=e96]:
+          - generic [ref=e98]:
+            - generic [ref=e99]: "1"
+            - paragraph [ref=e100]: Teacher uploads course documents in Knowledge Base.
+          - generic [ref=e102]:
+            - generic [ref=e103]: "2"
+            - paragraph [ref=e104]: System indexes content and prepares searchable chunks.
+          - generic [ref=e106]:
+            - generic [ref=e107]: "3"
+            - paragraph [ref=e108]: Student asks questions with course scope selected.
+          - generic [ref=e110]:
+            - generic [ref=e111]: "4"
+            - paragraph [ref=e112]: AI returns concise responses with source citations.
+      - generic [ref=e113]:
+        - generic [ref=e114]:
+          - heading "Ready to study smarter with cited answers?" [level=2] [ref=e115]
+          - paragraph [ref=e116]: Open the workspace and continue your SWD392 sessions.
+        - link "Launch Dashboard" [ref=e117] [cursor=pointer]:
+          - /url: /dashboard
+    - contentinfo [ref=e118]:
+      - generic [ref=e119]: OrbitDocs | Educational RAG workspace
+      - generic [ref=e120]: "Built for students and teachers | Course: SWD392"
+  - button "Open Next.js Dev Tools" [ref=e126] [cursor=pointer]:
+    - img [ref=e127]
