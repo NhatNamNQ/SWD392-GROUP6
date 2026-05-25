@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint",
+    "prepare": "cd ../.. && husky services/nextjs-frontend/.husky"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -17,6 +21,8 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "next": "^16.1.6",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tailwind-merge": "^3.6.0"

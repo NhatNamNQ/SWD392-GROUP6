@@ -24,8 +24,7 @@ const features = [
   {
     title: "Course Context",
     tone: "peach" as const,
-    description:
-      "Every question stays scoped to the selected course so answers remain relevant.",
+    description: "Every question stays scoped to the selected course so answers remain relevant.",
     icon: Files,
   },
 ];
@@ -38,8 +37,7 @@ const knowledgeCards = [
   },
   {
     title: "Document Library",
-    description:
-      "Browse files by course, tags, and indexing status such as Processing or Indexed.",
+    description: "Browse files by course, tags, and indexing status such as Processing or Indexed.",
   },
   {
     title: "Teacher Separation",
@@ -66,9 +64,7 @@ export function LandingPage() {
             </div>
             <div>
               <p className="text-lg font-black text-slate-800">OrbitDocs</p>
-              <p className="text-sm font-bold text-slate-500">
-                Student-friendly RAG workspace
-              </p>
+              <p className="text-sm font-bold text-slate-500">Student-friendly RAG workspace</p>
             </div>
           </div>
           <nav className="hidden flex-wrap gap-2 md:flex">
@@ -85,10 +81,7 @@ export function LandingPage() {
               Knowledge Base
             </a>
           </nav>
-          <Link
-            href="/dashboard"
-            className={cn(buttonVariants(), "hidden md:inline-flex")}
-          >
+          <Link href="/dashboard" className={cn(buttonVariants(), "hidden md:inline-flex")}>
             Open Dashboard
           </Link>
         </div>
@@ -108,8 +101,8 @@ export function LandingPage() {
                 Ask course questions and get cited answers in one bright workspace.
               </h1>
               <p className="max-w-2xl text-base font-semibold text-slate-600 md:text-lg">
-                OrbitDocs helps students learn from course files using chat, while
-                teachers manage uploaded documents in a separate knowledge base view.
+                OrbitDocs helps students learn from course files using chat, while teachers manage
+                uploaded documents in a separate knowledge base view.
               </p>
             </div>
 
@@ -127,19 +120,14 @@ export function LandingPage() {
                 Launch workspace
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <a
-                href="#workflow"
-                className={buttonVariants({ variant: "secondary", size: "lg" })}
-              >
+              <a href="#workflow" className={buttonVariants({ variant: "secondary", size: "lg" })}>
                 See the flow
               </a>
             </div>
           </div>
 
           <Card className="overflow-hidden rounded-md">
-            <div className="orbit-panel-head bg-indigo-50 text-slate-700">
-              Chat Preview
-            </div>
+            <div className="orbit-panel-head bg-indigo-50 text-slate-700">Chat Preview</div>
             <CardContent className="space-y-3 p-4">
               <div className="max-w-[75%] rounded-sm border-2 border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700">
                 What is a Use Case Model?
@@ -148,8 +136,8 @@ export function LandingPage() {
                 Can you compare Sequence vs Communication diagrams?
               </div>
               <div className="rounded-sm border-2 border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700">
-                Sequence diagrams focus on time order, while communication diagrams
-                focus on object collaboration [1].
+                Sequence diagrams focus on time order, while communication diagrams focus on object
+                collaboration [1].
               </div>
             </CardContent>
           </Card>
@@ -213,9 +201,7 @@ export function LandingPage() {
         </section>
 
         <section id="workflow" className="orbit-frame overflow-hidden">
-          <div className="orbit-panel-head bg-orange-50 text-slate-700">
-            How It Works
-          </div>
+          <div className="orbit-panel-head bg-orange-50 text-slate-700">How It Works</div>
           <div className="grid gap-4 p-4 md:grid-cols-4">
             {workflow.map((step, index) => (
               <Card key={step} className="shadow-chip">

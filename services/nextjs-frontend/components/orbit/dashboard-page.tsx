@@ -58,8 +58,7 @@ const initialConversations: Conversation[] = [
       {
         id: "m2",
         role: "assistant",
-        text:
-          "A use case model captures how actors reach goals with the system. It keeps the focus on user intent and system scope before internal design details.",
+        text: "A use case model captures how actors reach goals with the system. It keeps the focus on user intent and system scope before internal design details.",
         citations: [
           {
             id: "c1",
@@ -84,8 +83,7 @@ const initialConversations: Conversation[] = [
       {
         id: "m4",
         role: "assistant",
-        text:
-          "MVC helps when UI behavior changes often because it separates interaction flow from display concerns. Layered architecture is stronger when service boundaries and dependency direction matter most.",
+        text: "MVC helps when UI behavior changes often because it separates interaction flow from display concerns. Layered architecture is stronger when service boundaries and dependency direction matter most.",
         citations: [
           {
             id: "c2",
@@ -233,7 +231,7 @@ export function DashboardPage() {
       ? "Knowledge Base"
       : isNewChat
         ? "New Chat"
-        : activeConversation?.title ?? "Workspace";
+        : (activeConversation?.title ?? "Workspace");
   const subtitle =
     view === "knowledge"
       ? "Upload and organize teacher-approved course documents for cited answers."
@@ -398,12 +396,8 @@ export function DashboardPage() {
                       : "border-slate-300 bg-white",
                   )}
                 >
-                  <p className="text-sm font-extrabold text-slate-800">
-                    {conversation.title}
-                  </p>
-                  <p className="text-xs font-bold text-slate-500">
-                    {conversation.summary}
-                  </p>
+                  <p className="text-sm font-extrabold text-slate-800">{conversation.title}</p>
+                  <p className="text-xs font-bold text-slate-500">{conversation.summary}</p>
                 </button>
               ))}
             </div>
@@ -463,7 +457,11 @@ export function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Tabs value={view} onValueChange={(value) => setView(value as ViewMode)} className="flex-1">
+          <Tabs
+            value={view}
+            onValueChange={(value) => setView(value as ViewMode)}
+            className="flex-1"
+          >
             <TabsContent value="chat" className="mt-0">
               <div className="orbit-frame flex min-h-[720px] flex-col overflow-hidden">
                 <ScrollArea className="h-[500px] flex-1 bg-white/70 px-4 py-4 md:px-5">
@@ -530,9 +528,8 @@ export function DashboardPage() {
                             What would you like to learn today?
                           </CardTitle>
                           <p className="max-w-2xl text-sm font-semibold text-slate-600 md:text-base">
-                            Ask about models, patterns, or diagrams. OrbitDocs
-                            answers from the course library and shows the exact
-                            source.
+                            Ask about models, patterns, or diagrams. OrbitDocs answers from the
+                            course library and shows the exact source.
                           </p>
                         </CardHeader>
                         <CardContent className="flex flex-wrap gap-2">
@@ -552,7 +549,10 @@ export function DashboardPage() {
                   )}
                 </ScrollArea>
 
-                <form onSubmit={handleSubmit} className="border-t-2 border-slate-700 bg-slate-50/90 p-4 md:p-5">
+                <form
+                  onSubmit={handleSubmit}
+                  className="border-t-2 border-slate-700 bg-slate-50/90 p-4 md:p-5"
+                >
                   <Card className="overflow-hidden">
                     <div className="border-b-2 border-slate-700 bg-amber-50 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-slate-600">
                       Searching in: {course}
@@ -587,9 +587,8 @@ export function DashboardPage() {
                           Teach the AI with clean course materials.
                         </CardTitle>
                         <p className="mt-3 text-sm font-semibold leading-6 text-slate-600 md:text-base">
-                          Teachers can add lecture slides, PDFs, and handouts here
-                          without crowding the student chat. Students only see cited
-                          answers from approved files.
+                          Teachers can add lecture slides, PDFs, and handouts here without crowding
+                          the student chat. Students only see cited answers from approved files.
                         </p>
                       </div>
                       <div className="rounded-md border-2 border-dashed border-slate-400 bg-slate-50 p-5">
@@ -602,8 +601,8 @@ export function DashboardPage() {
                               Drop lecture slides or PDFs here
                             </p>
                             <p className="mt-2 text-sm font-semibold text-slate-600">
-                              PDF, DOCX, PPTX, or Markdown. New files appear as
-                              processing cards below.
+                              PDF, DOCX, PPTX, or Markdown. New files appear as processing cards
+                              below.
                             </p>
                           </div>
                         </div>
@@ -684,8 +683,8 @@ export function DashboardPage() {
                 </div>
 
                 <div className="border-t-2 border-slate-700 bg-orange-50 px-5 py-4 text-sm font-bold text-slate-600">
-                  Knowledge Base is a teacher workspace. The student chat stays
-                  focused on questions, answers, and citations.
+                  Knowledge Base is a teacher workspace. The student chat stays focused on
+                  questions, answers, and citations.
                 </div>
               </div>
             </TabsContent>
