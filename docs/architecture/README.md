@@ -36,13 +36,14 @@ The system will support:
 
 ## Recommended Reading Order
 
-1. [C4 Diagrams](./c4-diagrams.md) - system overview and service boundaries.
-2. [Backend Microservices](./backend-microservices.md) - responsibilities and API ownership.
-3. [RAG and Data Architecture](./rag-and-data.md) - document ingestion, retrieval, and storage.
-4. [DevSecOps](./devsecops.md) - CI/CD, quality, and security scanning.
-5. [Observability](./observability.md) - metrics, dashboards, and future alerts.
-6. [Deployment Roadmap](./deployment-roadmap.md) - local first, Kubernetes later.
-7. [Architecture Decision Records](./adr/) - reasons behind major decisions.
+1. [Use Case Diagram](./use-case-diagram.md) - actors and major system interactions.
+2. [C4 Diagrams](./c4-diagrams.md) - system overview and service boundaries.
+3. [Backend Microservices](./backend-microservices.md) - responsibilities and API ownership.
+4. [RAG and Data Architecture](./rag-and-data.md) - document ingestion, retrieval, and storage.
+5. [DevSecOps](./devsecops.md) - CI/CD, quality, and security scanning.
+6. [Observability](./observability.md) - metrics, dashboards, and future alerts.
+7. [Deployment Roadmap](./deployment-roadmap.md) - local first, Kubernetes later.
+8. [Architecture Decision Records](./adr/) - reasons behind major decisions.
 
 ## Glossary
 
