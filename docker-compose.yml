@@ -20,7 +20,7 @@ services:
 
   nextjs-frontend:
     build:
-      context: ./services/nextjs-frontend
+      context: ./frontend
     container_name: swd392-frontend
     ports:
       - "3000:3000"
@@ -36,7 +36,7 @@ services:
 
   java-backend:
     build:
-      context: ./services/java-backend
+      context: ./backend
     container_name: swd392-java-backend
     ports:
       - "8081:8081"
@@ -52,7 +52,7 @@ services:
 
   python-backend:
     build:
-      context: ./services/python-backend
+      context: ./rag-backend
     container_name: swd392-python-backend
     ports:
       - "8002:8000"

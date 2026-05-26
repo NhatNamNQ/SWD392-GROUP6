@@ -72,9 +72,9 @@ flowchart TD
 | `docs/architecture/` | Architecture handbook, diagrams, DevSecOps, observability, and ADRs |
 | `docs/swd392-chatbot-user-stories.md` | Product stories and acceptance criteria |
 | `docs/embeddings/` | Embedding and retrieval reference material |
-| `services/nextjs-frontend/` | Future Next.js frontend workspace |
-| `services/java-backend/` | Future integration point for the Java backend submodule |
-| `services/python-backend/` | Future Python FastAPI RAG service workspace |
+| `frontend/` | Future Next.js frontend workspace |
+| `backend/` | Future integration point for the Java backend submodule |
+| `rag-backend/` | Future Python FastAPI RAG service workspace |
 | `infra/` | Future infrastructure documentation and IaC |
 | `scripts/` | Future helper scripts for setup, seed data, and tests |
 

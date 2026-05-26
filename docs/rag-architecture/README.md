@@ -27,7 +27,7 @@ architecture because it adds another datastore for the team to operate.
 ## Suggested Python Service Structure
 
 ```text
-services/python-backend/
+rag-backend/
 ├── app/
 │   ├── api/                   # FastAPI routes
 │   ├── core/                  # Configuration and exceptions
