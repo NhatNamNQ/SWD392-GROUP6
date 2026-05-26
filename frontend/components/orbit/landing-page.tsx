@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { SiteHeader } from "@/components/orbit/site-header";
 
 const features = [
   {
@@ -23,7 +24,7 @@ const features = [
   },
   {
     title: "Course Context",
-    tone: "peach" as const,
+    tone: "neutral" as const,
     description: "Every question stays scoped to the selected course so answers remain relevant.",
     icon: Files,
   },
@@ -56,36 +57,7 @@ const workflow = [
 export function LandingPage() {
   return (
     <div className="pb-12">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-slate-50/90 backdrop-blur">
-        <div className="orbit-shell flex items-center justify-between gap-3 py-3">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-sm border-2 border-slate-700 bg-emerald-100 font-black text-emerald-800 shadow-chip">
-              OD
-            </div>
-            <div>
-              <p className="text-lg font-black text-slate-800">OrbitDocs</p>
-              <p className="text-sm font-bold text-slate-500">Student-friendly RAG workspace</p>
-            </div>
-          </div>
-          <nav className="hidden flex-wrap gap-2 md:flex">
-            <a className="orbit-chip" href="#overview">
-              Overview
-            </a>
-            <a className="orbit-chip" href="#features">
-              Features
-            </a>
-            <a className="orbit-chip" href="#workflow">
-              How It Works
-            </a>
-            <a className="orbit-chip" href="#knowledge">
-              Knowledge Base
-            </a>
-          </nav>
-          <Link href="/dashboard" className={cn(buttonVariants(), "hidden md:inline-flex")}>
-            Open Dashboard
-          </Link>
-        </div>
-      </header>
+      <SiteHeader variant="landing" />
 
       <main className="orbit-shell space-y-4 pt-5">
         <section
@@ -94,7 +66,7 @@ export function LandingPage() {
         >
           <div className="space-y-4">
             <div className="space-y-3">
-              <Badge variant="yellow" className="w-fit">
+              <Badge variant="blue" className="w-fit">
                 SWD392 Prototype
               </Badge>
               <h1 className="max-w-3xl text-balance text-4xl font-black leading-[0.95] tracking-[-0.05em] text-slate-800 md:text-6xl">
@@ -108,8 +80,8 @@ export function LandingPage() {
 
             <div className="flex flex-wrap gap-2">
               <Badge variant="mint">Inline citations</Badge>
-              <Badge variant="peach">Conversation history</Badge>
-              <Badge variant="pink">Teacher document space</Badge>
+              <Badge variant="mint">Conversation history</Badge>
+              <Badge variant="mint">Teacher document space</Badge>
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
@@ -127,7 +99,7 @@ export function LandingPage() {
           </div>
 
           <Card className="overflow-hidden rounded-md">
-            <div className="orbit-panel-head bg-indigo-50 text-slate-700">Chat Preview</div>
+            <div className="orbit-panel-head bg-sky-50 text-slate-700">Chat Preview</div>
             <CardContent className="space-y-3 p-4">
               <div className="max-w-[75%] rounded-sm border-2 border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700">
                 What is a Use Case Model?
@@ -144,16 +116,16 @@ export function LandingPage() {
         </section>
 
         <section id="features" className="orbit-frame overflow-hidden">
-          <div className="orbit-panel-head bg-indigo-50 text-slate-700">Core Features</div>
+          <div className="orbit-panel-head bg-sky-50 text-slate-700">Core Features</div>
           <div className="grid gap-4 p-4 md:grid-cols-3">
             {features.map((feature) => {
               const Icon = feature.icon;
               const headerTone =
                 feature.tone === "blue"
-                  ? "bg-indigo-50"
+                  ? "bg-sky-50"
                   : feature.tone === "mint"
                     ? "bg-emerald-50"
-                    : "bg-orange-50";
+                    : "bg-sky-50";
 
               return (
                 <Card key={feature.title} className="overflow-hidden shadow-chip">
@@ -186,8 +158,8 @@ export function LandingPage() {
                     index === 0
                       ? "border-b-2 border-slate-700 bg-emerald-50"
                       : index === 1
-                        ? "border-b-2 border-slate-700 bg-indigo-50"
-                        : "border-b-2 border-slate-700 bg-orange-50"
+                        ? "border-b-2 border-slate-700 bg-sky-50"
+                        : "border-b-2 border-slate-700 bg-white"
                   }
                 >
                   <CardTitle className="text-base">{card.title}</CardTitle>
@@ -201,12 +173,12 @@ export function LandingPage() {
         </section>
 
         <section id="workflow" className="orbit-frame overflow-hidden">
-          <div className="orbit-panel-head bg-orange-50 text-slate-700">How It Works</div>
+          <div className="orbit-panel-head bg-sky-50 text-slate-700">How It Works</div>
           <div className="grid gap-4 p-4 md:grid-cols-4">
             {workflow.map((step, index) => (
               <Card key={step} className="shadow-chip">
                 <CardContent className="space-y-3 p-4">
-                  <div className="inline-flex rounded-full border-2 border-slate-700 bg-amber-100 px-3 py-1 text-xs font-black">
+                  <div className="inline-flex rounded-full border-2 border-slate-700 bg-emerald-100 px-3 py-1 text-xs font-black">
                     {index + 1}
                   </div>
                   <p className="text-sm font-bold text-slate-700">{step}</p>

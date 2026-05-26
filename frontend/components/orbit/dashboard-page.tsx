@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { SiteHeader } from "@/components/orbit/site-header";
 
 type ViewMode = "chat" | "knowledge";
 type MessageRole = "user" | "assistant";
@@ -188,8 +189,8 @@ function buildAssistantReply(message: string): Message {
   };
 }
 
-function statusVariant(status: DocumentRecord["status"]): "mint" | "yellow" {
-  return status === "Indexed" ? "mint" : "yellow";
+function statusVariant(status: DocumentRecord["status"]): "mint" | "blue" {
+  return status === "Indexed" ? "mint" : "blue";
 }
 
 export function DashboardPage() {
@@ -336,7 +337,7 @@ export function DashboardPage() {
 
   const sidebar = (
     <div className="flex h-full flex-col overflow-hidden rounded-md border-2 border-slate-700 bg-white shadow-orbit">
-      <div className="border-b-2 border-slate-700 bg-indigo-50 px-4 py-3 text-sm font-extrabold text-slate-700">
+      <div className="border-b-2 border-slate-700 bg-sky-50 px-4 py-3 text-sm font-extrabold text-slate-700">
         Workspace Navigation
       </div>
       <div className="flex h-full flex-col gap-4 p-4">
@@ -404,7 +405,7 @@ export function DashboardPage() {
           </ScrollArea>
         </div>
 
-        <div className="mt-auto rounded-sm border-2 border-slate-700 bg-pink-100 p-3">
+        <div className="mt-auto rounded-sm border-2 border-slate-700 bg-sky-50 p-3">
           <p className="text-sm font-extrabold text-slate-800">Minh Anh</p>
           <p className="text-xs font-bold text-slate-600">SWD392 student</p>
           <p className="text-xs font-bold text-slate-500">Course library access enabled</p>
@@ -414,281 +415,285 @@ export function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen px-4 py-4 md:px-5 md:py-5">
-      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1280px] gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
-        <div className="hidden lg:block">{sidebar}</div>
+    <div className="min-h-screen">
+      <SiteHeader variant="app" />
+      <div className="px-4 py-4 md:px-5 md:py-5">
+        <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1280px] gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
+          <div className="hidden lg:block">{sidebar}</div>
 
-        <div className="flex min-w-0 flex-col gap-4">
-          <Card className="overflow-hidden">
-            <CardContent className="grid gap-3 p-4 md:grid-cols-[1fr_auto] md:items-center">
-              <div className="flex items-start gap-3">
-                <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="secondary" size="icon" className="lg:hidden">
-                      <Menu className="h-5 w-5" />
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent>{sidebar}</SheetContent>
-                </Sheet>
-
-                <div>
-                  <h2 className="text-3xl font-black tracking-[-0.04em] text-slate-800 md:text-4xl">
-                    {title}
-                  </h2>
-                  <p className="mt-1 text-sm font-semibold text-slate-600 md:text-base">
-                    {subtitle}
-                  </p>
-                </div>
-              </div>
-
-              <label className="grid gap-2 text-sm font-extrabold text-slate-700">
-                Course
-                <select
-                  className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2"
-                  value={course}
-                  onChange={(event) => setCourse(event.target.value)}
-                >
-                  {courses.map((courseName) => (
-                    <option key={courseName}>{courseName}</option>
-                  ))}
-                </select>
-              </label>
-            </CardContent>
-          </Card>
-
-          <Tabs
-            value={view}
-            onValueChange={(value) => setView(value as ViewMode)}
-            className="flex-1"
-          >
-            <TabsContent value="chat" className="mt-0">
-              <div className="orbit-frame flex min-h-[720px] flex-col overflow-hidden">
-                <ScrollArea className="h-[500px] flex-1 bg-white/70 px-4 py-4 md:px-5">
-                  {activeConversation?.messages?.length ? (
-                    <div className="space-y-4 pr-2">
-                      {activeConversation.messages.map((message) => (
-                        <article
-                          key={message.id}
-                          className={cn(
-                            "max-w-[90%] rounded-md border-2 px-4 py-4 shadow-chip md:max-w-[80%]",
-                            message.role === "user"
-                              ? "ml-auto border-sky-300 bg-sky-100"
-                              : "border-slate-300 bg-white",
-                          )}
-                        >
-                          <p className="mb-2 text-xs font-black uppercase tracking-[0.08em] text-slate-500">
-                            {message.role === "user" ? "You" : "OrbitDocs"}
-                          </p>
-                          <p className="text-sm font-bold leading-6 text-slate-700">
-                            {message.text}
-                          </p>
-                          {message.citations?.length ? (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {message.citations.map((citation, index) => {
-                                const open = openCitationId === citation.id;
-
-                                return (
-                                  <div key={citation.id} className="relative">
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        setOpenCitationId((current) =>
-                                          current === citation.id ? null : citation.id,
-                                        )
-                                      }
-                                      className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-extrabold text-slate-700"
-                                    >
-                                      [{index + 1}] {citation.label}
-                                    </button>
-                                    {open ? (
-                                      <div className="absolute left-0 top-[calc(100%+0.5rem)] z-10 w-72 rounded-sm border-2 border-slate-700 bg-white p-3 text-xs font-bold text-slate-600 shadow-orbit">
-                                        <p className="mb-1 text-xs font-black text-slate-800">
-                                          {citation.label}
-                                        </p>
-                                        <p>{citation.snippet}</p>
-                                      </div>
-                                    ) : null}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : null}
-                        </article>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="grid min-h-full place-items-center">
-                      <Card className="w-full max-w-3xl bg-paper">
-                        <CardHeader className="space-y-4">
-                          <Badge variant="blue" className="w-fit">
-                            SWD392 study helper
-                          </Badge>
-                          <CardTitle className="text-3xl md:text-4xl">
-                            What would you like to learn today?
-                          </CardTitle>
-                          <p className="max-w-2xl text-sm font-semibold text-slate-600 md:text-base">
-                            Ask about models, patterns, or diagrams. OrbitDocs answers from the
-                            course library and shows the exact source.
-                          </p>
-                        </CardHeader>
-                        <CardContent className="flex flex-wrap gap-2">
-                          {promptSuggestions.map((prompt) => (
-                            <button
-                              key={prompt}
-                              type="button"
-                              className="orbit-chip text-left"
-                              onClick={() => handlePromptClick(prompt)}
-                            >
-                              {prompt}
-                            </button>
-                          ))}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
-                </ScrollArea>
-
-                <form
-                  onSubmit={handleSubmit}
-                  className="border-t-2 border-slate-700 bg-slate-50/90 p-4 md:p-5"
-                >
-                  <Card className="overflow-hidden">
-                    <div className="border-b-2 border-slate-700 bg-amber-50 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-slate-600">
-                      Searching in: {course}
-                    </div>
-                    <CardContent className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-                      <Textarea
-                        value={chatInput}
-                        onChange={(event) => setChatInput(event.target.value)}
-                        placeholder="Ask about a lecture, diagram, pattern, or assignment..."
-                        aria-label="Chat input"
-                        className="min-h-[116px]"
-                      />
-                      <Button type="submit" size="lg" className="md:h-[116px] md:w-[120px]">
-                        Send
+          <div className="flex min-w-0 flex-col gap-4">
+            <Card className="overflow-hidden">
+              <CardContent className="grid gap-3 p-4 md:grid-cols-[1fr_auto] md:items-center">
+                <div className="flex items-start gap-3">
+                  <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                    <SheetTrigger asChild>
+                      <Button variant="secondary" size="icon" className="lg:hidden">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Open menu</span>
                       </Button>
-                    </CardContent>
-                  </Card>
-                </form>
-              </div>
-            </TabsContent>
+                    </SheetTrigger>
+                    <SheetContent>{sidebar}</SheetContent>
+                  </Sheet>
 
-            <TabsContent value="knowledge" className="mt-0">
-              <div className="orbit-frame min-h-[720px] overflow-hidden">
-                <div className="grid gap-4 p-4 md:p-5 xl:grid-cols-[1.05fr_0.95fr]">
-                  <Card className="overflow-hidden">
-                    <div className="orbit-panel-head bg-emerald-50 text-slate-700">
-                      Knowledge Base
-                    </div>
-                    <CardContent className="space-y-4 p-5">
-                      <div>
-                        <CardTitle className="text-3xl md:text-4xl">
-                          Teach the AI with clean course materials.
-                        </CardTitle>
-                        <p className="mt-3 text-sm font-semibold leading-6 text-slate-600 md:text-base">
-                          Teachers can add lecture slides, PDFs, and handouts here without crowding
-                          the student chat. Students only see cited answers from approved files.
-                        </p>
-                      </div>
-                      <div className="rounded-md border-2 border-dashed border-slate-400 bg-slate-50 p-5">
-                        <div className="flex items-start gap-3">
-                          <div className="rounded-sm border-2 border-slate-700 bg-white p-2 shadow-chip">
-                            <Upload className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <p className="text-lg font-black text-slate-800">
-                              Drop lecture slides or PDFs here
-                            </p>
-                            <p className="mt-2 text-sm font-semibold text-slate-600">
-                              PDF, DOCX, PPTX, or Markdown. New files appear as processing cards
-                              below.
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mt-4 flex flex-wrap gap-3">
-                          <input
-                            id={fileInputId}
-                            ref={fileInputRef}
-                            type="file"
-                            multiple
-                            className="sr-only"
-                            onChange={(event) => addFiles(event.target.files)}
-                          />
-                          <Button type="button" onClick={() => fileInputRef.current?.click()}>
-                            Choose files
-                          </Button>
-                          <Badge variant="peach">Prototype upload flow</Badge>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div>
+                    <h2 className="text-3xl font-black tracking-[-0.04em] text-slate-800 md:text-4xl">
+                      {title}
+                    </h2>
+                    <p className="mt-1 text-sm font-semibold text-slate-600 md:text-base">
+                      {subtitle}
+                    </p>
+                  </div>
+                </div>
 
-                  <Card className="overflow-hidden">
-                    <div className="orbit-panel-head bg-indigo-50 text-slate-700">
-                      Document Library
-                    </div>
-                    <CardContent className="space-y-4 p-5">
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+                  Course
+                  <select
+                    className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2"
+                    value={course}
+                    onChange={(event) => setCourse(event.target.value)}
+                  >
+                    {courses.map((courseName) => (
+                      <option key={courseName}>{courseName}</option>
+                    ))}
+                  </select>
+                </label>
+              </CardContent>
+            </Card>
+
+            <Tabs
+              value={view}
+              onValueChange={(value) => setView(value as ViewMode)}
+              className="flex-1"
+            >
+              <TabsContent value="chat" className="mt-0">
+                <div className="orbit-frame flex min-h-[720px] flex-col overflow-hidden">
+                  <ScrollArea className="h-[500px] flex-1 bg-white/70 px-4 py-4 md:px-5">
+                    {activeConversation?.messages?.length ? (
+                      <div className="space-y-4 pr-2">
+                        {activeConversation.messages.map((message) => (
+                          <article
+                            key={message.id}
+                            className={cn(
+                              "max-w-[90%] rounded-md border-2 px-4 py-4 shadow-chip md:max-w-[80%]",
+                              message.role === "user"
+                                ? "ml-auto border-sky-300 bg-sky-100"
+                                : "border-slate-300 bg-white",
+                            )}
+                          >
+                            <p className="mb-2 text-xs font-black uppercase tracking-[0.08em] text-slate-500">
+                              {message.role === "user" ? "You" : "OrbitDocs"}
+                            </p>
+                            <p className="text-sm font-bold leading-6 text-slate-700">
+                              {message.text}
+                            </p>
+                            {message.citations?.length ? (
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {message.citations.map((citation, index) => {
+                                  const open = openCitationId === citation.id;
+
+                                  return (
+                                    <div key={citation.id} className="relative">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setOpenCitationId((current) =>
+                                            current === citation.id ? null : citation.id,
+                                          )
+                                        }
+                                        className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-extrabold text-slate-700"
+                                      >
+                                        [{index + 1}] {citation.label}
+                                      </button>
+                                      {open ? (
+                                        <div className="absolute left-0 top-[calc(100%+0.5rem)] z-10 w-72 rounded-sm border-2 border-slate-700 bg-white p-3 text-xs font-bold text-slate-600 shadow-orbit">
+                                          <p className="mb-1 text-xs font-black text-slate-800">
+                                            {citation.label}
+                                          </p>
+                                          <p>{citation.snippet}</p>
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : null}
+                          </article>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid min-h-full place-items-center">
+                        <Card className="w-full max-w-3xl bg-paper">
+                          <CardHeader className="space-y-4">
+                            <Badge variant="blue" className="w-fit">
+                              SWD392 study helper
+                            </Badge>
+                            <CardTitle className="text-3xl md:text-4xl">
+                              What would you like to learn today?
+                            </CardTitle>
+                            <p className="max-w-2xl text-sm font-semibold text-slate-600 md:text-base">
+                              Ask about models, patterns, or diagrams. OrbitDocs answers from the
+                              course library and shows the exact source.
+                            </p>
+                          </CardHeader>
+                          <CardContent className="flex flex-wrap gap-2">
+                            {promptSuggestions.map((prompt) => (
+                              <button
+                                key={prompt}
+                                type="button"
+                                className="orbit-chip text-left"
+                                onClick={() => handlePromptClick(prompt)}
+                              >
+                                {prompt}
+                              </button>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </ScrollArea>
+
+                  <form
+                    onSubmit={handleSubmit}
+                    className="border-t-2 border-slate-700 bg-slate-50/90 p-4 md:p-5"
+                  >
+                    <Card className="overflow-hidden">
+                      <div className="border-b-2 border-slate-700 bg-sky-50 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-slate-600">
+                        Searching in: {course}
+                      </div>
+                      <CardContent className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+                        <Textarea
+                          value={chatInput}
+                          onChange={(event) => setChatInput(event.target.value)}
+                          placeholder="Ask about a lecture, diagram, pattern, or assignment..."
+                          aria-label="Chat input"
+                          className="min-h-[116px]"
+                        />
+                        <Button type="submit" size="lg" className="md:h-[116px] md:w-[120px]">
+                          Send
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </form>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="knowledge" className="mt-0">
+                <div className="orbit-frame min-h-[720px] overflow-hidden">
+                  <div className="grid gap-4 p-4 md:p-5 xl:grid-cols-[1.05fr_0.95fr]">
+                    <Card className="overflow-hidden">
+                      <div className="orbit-panel-head bg-emerald-50 text-slate-700">
+                        Knowledge Base
+                      </div>
+                      <CardContent className="space-y-4 p-5">
                         <div>
-                          <p className="text-xl font-black text-slate-800">Teacher files</p>
-                          <p className="text-sm font-semibold text-slate-500">
-                            Filter by document or tag
+                          <CardTitle className="text-3xl md:text-4xl">
+                            Teach the AI with clean course materials.
+                          </CardTitle>
+                          <p className="mt-3 text-sm font-semibold leading-6 text-slate-600 md:text-base">
+                            Teachers can add lecture slides, PDFs, and handouts here without
+                            crowding the student chat. Students only see cited answers from approved
+                            files.
                           </p>
                         </div>
-                        <div className="relative w-full sm:max-w-xs">
-                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                          <Input
-                            className="pl-9"
-                            type="search"
-                            value={docQuery}
-                            onChange={(event) => setDocQuery(event.target.value)}
-                            placeholder="Filter documents"
-                            aria-label="Filter documents"
-                          />
+                        <div className="rounded-md border-2 border-dashed border-slate-400 bg-slate-50 p-5">
+                          <div className="flex items-start gap-3">
+                            <div className="rounded-sm border-2 border-slate-700 bg-white p-2 shadow-chip">
+                              <Upload className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <p className="text-lg font-black text-slate-800">
+                                Drop lecture slides or PDFs here
+                              </p>
+                              <p className="mt-2 text-sm font-semibold text-slate-600">
+                                PDF, DOCX, PPTX, or Markdown. New files appear as processing cards
+                                below.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-4 flex flex-wrap gap-3">
+                            <input
+                              id={fileInputId}
+                              ref={fileInputRef}
+                              type="file"
+                              multiple
+                              className="sr-only"
+                              onChange={(event) => addFiles(event.target.files)}
+                            />
+                            <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                              Choose files
+                            </Button>
+                            <Badge variant="mint">Prototype upload flow</Badge>
+                          </div>
                         </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="overflow-hidden">
+                      <div className="orbit-panel-head bg-sky-50 text-slate-700">
+                        Document Library
                       </div>
-
-                      <ScrollArea className="h-[470px] rounded-md">
-                        <div className="grid gap-3 pr-3">
-                          {filteredDocuments.map((document) => (
-                            <Card key={document.id} className="shadow-chip">
-                              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex items-start gap-3">
-                                  <div className="rounded-sm border-2 border-slate-700 bg-slate-50 p-2">
-                                    <BookOpen className="h-4 w-4 text-slate-600" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-extrabold text-slate-800">
-                                      {document.title}
-                                    </p>
-                                    <p className="text-xs font-bold text-slate-500">
-                                      {document.size}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  <Badge variant={statusVariant(document.status)}>
-                                    {document.status}
-                                  </Badge>
-                                  <Badge variant="blue">{document.tag}</Badge>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
+                      <CardContent className="space-y-4 p-5">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="text-xl font-black text-slate-800">Teacher files</p>
+                            <p className="text-sm font-semibold text-slate-500">
+                              Filter by document or tag
+                            </p>
+                          </div>
+                          <div className="relative w-full sm:max-w-xs">
+                            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <Input
+                              className="pl-9"
+                              type="search"
+                              value={docQuery}
+                              onChange={(event) => setDocQuery(event.target.value)}
+                              placeholder="Filter documents"
+                              aria-label="Filter documents"
+                            />
+                          </div>
                         </div>
-                      </ScrollArea>
-                    </CardContent>
-                  </Card>
-                </div>
 
-                <div className="border-t-2 border-slate-700 bg-orange-50 px-5 py-4 text-sm font-bold text-slate-600">
-                  Knowledge Base is a teacher workspace. The student chat stays focused on
-                  questions, answers, and citations.
+                        <ScrollArea className="h-[470px] rounded-md">
+                          <div className="grid gap-3 pr-3">
+                            {filteredDocuments.map((document) => (
+                              <Card key={document.id} className="shadow-chip">
+                                <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                                  <div className="flex items-start gap-3">
+                                    <div className="rounded-sm border-2 border-slate-700 bg-slate-50 p-2">
+                                      <BookOpen className="h-4 w-4 text-slate-600" />
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-extrabold text-slate-800">
+                                        {document.title}
+                                      </p>
+                                      <p className="text-xs font-bold text-slate-500">
+                                        {document.size}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    <Badge variant={statusVariant(document.status)}>
+                                      {document.status}
+                                    </Badge>
+                                    <Badge variant="blue">{document.tag}</Badge>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <div className="border-t-2 border-slate-700 bg-emerald-50 px-5 py-4 text-sm font-bold text-slate-600">
+                    Knowledge Base is a teacher workspace. The student chat stays focused on
+                    questions, answers, and citations.
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
     </div>

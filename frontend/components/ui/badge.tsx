@@ -10,10 +10,7 @@ const badgeVariants = cva(
       variant: {
         default: "border-slate-300 bg-white text-slate-700",
         mint: "border-emerald-300 bg-emerald-100 text-emerald-800",
-        peach: "border-orange-300 bg-orange-100 text-orange-800",
-        pink: "border-pink-300 bg-pink-100 text-pink-800",
         blue: "border-sky-300 bg-sky-100 text-sky-800",
-        yellow: "border-amber-300 bg-amber-100 text-amber-800",
       },
     },
     defaultVariants: {
