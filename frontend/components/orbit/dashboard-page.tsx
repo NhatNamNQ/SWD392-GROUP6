@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useDeferredValue, useId, useRef, useState } from "react";
+import { startTransition, useDeferredValue, useId, useMemo, useRef, useState } from "react";
 import { BookOpen, Menu, Search, Upload } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -212,18 +212,30 @@ export function DashboardPage() {
   const deferredHistoryQuery = useDeferredValue(historyQuery);
   const deferredDocQuery = useDeferredValue(docQuery);
 
-  const filteredConversations = conversations.filter((conversation) =>
-    conversation.title.toLowerCase().includes(deferredHistoryQuery.toLowerCase()),
+  const normalizedHistoryQuery = deferredHistoryQuery.trim().toLowerCase();
+  const normalizedDocQuery = deferredDocQuery.trim().toLowerCase();
+
+  const filteredConversations = useMemo(
+    () =>
+      conversations.filter((conversation) =>
+        conversation.title.toLowerCase().includes(normalizedHistoryQuery),
+      ),
+    [conversations, normalizedHistoryQuery],
   );
 
-  const filteredDocuments = documents.filter((document) =>
-    `${document.title} ${document.tag} ${document.status}`
-      .toLowerCase()
-      .includes(deferredDocQuery.toLowerCase()),
+  const filteredDocuments = useMemo(
+    () =>
+      documents.filter((document) =>
+        `${document.title} ${document.tag} ${document.status}`
+          .toLowerCase()
+          .includes(normalizedDocQuery),
+      ),
+    [documents, normalizedDocQuery],
   );
 
-  const activeConversation = conversations.find(
-    (conversation) => conversation.id === activeConversationId,
+  const activeConversation = useMemo(
+    () => conversations.find((conversation) => conversation.id === activeConversationId),
+    [activeConversationId, conversations],
   );
 
   const isNewChat = activeConversationId === null;
@@ -432,7 +444,12 @@ export function DashboardPage() {
                         <span className="sr-only">Open menu</span>
                       </Button>
                     </SheetTrigger>
-                    <SheetContent>{sidebar}</SheetContent>
+                    <SheetContent>
+                      <SheetHeader className="sr-only">
+                        <SheetTitle>Workspace navigation</SheetTitle>
+                      </SheetHeader>
+                      {sidebar}
+                    </SheetContent>
                   </Sheet>
 
                   <div>
