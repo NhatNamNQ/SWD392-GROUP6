@@ -15,12 +15,13 @@ Read the [Architecture Handbook](docs/architecture/README.md) first.
 Recommended order:
 
 1. [Architecture Handbook](docs/architecture/README.md)
-2. [C4 Diagrams](docs/architecture/c4-diagrams.md)
-3. [Backend Microservices](docs/architecture/backend-microservices.md)
-4. [RAG and Data Architecture](docs/architecture/rag-and-data.md)
-5. [DevSecOps](docs/architecture/devsecops.md)
-6. [Observability](docs/architecture/observability.md)
-7. [Deployment Roadmap](docs/architecture/deployment-roadmap.md)
+2. [Use Case Diagram](docs/architecture/use-case-diagram.md)
+3. [C4 Diagrams](docs/architecture/c4-diagrams.md)
+4. [Backend Microservices](docs/architecture/backend-microservices.md)
+5. [RAG and Data Architecture](docs/architecture/rag-and-data.md)
+6. [DevSecOps](docs/architecture/devsecops.md)
+7. [Observability](docs/architecture/observability.md)
+8. [Deployment Roadmap](docs/architecture/deployment-roadmap.md)
 
 ## Target Architecture
 
