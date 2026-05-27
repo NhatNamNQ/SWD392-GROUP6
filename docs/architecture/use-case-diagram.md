@@ -33,18 +33,28 @@ flowchart LR
     Admin[Admin]
 
     subgraph OrbitDocs["OrbitDocs System"]
-        UC1([Register Account])
-        UC2([Log In])
-        UC3([Start Chat Session])
-        UC4([Ask Course Question])
-        UC5([View Answer Citations])
-        UC6([Review Chat History])
-        UC7([Upload Study Materials])
-        UC8([Manage Document Library])
-        UC9([Review Indexing Status])
-        UC10([Manage Users and Roles])
-        UC11([Monitor System Status])
-        UC12([Manage Course Access Policies])
+        direction TB
+
+        subgraph StudentUC["Student Learning Flows"]
+            UC1([Register Account])
+            UC2([Log In])
+            UC3([Start Chat Session])
+            UC4([Ask Course Question])
+            UC5([View Answer Citations])
+            UC6([Review Chat History])
+        end
+
+        subgraph TeacherUC["Teacher Content Flows"]
+            UC7([Upload Study Materials])
+            UC8([Manage Document Library])
+            UC9([Review Indexing Status])
+        end
+
+        subgraph AdminUC["Admin Governance Flows"]
+            UC10([Manage Users and Roles])
+            UC11([Monitor System Status])
+            UC12([Manage Course Access Policies])
+        end
     end
 
     Student --> UC1
@@ -62,11 +72,11 @@ flowchart LR
     Teacher --> UC5
 
     Admin --> UC2
+    Admin --> UC8
+    Admin --> UC9
     Admin --> UC10
     Admin --> UC11
     Admin --> UC12
-    Admin --> UC8
-    Admin --> UC9
 
     UC3 -. "<<include>>" .-> UC2
     UC4 -. "<<include>>" .-> UC3
