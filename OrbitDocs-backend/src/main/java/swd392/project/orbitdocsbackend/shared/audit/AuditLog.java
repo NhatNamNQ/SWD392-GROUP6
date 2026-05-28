@@ -1,10 +1,10 @@
-package swd392.project.orbitdocsbackend.admin.entity;
+package swd392.project.orbitdocsbackend.shared.audit;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import swd392.project.orbitdocsbackend.user.entity.User;
+import swd392.project.orbitdocsbackend.identity.entity.User;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -2,7 +2,7 @@ package swd392.project.orbitdocsbackend.course.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import swd392.project.orbitdocsbackend.user.entity.User;
+import swd392.project.orbitdocsbackend.identity.entity.User;
 import java.time.Instant;
 import java.util.UUID;
 

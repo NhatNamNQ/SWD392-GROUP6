@@ -6,7 +6,7 @@ import swd392.project.orbitdocsbackend.course.entity.Course;
 import swd392.project.orbitdocsbackend.document.entity.Chapter;
 import swd392.project.orbitdocsbackend.document.entity.Document;
 import swd392.project.orbitdocsbackend.shared.entity.BaseEntity;
-import swd392.project.orbitdocsbackend.user.entity.User;
+import swd392.project.orbitdocsbackend.identity.entity.User;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

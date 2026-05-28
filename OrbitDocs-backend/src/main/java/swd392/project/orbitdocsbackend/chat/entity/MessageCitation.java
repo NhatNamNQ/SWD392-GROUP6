@@ -3,7 +3,7 @@ package swd392.project.orbitdocsbackend.chat.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import swd392.project.orbitdocsbackend.document.entity.Document;
-import swd392.project.orbitdocsbackend.rag.entity.DocumentChunk;
+import swd392.project.orbitdocsbackend.document.entity.DocumentChunk;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.rag.entity;
+package swd392.project.orbitdocsbackend.document.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

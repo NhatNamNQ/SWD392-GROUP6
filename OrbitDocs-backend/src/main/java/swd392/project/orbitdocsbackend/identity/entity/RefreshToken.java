@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.user.entity;
+package swd392.project.orbitdocsbackend.identity.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
