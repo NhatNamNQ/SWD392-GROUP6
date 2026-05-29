@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, BookCopy, BrainCircuit, Files } from "lucide-react";
 
+import { SiteHeader } from "@/components/shared/site-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { SiteHeader } from "@/components/orbit/site-header";
 
 const features = [
   {
