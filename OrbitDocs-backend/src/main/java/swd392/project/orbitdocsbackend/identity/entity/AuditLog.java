@@ -1,11 +1,9 @@
-package swd392.project.orbitdocsbackend.shared.audit;
+package swd392.project.orbitdocsbackend.identity.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import swd392.project.orbitdocsbackend.identity.entity.User;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -14,9 +12,13 @@ import java.util.UUID;
  * a significant state-changing action (user management, course changes,
  * document operations, role assignments, etc.).
  *
- * <p>Rows are <em>never updated or deleted</em> — append-only table.</p>
+ * <p>
+ * Rows are <em>never updated or deleted</em> — append-only table.
+ * </p>
  *
- * <p>Module: admin</p>
+ * <p>
+ * Module: admin
+ * </p>
  */
 @Entity
 @Table(name = "audit_logs")
