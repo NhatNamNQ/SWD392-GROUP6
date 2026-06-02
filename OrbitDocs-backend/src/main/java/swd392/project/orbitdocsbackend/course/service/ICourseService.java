@@ -1,0 +1,17 @@
+package swd392.project.orbitdocsbackend.course.service;
+
+import org.springframework.data.domain.Page;
+import swd392.project.orbitdocsbackend.course.dto.request.CourseRequest;
+import swd392.project.orbitdocsbackend.course.dto.response.CourseResponse;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface ICourseService {
+    CourseResponse createCourse(CourseRequest request);
+    CourseResponse getCourseById(UUID id);
+    List<CourseResponse> getAllCourses();
+    Page<CourseResponse> searchCoursesByCode(String code, int pageNo, int pageSize);
+    CourseResponse updateCourse(UUID id, CourseRequest request);
+    void assignLecturer(UUID courseId, UUID lecturerId);
+}
