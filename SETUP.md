@@ -2,108 +2,121 @@
 
 ## Yêu cầu hệ thống
 
-| Công cụ | Phiên bản tối thiểu |
-|---------|---------------------|
-| Java | 17+ |
-| Maven | 3.9+ |
-| Python | 3.11+ |
-| PostgreSQL | 15+ (có extension `pgvector`) |
-| Ollama | latest |
-| Git | 2.x |
+| Công cụ | Phiên bản tối thiểu | Ghi chú |
+|---------|---------------------|---------|
+| Docker | 24+ | Chạy PostgreSQL, Ollama |
+| Docker Compose | v2+ | Đi kèm Docker Desktop |
+| Java | 17+ | Chạy Java Backend |
+| Maven | 3.9+ | Build Java Backend |
+| Python | 3.11+ | Chạy RAG Backend |
+| Git | 2.x | |
 
 ---
 
-## 1. Cài đặt PostgreSQL + pgvector
+## 1. Clone & cấu hình `.env`
 
 ```bash
-# Tạo database
-psql -U postgres
-CREATE USER orbitdocs_admin WITH PASSWORD 'orbitdocs_password';
-CREATE DATABASE orbitdocs_db OWNER orbitdocs_admin;
-\c orbitdocs_db
-CREATE EXTENSION IF NOT EXISTS vector;
-\q
+git clone https://github.com/NhatNamNQ/SWD392-GROUP6.git
+cd SWD392-GROUP6
+cp .env.example .env
 ```
 
-> **Lưu ý:** Nếu dùng Docker thì chạy image `pgvector/pgvector:pg16` để có sẵn extension.
-
----
-
-## 2. Cài đặt Ollama + Embedding Model
-
-```bash
-# Cài đặt Ollama: https://ollama.ai
-# Pull embedding model
-ollama pull qwen3-embedding:0.6b
-```
-
-Kiểm tra Ollama đang chạy tại `http://localhost:11434`:
-```bash
-curl http://localhost:11434/api/tags
-```
-
----
-
-## 3. Cấu hình file `.env`
-
-Tạo file `.env` ở **thư mục gốc** của project (cùng cấp với `OrbitDocs-backend/` và `rag-backend/`):
+Mở file `.env` và sửa các giá trị cho phù hợp:
 
 ```env
 # PostgreSQL
+POSTGRES_DB=orbitdocs_db
+POSTGRES_USER=orbitdocs_admin
+POSTGRES_PASSWORD=your_strong_password
+
+# Java Backend (JDBC)
 DB_URL=jdbc:postgresql://localhost:5432/orbitdocs_db
 DB_USERNAME=orbitdocs_admin
-DB_PASSWORD=orbitdocs_password
+DB_PASSWORD=your_strong_password
+
+# Python RAG Backend (SQLAlchemy)
+DATABASE_URL=postgresql://orbitdocs_admin:your_strong_password@localhost:5432/orbitdocs_db
 
 # JWT
-JWT_SECRET=your-secret-key-min-32-characters-long-change-in-production
+JWT_SECRET=your-secret-key-min-32-characters-long
 
-# RAG & Java Integration
+# Storage
+UPLOAD_DIR=uploads/documents
+
+# Service URLs
 PYTHON_RAG_URL=http://localhost:8000
 JAVA_BACKEND_URL=http://localhost:8080
 
-# Python RAG Database URL
-DATABASE_URL=postgresql://orbitdocs_admin:orbitdocs_password@localhost:5432/orbitdocs_db
+# Ollama
+OLLAMA_BASE_URL=http://localhost:11434
+EMBEDDING_MODEL=qwen3-embedding:0.6b
 
 # Gemini API Key (lấy tại https://aistudio.google.com/apikey)
-GEMINI_API_KEY=your-gemini-api-key-here
+GEMINI_API_KEY=your-gemini-api-key
+LLM_MODEL=gemini-3.1-flash-lite
 ```
 
-> Cả Java backend và Python backend đều đọc chung file `.env` này.
+> **Lưu ý:** File `.env` chứa secrets — **không commit** lên Git. Dùng `.env.example` làm template.
 
 ---
 
-## 4. Chạy Java Backend (`OrbitDocs-backend`)
+## 2. Khởi động hạ tầng bằng Docker
 
-### 4.1. Cài đặt dependencies
+```bash
+# Chạy PostgreSQL + Ollama
+docker compose up -d
+
+# Kiểm tra trạng thái
+docker compose ps
+```
+
+Kết quả mong đợi:
+```
+NAME                  STATUS
+orbitdocs-postgres    running (healthy)
+orbitdocs-ollama      running
+```
+
+### Pull Embedding Model
+
+```bash
+# Pull model embedding vào Ollama container
+docker exec -it orbitdocs-ollama ollama pull qwen3-embedding:0.6b
+
+# Kiểm tra
+docker exec -it orbitdocs-ollama ollama list
+```
+
+---
+
+## 3. Chạy Java Backend (`OrbitDocs-backend`)
 
 ```bash
 cd OrbitDocs-backend
+
+# Build
 mvn clean install -DskipTests
-```
 
-### 4.2. Chạy server
-
-```bash
+# Chạy
 mvn spring-boot:run
 ```
 
 Server chạy tại: **http://localhost:8080**
 
-### 4.3. Kiểm tra
-
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- Health check: http://localhost:8080/actuator/health
+| Endpoint | URL |
+|----------|-----|
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| Health check | http://localhost:8080/actuator/health |
+| API docs | http://localhost:8080/api-docs |
 
 ---
 
-## 5. Chạy Python RAG Backend (`rag-backend`)
-
-### 5.1. Tạo virtual environment
+## 4. Chạy Python RAG Backend (`rag-backend`)
 
 ```bash
 cd rag-backend
 
-# Tạo venv
+# Tạo virtual environment
 python -m venv venv
 
 # Kích hoạt (Windows)
@@ -111,46 +124,49 @@ venv\Scripts\activate
 
 # Kích hoạt (macOS/Linux)
 source venv/bin/activate
-```
 
-### 5.2. Cài đặt dependencies
-
-```bash
+# Cài đặt dependencies
 pip install -r requirements.txt
 pip install langchain-ollama
-```
 
-### 5.3. Chạy server
-
-```bash
+# Chạy server
 uvicorn main:app --reload --port 8000
 ```
 
 Server chạy tại: **http://localhost:8000**
 
-### 5.4. Kiểm tra
-
-- Health check: http://localhost:8000/health
-- API docs: http://localhost:8000/docs (FastAPI tự tạo Swagger)
+| Endpoint | URL |
+|----------|-----|
+| API docs | http://localhost:8000/docs |
 
 ---
 
-## 6. Thứ tự khởi động
-
-Chạy theo đúng thứ tự sau:
+## 5. Thứ tự khởi động
 
 ```
-1. PostgreSQL       → Port 5432
-2. Ollama           → Port 11434
-3. Java Backend     → Port 8080
-4. Python RAG       → Port 8000
+1. docker compose up -d          → PostgreSQL (5432) + Ollama (11434)
+2. ollama pull qwen3-embedding   → Pull model (chỉ cần lần đầu)
+3. Java Backend                  → Port 8080
+4. Python RAG Backend            → Port 8000
+```
+
+---
+
+## 6. Dừng hạ tầng
+
+```bash
+# Dừng tất cả containers
+docker compose down
+
+# Dừng và xóa data (reset DB)
+docker compose down -v
 ```
 
 ---
 
 ## 7. Test nhanh luồng Upload + Chat
 
-### 7.1. Upload tài liệu (Postman)
+### Upload tài liệu
 
 ```
 POST http://localhost:8080/api/documents/upload
@@ -158,10 +174,10 @@ Content-Type: multipart/form-data
 
 Body (form-data):
   - courseId: <UUID của course>  (lấy từ DB bảng courses)
-  - file: <chọn file PDF>
+  - file: <chọn file PDF, tối đa 8MB>
 ```
 
-### 7.2. Chat với tài liệu (Postman)
+### Chat với tài liệu
 
 ```
 POST http://localhost:8000/api/chat
@@ -174,40 +190,26 @@ Content-Type: application/json
 }
 ```
 
-Chat theo chương cụ thể:
-```json
-{
-    "document_id": "<UUID>",
-    "query": "Giải thích khái niệm trong chương này",
-    "chapter_title": "Tên chương (copy từ DB)",
-    "top_k": 5
-}
-```
-
 ---
 
 ## 8. Cấu trúc thư mục
 
 ```
 SWD392-GROUP6/
-├── .env                          # Biến môi trường (chung cho cả 2 backend)
+├── .env.example                  # Template biến môi trường
+├── docker-compose.yml            # PostgreSQL + Ollama
 ├── OrbitDocs-backend/            # Java Spring Boot Backend
 │   ├── src/main/java/.../
 │   │   ├── document/             # Module quản lý tài liệu
 │   │   ├── identity/             # Module xác thực (JWT)
 │   │   ├── course/               # Module khóa học
-│   │   ├── chat/                 # Module chat history
 │   │   └── shared/               # Config, exception, response chung
-│   ├── src/main/resources/
-│   │   ├── application.yaml      # Cấu hình Spring Boot
-│   │   └── data.sql              # Seed data
 │   └── pom.xml
-├── rag-backend/                  # Python FastAPI RAG Backend
-│   ├── core/                     # Config & database connection
-│   ├── models/                   # SQLAlchemy models (chunk, embedding)
-│   ├── routers/                  # API endpoints (indexer, chat)
-│   ├── services/                 # Business logic (parser, chunking, embedding, webhook)
-│   ├── main.py                   # FastAPI app entry point
-│   └── requirements.txt
-└── docs/                         # Tài liệu kiến trúc
+└── rag-backend/                  # Python FastAPI RAG Backend
+    ├── core/                     # Config & database connection
+    ├── models/                   # SQLAlchemy models
+    ├── routers/                  # API endpoints (indexer, chat)
+    ├── services/                 # Business logic
+    ├── main.py                   # FastAPI entry point
+    └── requirements.txt
 ```
