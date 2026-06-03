@@ -3,7 +3,12 @@ spring:
     name: OrbitDocs-backend
 
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:.env[.properties], optional:file:../.env[.properties]
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
   # ── Database ──────────────────────────────────────────────
   datasource:
@@ -33,6 +38,11 @@ jwt:
   secret: ${JWT_SECRET:orbitdocs-default-secret-key-change-in-production-min-32-chars}
   access-token-expiry-seconds: 900 # 15 phút
   refresh-token-expiry-seconds: 604800 # 7 ngày
+
+# ── Storage ───────────────────────────────────────────────────
+app:
+  storage:
+    upload-dir: ${UPLOAD_DIR:uploads/documents}
 
 # ── Python RAG service (internal) ───────────────────────────
 rag:

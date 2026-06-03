@@ -11,7 +11,10 @@ public enum ErrorCode {
     UNAUTHENTICATED(401, "Unauthenticated"),
     UNAUTHORIZED(403, "You do not have permission"),
     DOCUMENT_NOT_FOUND(404, "Document not found"),
-    COURSE_NOT_FOUND(404, "Course not found");
+    COURSE_NOT_FOUND(404, "Course not found"),
+    INVALID_FILE_TYPE(400, "Only PDF files are supported"),
+    FILE_STORAGE_FAILED(500, "Failed to store file"),
+    INDEXING_JOB_NOT_FOUND(404, "Indexing job not found");
 
     private final int statusCode;
     private final String message;

@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface IndexingJobRepository extends JpaRepository<IndexingJob, UUID> {
     Optional<IndexingJob> findTopByDocumentIdOrderByAttemptNumberDesc(UUID documentId);
+    long countByDocumentId(UUID documentId);
 }
 

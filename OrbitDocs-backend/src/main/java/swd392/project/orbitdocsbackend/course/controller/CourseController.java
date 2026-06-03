@@ -29,7 +29,7 @@ public class CourseController {
         return ApiResponse.success(courseService.getAllCourses());
     }
 
-    @PostMapping
+    @PostMapping("/search")
     public ApiResponse<Page<CourseResponse>> searchCoursesByCode(
             @RequestParam String code,
             @RequestParam(defaultValue = "0") int pageNo,

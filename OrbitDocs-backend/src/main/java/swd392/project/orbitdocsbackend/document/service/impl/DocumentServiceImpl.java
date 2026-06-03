@@ -1,0 +1,149 @@
+package swd392.project.orbitdocsbackend.document.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import swd392.project.orbitdocsbackend.course.entity.Course;
+import swd392.project.orbitdocsbackend.course.repository.CourseRepository;
+import swd392.project.orbitdocsbackend.document.dto.request.DocumentUploadRequest;
+import swd392.project.orbitdocsbackend.document.dto.response.DocumentResponse;
+import swd392.project.orbitdocsbackend.document.entity.Document;
+import swd392.project.orbitdocsbackend.document.mapper.DocumentMapper;
+import swd392.project.orbitdocsbackend.document.repository.DocumentRepository;
+import swd392.project.orbitdocsbackend.document.service.IDocumentService;
+import swd392.project.orbitdocsbackend.document.service.IRagIntegrationService;
+import swd392.project.orbitdocsbackend.document.service.IStorageService;
+import swd392.project.orbitdocsbackend.identity.entity.User;
+import swd392.project.orbitdocsbackend.identity.repository.UserRepository;
+import swd392.project.orbitdocsbackend.shared.enums.DocumentStatus;
+import swd392.project.orbitdocsbackend.shared.enums.FileType;
+import swd392.project.orbitdocsbackend.shared.exception.AppException;
+import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class DocumentServiceImpl implements IDocumentService {
+
+    private final DocumentRepository documentRepository;
+    private final CourseRepository courseRepository;
+    private final UserRepository userRepository; // TODO: Replace with SecurityContext after auth integration
+    private final IStorageService storageService;
+    private final IRagIntegrationService ragIntegrationService;
+    private final DocumentMapper documentMapper;
+
+    @Override
+    @Transactional
+    public DocumentResponse uploadDocument(DocumentUploadRequest request) {
+        Course course = courseRepository.findById(request.getCourseId())
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+
+        // TODO: Replace with SecurityContext.getCurrentUser() after auth integration
+        User uploadedBy = userRepository.findAll().stream().findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Validate file type
+        String originalFilename = request.getFile().getOriginalFilename();
+        if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".pdf")) {
+            throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+        }
+
+        // Check if a document with the same filename already exists in this course
+        var existingDoc = documentRepository.findByOriginalFilenameAndCourseId(originalFilename, course.getId());
+
+        Document document;
+        String storagePath;
+
+        if (existingDoc.isPresent()) {
+            // Reuse existing document - just update file and reset status
+            document = existingDoc.get();
+
+            // Delete old file from storage
+            try {
+                storageService.deleteFile(document.getStoragePath());
+            } catch (IOException e) {
+                log.warn("Could not delete old file: {}", document.getStoragePath());
+            }
+
+            // Upload new file
+            try {
+                storagePath = storageService.uploadFile(request.getFile());
+            } catch (IOException e) {
+                log.error("Failed to store file", e);
+                throw new AppException(ErrorCode.FILE_STORAGE_FAILED);
+            }
+
+            // Update existing document metadata
+            document.setStoragePath(storagePath);
+            document.setFileSizeBytes(request.getFile().getSize());
+            document.setStatus(DocumentStatus.UPLOADED);
+            document.setFailureReason(null);
+            document = documentRepository.save(document);
+
+            log.info("Re-uploading existing document: {} (ID: {})", originalFilename, document.getId());
+        } else {
+            // Brand new document
+            try {
+                storagePath = storageService.uploadFile(request.getFile());
+            } catch (IOException e) {
+                log.error("Failed to store file", e);
+                throw new AppException(ErrorCode.FILE_STORAGE_FAILED);
+            }
+
+            document = Document.builder()
+                    .course(course)
+                    .uploadedBy(uploadedBy)
+                    .originalFilename(originalFilename)
+                    .storagePath(storagePath)
+                    .fileType(FileType.PDF)
+                    .fileSizeBytes(request.getFile().getSize())
+                    .status(DocumentStatus.UPLOADED)
+                    .build();
+
+            document = documentRepository.save(document);
+
+            log.info("Created new document: {} (ID: {})", originalFilename, document.getId());
+        }
+
+        // Trigger indexing (creates a new IndexingJob each time)
+        ragIntegrationService.triggerIndexing(document.getId(), storagePath);
+
+        return documentMapper.toResponse(document);
+    }
+
+    @Override
+    public List<DocumentResponse> getDocumentsByCourseId(UUID courseId) {
+        return documentRepository.findByCourseId(courseId)
+                .stream()
+                .map(documentMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public DocumentResponse getDocumentById(UUID id) {
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
+        return documentMapper.toResponse(document);
+    }
+
+    @Override
+    @Transactional
+    public void deleteDocument(UUID id) {
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
+
+        try {
+            storageService.deleteFile(document.getStoragePath());
+        } catch (IOException e) {
+            log.error("Failed to delete file from storage: {}", document.getStoragePath(), e);
+        }
+
+        documentRepository.delete(document);
+    }
+}
