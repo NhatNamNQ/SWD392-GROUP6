@@ -44,9 +44,10 @@ For updates to existing components, prefer previewing changes first:
 ## Component Layer Boundaries
 
 - `components/ui/*`: reusable shadcn-style primitives and shared UI building blocks.
-- `components/orbit/*`: OrbitDocs-specific compositions, page sections, and branding decisions.
+- `components/shared/*`: cross-feature layout and brand components shared by multiple experiences.
+- `features/*`: product-specific route modules, stateful compositions, mock data, and domain-specific UI.
 
-Keep product-specific layout/content decisions in `orbit` components and avoid back-porting those styles into `ui` primitives.
+Keep product-specific layout/content decisions in feature modules and avoid back-porting those styles into `ui` primitives.
 
 ## Verification Commands
 

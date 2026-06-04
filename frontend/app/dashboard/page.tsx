@@ -1,4 +1,4 @@
-import { DashboardPage } from "@/components/orbit/dashboard-page";
+import { DashboardPage } from "@/features/dashboard/dashboard-page";
 
 export default function DashboardRoute() {
   return <DashboardPage />;
