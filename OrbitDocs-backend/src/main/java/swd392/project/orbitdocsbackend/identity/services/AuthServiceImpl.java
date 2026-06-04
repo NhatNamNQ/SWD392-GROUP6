@@ -153,6 +153,7 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
@@ -174,6 +175,7 @@ public class AuthServiceImpl implements IAuthService {
         );
     }
     @Override
+    @Transactional
     public AuthResponse refresh(RefreshRequest request) {
         RefreshToken token = refreshTokenService.validateRefreshToken(request.getRefreshToken());
         UserDetails userDetails = new CustomUserDetails(token.getUser());

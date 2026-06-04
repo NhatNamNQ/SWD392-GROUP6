@@ -21,7 +21,14 @@ public class LocalStorageServiceImpl implements IStorageService {
 
     public LocalStorageServiceImpl(@Value("${app.storage.upload-dir:uploads/documents}") String uploadDir) {
         this.uploadDir = uploadDir;
-        this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
+        
+        Path baseDir = Paths.get("").toAbsolutePath();
+        // Failsafe: If running from the root project directory (e.g. IntelliJ default), append the backend module folder
+        if (!baseDir.endsWith("OrbitDocs-backend") && Files.exists(baseDir.resolve("OrbitDocs-backend"))) {
+            baseDir = baseDir.resolve("OrbitDocs-backend");
+        }
+        
+        this.fileStorageLocation = baseDir.resolve(uploadDir).normalize();
 
         try {
             Files.createDirectories(this.fileStorageLocation);
@@ -49,10 +56,14 @@ public class LocalStorageServiceImpl implements IStorageService {
         if (storagePath == null || storagePath.trim().isEmpty()) {
             return;
         }
-        // Resolve relative path against working directory
+        Path baseDir = Paths.get("").toAbsolutePath();
+        if (!baseDir.endsWith("OrbitDocs-backend") && Files.exists(baseDir.resolve("OrbitDocs-backend"))) {
+            baseDir = baseDir.resolve("OrbitDocs-backend");
+        }
+
         Path targetLocation = Paths.get(storagePath);
         if (!targetLocation.isAbsolute()) {
-            targetLocation = targetLocation.toAbsolutePath().normalize();
+            targetLocation = baseDir.resolve(storagePath).normalize();
         }
         Files.deleteIfExists(targetLocation);
     }
