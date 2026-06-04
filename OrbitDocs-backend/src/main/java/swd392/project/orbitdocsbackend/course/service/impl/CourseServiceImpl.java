@@ -13,8 +13,8 @@ import swd392.project.orbitdocsbackend.course.mapper.CourseMapper;
 import swd392.project.orbitdocsbackend.course.repository.CourseLecturerRepository;
 import swd392.project.orbitdocsbackend.course.repository.CourseRepository;
 import swd392.project.orbitdocsbackend.course.service.ICourseService;
+import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
 import swd392.project.orbitdocsbackend.identity.entity.User;
-import swd392.project.orbitdocsbackend.identity.repository.UserRepository;
 import swd392.project.orbitdocsbackend.shared.exception.AppException;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
 

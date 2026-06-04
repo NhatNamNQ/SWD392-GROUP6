@@ -27,7 +27,19 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+  # ── SMTP ───────────────────────────────────────
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    from: ${SMTP_FROM_EMAIL}
   # ── Seed data ─────────────────────────────────────────────
   sql:
     init:
@@ -38,6 +50,7 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-expiry-seconds: 900 # 15 phút
   refresh-token-expiry-seconds: 604800 # 7 ngày
+
 
 # ── Storage ───────────────────────────────────────────────────
 app:
@@ -51,7 +64,7 @@ rag:
 # ── Swagger / SpringDoc ─────────────────────────────────────
 springdoc:
   api-docs:
-    path: /api-docs
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
     operations-sorter: method

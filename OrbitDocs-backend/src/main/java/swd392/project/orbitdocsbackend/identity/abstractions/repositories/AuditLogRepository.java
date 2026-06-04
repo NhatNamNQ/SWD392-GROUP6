@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.repository;
+package swd392.project.orbitdocsbackend.identity.abstractions.repositories;
 
 import swd392.project.orbitdocsbackend.identity.entity.AuditLog;
 import org.springframework.data.jpa.repository.JpaRepository;
