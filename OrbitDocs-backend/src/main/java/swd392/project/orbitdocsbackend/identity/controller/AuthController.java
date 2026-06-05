@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.controllers;
+package swd392.project.orbitdocsbackend.identity.controller;
 
 
 import jakarta.servlet.http.Cookie;
@@ -9,13 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import swd392.project.orbitdocsbackend.identity.abstractions.services.IAuthService;
-import swd392.project.orbitdocsbackend.identity.dtos.auth.request.ConfirmOtpRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.auth.request.LoginRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.auth.request.RefreshRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.auth.request.RegisterRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.user.response.AuthResponse;
-import swd392.project.orbitdocsbackend.identity.dtos.user.response.UserResponse;
-import swd392.project.orbitdocsbackend.identity.exceptions.token.TokenExpiredException;
+import swd392.project.orbitdocsbackend.identity.dto.auth.request.ConfirmOtpRequest;
+import swd392.project.orbitdocsbackend.identity.dto.auth.request.LoginRequest;
+import swd392.project.orbitdocsbackend.identity.dto.auth.request.RefreshRequest;
+import swd392.project.orbitdocsbackend.identity.dto.auth.request.RegisterRequest;
+import swd392.project.orbitdocsbackend.identity.dto.user.response.AuthResponse;
+import swd392.project.orbitdocsbackend.identity.dto.user.response.UserResponse;
+import swd392.project.orbitdocsbackend.identity.exception.token.TokenExpiredException;
+import swd392.project.orbitdocsbackend.shared.response.ApiResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,17 +26,31 @@ public class AuthController {
     private final IAuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<Void>> register(
+            @Valid @RequestBody RegisterRequest request) {
+
         authService.register(request);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(null, "Register successfully")
+        );
     }
+
     @PostMapping("/confirm-otp")
-    public UserResponse confirmOtp(@RequestBody ConfirmOtpRequest request){
-        return authService.confirmOtp(request);
+    public ResponseEntity<ApiResponse<UserResponse>> confirmOtp(
+            @RequestBody ConfirmOtpRequest request) {
+
+        UserResponse response = authService.confirmOtp(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(response, "OTP confirmed successfully")
+        );
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletResponse response) {
 
         AuthResponse authResponse = authService.login(request);
 
@@ -49,31 +64,46 @@ public class AuthController {
         refreshToken.setMaxAge(60 * 60 * 24 * 7);
 
         response.addCookie(refreshToken);
+
         authResponse.setRefreshToken("");
-        return authResponse;
+
+        return ResponseEntity.ok(
+                ApiResponse.success(authResponse, "Login successfully")
+        );
     }
 
     @PostMapping("/refresh")
-    public AuthResponse refresh(
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
             @CookieValue("refreshToken") RefreshRequest refreshToken,
-            HttpServletResponse response
-    ) {
+            HttpServletResponse response) {
+
         AuthResponse authResponse = authService.refresh(refreshToken);
         authResponse.setRefreshToken("");
-        return authResponse;
+
+        return ResponseEntity.ok(
+                ApiResponse.success(authResponse, "Token refreshed successfully")
+        );
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response) {
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new TokenExpiredException();
+        if (refreshToken != null) {
+            authService.logout(refreshToken);
         }
 
-        String token = header.substring(7);
-        authService.logout(token);
+        Cookie refreshCookie = new Cookie("refreshToken", null);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(0);
 
-        return ResponseEntity.ok().build();
+        response.addCookie(refreshCookie);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(null, "Logout successfully")
+        );
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
-import swd392.project.orbitdocsbackend.identity.dtos.user.CustomUserDetails;
+import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 
 @Service

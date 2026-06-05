@@ -1,8 +1,8 @@
 package swd392.project.orbitdocsbackend.identity.abstractions.services;
 
 
-import swd392.project.orbitdocsbackend.identity.dtos.role.request.CommonRoleRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.role.response.RoleResponse;
+import swd392.project.orbitdocsbackend.identity.dto.role.request.CommonRoleRequest;
+import swd392.project.orbitdocsbackend.identity.dto.role.response.RoleResponse;
 
 import java.util.List;
 import java.util.UUID;

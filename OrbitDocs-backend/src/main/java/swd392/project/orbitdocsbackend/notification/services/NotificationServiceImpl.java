@@ -8,7 +8,7 @@ import swd392.project.orbitdocsbackend.notification.abstractions.INotificationSe
 import swd392.project.orbitdocsbackend.notification.abstractions.cache.IRedisIdempotencyService;
 import swd392.project.orbitdocsbackend.notification.abstractions.cache.IRedisOtpService;
 import swd392.project.orbitdocsbackend.notification.abstractions.cache.IRedisRateLimitService;
-import swd392.project.orbitdocsbackend.notification.dtos.OtpNotificationRequest;
+import swd392.project.orbitdocsbackend.notification.dto.OtpNotificationRequest;
 
 @Service
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.dtos.user.request;
+package swd392.project.orbitdocsbackend.identity.dto.user.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

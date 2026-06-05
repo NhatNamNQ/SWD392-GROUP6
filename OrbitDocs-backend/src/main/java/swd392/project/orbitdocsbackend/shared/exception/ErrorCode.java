@@ -8,6 +8,7 @@ public enum ErrorCode {
     TOKEN_EXPIRED(401, "Token expired"),
     TOKEN_INVALID(401, "Token invalid"),
     TOKEN_REVOKED(401, "Token revoked"),
+    MISSING_COOKIE(401, "Missing cookie"),
 
     // Auth
     EMAIL_NOT_FOUND(404, "Email not found"),

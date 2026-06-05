@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.dtos.auth;
+package swd392.project.orbitdocsbackend.identity.dto.auth;
 
 public record PendingUser(
         String email,

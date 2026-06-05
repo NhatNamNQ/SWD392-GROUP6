@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.exceptions.auth;
+package swd392.project.orbitdocsbackend.identity.exception.auth;
 
 
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;

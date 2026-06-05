@@ -1,9 +1,9 @@
 package swd392.project.orbitdocsbackend.identity.mapper;
 
 import org.mapstruct.*;
-import swd392.project.orbitdocsbackend.identity.dtos.user.request.CreateUserRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.user.request.UserCommonRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.user.response.UserResponse;
+import swd392.project.orbitdocsbackend.identity.dto.user.request.CreateUserRequest;
+import swd392.project.orbitdocsbackend.identity.dto.user.request.UserCommonRequest;
+import swd392.project.orbitdocsbackend.identity.dto.user.response.UserResponse;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 
 @Mapper(componentModel = "spring", uses = {RoleMapper.class})

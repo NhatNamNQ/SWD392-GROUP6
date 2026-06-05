@@ -1,8 +1,8 @@
-package swd392.project.orbitdocsbackend.identity.dtos.user.response;
+package swd392.project.orbitdocsbackend.identity.dto.user.response;
 
 import lombok.Getter;
 import lombok.Setter;
-import swd392.project.orbitdocsbackend.identity.dtos.role.response.RoleResponse;
+import swd392.project.orbitdocsbackend.identity.dto.role.response.RoleResponse;
 
 import java.time.Instant;
 import java.util.UUID;

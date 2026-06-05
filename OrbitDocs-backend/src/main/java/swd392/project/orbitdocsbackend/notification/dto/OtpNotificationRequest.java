@@ -1,9 +1,9 @@
-package swd392.project.orbitdocsbackend.notification.dtos;
+package swd392.project.orbitdocsbackend.notification.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import swd392.project.orbitdocsbackend.notification.dtos.Enums.OtpType;
+import swd392.project.orbitdocsbackend.notification.dto.Enums.OtpType;
 
 @Getter
 @Setter

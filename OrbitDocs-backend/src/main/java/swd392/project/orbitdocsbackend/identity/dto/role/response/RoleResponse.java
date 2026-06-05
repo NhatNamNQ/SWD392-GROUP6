@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.dtos.role.response;
+package swd392.project.orbitdocsbackend.identity.dto.role.response;
 
 
 import lombok.Getter;

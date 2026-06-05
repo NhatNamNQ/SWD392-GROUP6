@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.dtos.auth.request;
+package swd392.project.orbitdocsbackend.identity.dto.auth.request;
 
 import lombok.Getter;
 import lombok.Setter;

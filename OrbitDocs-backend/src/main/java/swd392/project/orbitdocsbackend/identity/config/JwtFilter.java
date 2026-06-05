@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
 import swd392.project.orbitdocsbackend.identity.abstractions.services.IJwtService;
-import swd392.project.orbitdocsbackend.identity.dtos.user.CustomUserDetails;
+import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.identity.services.cache.RedisTokenServiceImpl;
 

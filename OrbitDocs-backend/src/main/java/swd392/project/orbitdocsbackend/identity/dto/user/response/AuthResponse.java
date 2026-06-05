@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.dtos.user.response;
+package swd392.project.orbitdocsbackend.identity.dto.user.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
