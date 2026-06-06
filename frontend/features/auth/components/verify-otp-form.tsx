@@ -1,7 +1,7 @@
- "use client";
+"use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { startTransition, useState } from "react";
 
@@ -9,25 +9,20 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
-import {
-  registerAccount,
-  toAuthNotice,
-  validateRegisterPayload,
-  type AuthNotice,
-} from "@/features/auth/model/forms";
+import { confirmOtp, toAuthNotice, validateOtpPayload, type AuthNotice } from "@/features/auth/model/forms";
 
-export function RegisterForm() {
+export function VerifyOtpForm() {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
+  const [otp, setOtp] = useState("");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<AuthNotice | null>(null);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const validationError = validateRegisterPayload({ fullName, email, password });
+    const validationError = validateOtpPayload({ email, otp });
 
     if (validationError) {
       setNotice({ tone: "error", message: validationError });
@@ -39,8 +34,8 @@ export function RegisterForm() {
 
     startTransition(async () => {
       try {
-        const result = await registerAccount({ fullName, email, password });
-        router.replace(`/verify-otp?email=${encodeURIComponent(result.email)}`);
+        const result = await confirmOtp({ email, otp });
+        router.replace(`/login?email=${encodeURIComponent(result.email)}&verified=1`);
       } catch (error) {
         setNotice(toAuthNotice(error));
       } finally {
@@ -52,8 +47,10 @@ export function RegisterForm() {
   return (
     <div className="space-y-6 bg-slate-50 p-6 md:p-8">
       <div className="space-y-2">
-        <CardTitle className="text-3xl tracking-[-0.04em] text-slate-800">Register</CardTitle>
-        <p className="text-sm font-semibold text-slate-600">Create a new account to get started.</p>
+        <CardTitle className="text-3xl tracking-[-0.04em] text-slate-800">Verify OTP</CardTitle>
+        <p className="text-sm font-semibold text-slate-600">
+          Confirm the 6-digit code sent to your email to finish registration.
+        </p>
       </div>
 
       <CardContent className="space-y-6 rounded-md border border-slate-200 bg-white p-6 md:p-8">
@@ -61,59 +58,46 @@ export function RegisterForm() {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <label className="text-sm font-extrabold text-slate-700" htmlFor="name">
-              Full name
-            </label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Your name"
-              autoComplete="name"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
             <label className="text-sm font-extrabold text-slate-700" htmlFor="email">
               Email
             </label>
             <Input
               id="email"
               type="email"
-              placeholder="you@school.edu"
-              autoComplete="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@school.edu"
+              autoComplete="email"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-extrabold text-slate-700" htmlFor="password">
-              Password
+            <label className="text-sm font-extrabold text-slate-700" htmlFor="otp">
+              OTP code
             </label>
             <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              id="otp"
+              inputMode="numeric"
+              value={otp}
+              onChange={(event) => setOtp(event.target.value)}
+              placeholder="123456"
+              autoComplete="one-time-code"
+              maxLength={6}
             />
           </div>
 
           <Button type="submit" size="lg" className="w-full gap-2" disabled={pending}>
-            {pending ? "Creating account..." : "Create account"}
+            {pending ? "Verifying..." : "Verify code"}
             <ArrowRight className="h-4 w-4" />
           </Button>
         </form>
 
         <div className="flex items-center justify-between gap-3 text-sm font-semibold text-slate-600">
-          <Link href="/login" className="transition hover:text-slate-800">
-            Already have an account?
+          <Link href="/register" className="transition hover:text-slate-800">
+            Back to register
           </Link>
-          <Link href="/verify-otp" className="transition hover:text-slate-800">
-            Verify OTP
+          <Link href="/login" className="transition hover:text-slate-800">
+            Already verified?
           </Link>
         </div>
       </CardContent>

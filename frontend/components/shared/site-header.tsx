@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 type SiteHeaderProps = {
   variant: "landing" | "app";
+  actions?: ReactNode;
 };
 
 function BrandMark() {
@@ -24,15 +26,16 @@ function BrandCopy() {
   );
 }
 
-export function SiteHeader({ variant }: SiteHeaderProps) {
+export function SiteHeader({ variant, actions }: SiteHeaderProps) {
   if (variant === "app") {
     return (
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-slate-50/90 backdrop-blur">
-        <div className="orbit-shell flex items-center gap-3 py-3">
+        <div className="orbit-shell flex items-center justify-between gap-3 py-3">
           <Link href="/" className="flex items-center gap-3">
             <BrandMark />
             <BrandCopy />
           </Link>
+          {actions}
         </div>
       </header>
     );

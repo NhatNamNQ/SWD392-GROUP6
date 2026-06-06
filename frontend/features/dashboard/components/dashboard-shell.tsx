@@ -17,10 +17,16 @@ import {
   initialDocuments,
   promptSuggestions,
 } from "@/features/dashboard/data/mock-dashboard";
+import { AuthUserActions } from "@/features/auth/components/auth-user-actions";
+import type { AuthUser } from "@/features/auth/model/contracts";
 import { buildAssistantReply } from "@/features/dashboard/model/reply";
 import type { Conversation, DocumentRecord, ViewMode } from "@/features/dashboard/model/types";
 
-export function DashboardShell() {
+type DashboardShellProps = {
+  user: AuthUser;
+};
+
+export function DashboardShell({ user }: DashboardShellProps) {
   const fileInputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [view, setView] = useState<ViewMode>("chat");
@@ -190,7 +196,7 @@ export function DashboardShell() {
 
   return (
     <div className="min-h-screen">
-      <SiteHeader variant="app" />
+      <SiteHeader variant="app" actions={<AuthUserActions user={user} />} />
       <div className="px-4 py-4 md:px-5 md:py-5">
         <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1280px] gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
           <div className="hidden lg:block">{sidebar}</div>
