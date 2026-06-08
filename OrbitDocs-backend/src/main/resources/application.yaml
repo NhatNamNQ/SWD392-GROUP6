@@ -60,6 +60,7 @@ app:
 # ── Python RAG service (internal) ───────────────────────────
 rag:
   internal-url: ${PYTHON_RAG_URL}
+  internal-api-key: ${INTERNAL_API_KEY}
 
 # ── Swagger / SpringDoc ─────────────────────────────────────
 springdoc:
