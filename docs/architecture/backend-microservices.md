@@ -9,21 +9,21 @@ boundaries.
 | Service | Owner | Responsibility |
 | --- | --- | --- |
 | Next.js BFF | Frontend team | Browser UI, server-side frontend orchestration, streaming chat UI |
-| Java backend | External submodule team | Authentication integration, courses, chapters, document metadata, chat session metadata |
+| Java backend | Backend team | Authentication integration, courses, chapters, document metadata, chat session metadata |
 | Python RAG backend | AI/backend team | Document ingestion, chunking, embeddings, retrieval, prompt construction, LLM calls |
 
-## Java Backend As A Git Submodule
+## Java Backend Workspace
 
-The Java backend is not owned directly by this repository. Treat it as an
-external service with a pinned version.
+The Java backend now lives directly in this repository under
+`OrbitDocs-backend/`. Treat it as its own service boundary even though the code
+is checked into the same repo.
 
 Best practices:
 
-- Add the Java repository as a Git submodule when implementation starts.
-- Pin the submodule to a known commit for each integration milestone.
-- Require an OpenAPI contract or equivalent API document from the Java service.
+- Keep the Java service independently buildable with the Maven wrapper.
+- Keep integration contracts explicit at the HTTP/API boundary.
 - Do not let the frontend or Python service depend on internal Java classes.
-- Update the submodule through pull requests so API changes are reviewed.
+- Review Java API changes through normal pull requests in this repository.
 
 ## API Ownership
 

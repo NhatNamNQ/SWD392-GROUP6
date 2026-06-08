@@ -24,13 +24,13 @@ The system will support:
 | --- | --- |
 | Frontend | Next.js BFF |
 | Backend style | Pragmatic microservice architecture |
-| Java backend | External Git submodule, integrated through API contracts |
+| Java backend | Spring Boot service in `OrbitDocs-backend/`, integrated through HTTP/API contracts |
 | RAG backend | Python FastAPI service |
 | Vector store | PostgreSQL + pgvector |
 | Local environment | Docker Compose first |
 | Kubernetes | Future production deployment model, not required now |
 | CI/CD | GitHub Actions first; Jenkins documented as an alternative |
-| Code quality | SonarQube quality gate |
+| Code quality | SonarQube Cloud quality gate |
 | Security scanning | Trivy for dependencies, containers, and IaC |
 | Observability | Prometheus metrics and Grafana dashboards |
 
@@ -43,7 +43,8 @@ The system will support:
 5. [DevSecOps](./devsecops.md) - CI/CD, quality, and security scanning.
 6. [Observability](./observability.md) - metrics, dashboards, and future alerts.
 7. [Deployment Roadmap](./deployment-roadmap.md) - local first, Kubernetes later.
-8. [Architecture Decision Records](./adr/) - reasons behind major decisions.
+8. [Security Tooling](../../security/README.md) - SonarQube Cloud and Trivy setup notes.
+9. [Architecture Decision Records](./adr/) - reasons behind major decisions.
 
 ## Glossary
 

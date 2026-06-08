@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="Electron" version="29.6.6">
+  <diagram name="SWD392 DevSecOps Architecture" id="swd392-eks-arch-diagram">
+    <mxGraphModel dx="2400" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="node_dev" value="Developer" style="verticalLabelPosition=bottom;shadow=0;dashed=0;align=center;html=1;verticalAlign=top;strokeWidth=2;shape=mxgraph.mockup.containers.userMale;strokeColor=#6c8ebf;fillColor=#dae8fc;" vertex="1" parent="1">
+          <mxGeometry x="50" y="360" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_git" value="GitHub Actions" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg;" vertex="1" parent="1">
+          <mxGeometry x="200" y="360" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_argocd" value="Argo CD" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/argoproj/argo-cd/master/assets/logo.png;" vertex="1" parent="1">
+          <mxGeometry x="200" y="180" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_sonar" value="SonarQube Cloud" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sonarqube/sonarqube-original.svg;" vertex="1" parent="1">
+          <mxGeometry x="350" y="220" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_trivy_fs" value="Trivy FS Scan" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/aquasecurity/trivy/main/logo/trivy-logo.png;" vertex="1" parent="1">
+          <mxGeometry x="350" y="360" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_nexus" value="Nexus Repository" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/sonatype/nexus-public/master/images/nexus-logo.png;fillColor=#1B1C30;" vertex="1" parent="1">
+          <mxGeometry x="500" y="360" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_ec2" value="EC2 Build Host" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg;" vertex="1" parent="1">
+          <mxGeometry x="650" y="360" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_trivy_img" value="Trivy Image Scan" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/aquasecurity/trivy/main/logo/trivy-logo.png;" vertex="1" parent="1">
+          <mxGeometry x="800" y="360" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_ecr" value="Amazon ECR" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ecr;fillColor=#ED7100;strokeColor=#BD5A00;fontColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;" vertex="1" parent="1">
+          <mxGeometry x="950" y="360" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="swimlane_terraform" value="IaC Infrastructure" style="swimlane;startSize=24;fillColor=#e2f0d9;strokeColor=#385723;fontColor=#385723;html=1;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="560" width="230" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_terraform" value="Terraform" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg;" vertex="1" parent="swimlane_terraform">
+          <mxGeometry x="75" y="45" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_client" value="Laptop Client&lt;br&gt;&lt;i&gt;Web Browser&lt;/i&gt;" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/laptop_client.svg;" vertex="1" parent="1">
+          <mxGeometry x="950" y="40" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_route53" value="Route 53" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_53;fillColor=#ED7100;strokeColor=#BD5A00;fontColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="40" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="swimlane_runtime" value="AWS EKS Cluster (orbitdocs-dev)" style="swimlane;startSize=24;fillColor=#fdfefe;strokeColor=#bdc3c7;fontColor=#2c3e50;html=1;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="140" width="600" height="520" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_fe" value="Next.js Frontend" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="40" y="60" width="90" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_be" value="Spring Boot API" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="220" y="60" width="90" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_rag" value="FastAPI RAG" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="220" y="210" width="90" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_redis" value="Redis Cache" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="410" y="60" width="90" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_postgres" value="PostgreSQL" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="410" y="210" width="90" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_ollama" value="Ollama" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/ollama/ollama/main/docs/assets/ollama.png;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="410" y="350" width="90" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_kyverno" value="Kyverno" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/kyverno/kyverno/main/logo/logo.png;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="40" y="380" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_falco" value="Falco" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/falcosecurity/falco/master/artwork/falco-logo.png;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="190" y="380" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_eks" value="" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eks_cloud;fillColor=#ED7100;strokeColor=#BD5A00;fontColor=#ffffff;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;" vertex="1" parent="swimlane_runtime">
+          <mxGeometry x="510" y="440" width="60" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="swimlane_monitoring" value="Observability &amp;amp; Monitoring" style="swimlane;startSize=24;fillColor=#fcf8e3;strokeColor=#fbeed5;fontColor=#c09853;html=1;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="700" width="600" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_prometheus" value="Prometheus" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prometheus/prometheus-original.svg;" vertex="1" parent="swimlane_monitoring">
+          <mxGeometry x="60" y="45" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_grafana" value="Grafana" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg;" vertex="1" parent="swimlane_monitoring">
+          <mxGeometry x="260" y="45" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_alert" value="Alertmanager" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://raw.githubusercontent.com/prometheus/alertmanager/main/docs/alertmanager-logo.png;" vertex="1" parent="swimlane_monitoring">
+          <mxGeometry x="460" y="45" width="80" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_dev_git" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_dev" target="node_git">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_dev_tf" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_dev" target="node_terraform">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_tf_eks" value="Deploy Infra" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_terraform" target="node_eks">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_git_sonar" value="Check" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_git" target="node_sonar">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_git_trivy_fs" value="Scan" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_git" target="node_trivy_fs">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_trivy_nexus" value="Package" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_trivy_fs" target="node_nexus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_nexus_ec2" value="Fetch" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_nexus" target="node_ec2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_ec2_trivy_img" value="Build" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_ec2" target="node_trivy_img">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_trivy_ecr" value="Push" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_trivy_img" target="node_ecr">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_ecr_fe" value="Pull" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="node_ecr" target="node_fe">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_ecr_be" value="Pull" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="node_ecr" target="node_be">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_git_argocd" value="Trigger" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_git" target="node_argocd">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_argocd_eks" value="Sync Manifests" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_argocd" target="node_eks">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_client_route53" value="https://orbitdocs.teamdevops.shop" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;fontStyle=1;" edge="1" parent="1" source="node_client" target="node_route53">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_route53_fe" value="Ingress Route" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_route53" target="node_fe">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_fe_be" value="API requests" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_fe" target="node_be">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_be_rag" value="RAG query" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_be" target="node_rag">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_be_redis" value="Cache" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_be" target="node_redis">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_be_postgres" value="Persist" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_be" target="node_postgres">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_rag_postgres" value="Vector lookup" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_rag" target="node_postgres">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_rag_ollama" value="Generate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_rag" target="node_ollama">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_kyverno_eks" value="Audit" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="node_kyverno" target="node_eks">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_falco_eks" value="Audit" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="node_falco" target="node_eks">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_prometheus_eks" value="Scrape" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="node_prometheus" target="node_eks">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_prometheus_grafana" value="Graph" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_prometheus" target="node_grafana">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge_prometheus_alert" value="Alert" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeWidth=2;" edge="1" parent="1" source="node_prometheus" target="node_alert">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
