@@ -1,7 +1,7 @@
 # SWD392 Course Document Chatbot
 
-This repository contains the architecture, documentation, and future service
-workspace for the SWD392 Course Document Chatbot.
+This repository contains the architecture, documentation, and active service
+workspaces for the SWD392 Course Document Chatbot.
 
 The current phase is **architecture and planning**, not application
 implementation. The project is designed as a production-like learning system so
@@ -22,6 +22,7 @@ Recommended order:
 6. [DevSecOps](docs/architecture/devsecops.md)
 7. [Observability](docs/architecture/observability.md)
 8. [Deployment Roadmap](docs/architecture/deployment-roadmap.md)
+9. [Security Tooling](security/README.md)
 
 ## Target Architecture
 
@@ -34,7 +35,7 @@ flowchart TD
     end
 
     subgraph Services["Backend Services"]
-        Java[Java Backend Submodule]
+        Java[Spring Boot Java Backend]
         Python[Python FastAPI RAG Service]
     end
 
@@ -48,7 +49,7 @@ flowchart TD
 
     subgraph PlatformOps["Platform Engineering"]
         GHA[GitHub Actions]
-        Quality[Tests + SonarQube + Trivy]
+        Quality[Tests + SonarQube Cloud + Trivy]
         Prom[Prometheus]
         Grafana[Grafana]
     end
@@ -71,11 +72,13 @@ flowchart TD
 | Path | Purpose |
 | --- | --- |
 | `docs/architecture/` | Architecture handbook, diagrams, DevSecOps, observability, and ADRs |
+| `docs/devsecops/` | Short security-first CI/CD entry point |
 | `docs/swd392-chatbot-user-stories.md` | Product stories and acceptance criteria |
 | `docs/embeddings/` | Embedding and retrieval reference material |
-| `frontend/` | Future Next.js frontend workspace |
-| `backend/` | Future integration point for the Java backend submodule |
-| `rag-backend/` | Future Python FastAPI RAG service workspace |
+| `security/` | SonarQube Cloud and Trivy setup notes and examples |
+| `frontend/` | Active Next.js frontend workspace |
+| `OrbitDocs-backend/` | Active Spring Boot Java backend workspace |
+| `rag-backend/` | Active Python FastAPI RAG service workspace |
 | `infra/` | Future infrastructure documentation and IaC |
 | `scripts/` | Future helper scripts for setup, seed data, and tests |
 
@@ -85,19 +88,19 @@ flowchart TD
 | --- | --- |
 | Frontend | Next.js BFF |
 | Backend | Pragmatic microservice architecture |
-| Java backend | External Git submodule integrated through API contracts |
+| Java backend | Spring Boot service in `OrbitDocs-backend/`, integrated through HTTP/API contracts |
 | RAG backend | Python FastAPI |
 | Vector store | PostgreSQL + pgvector |
 | Local workflow | Docker Compose first |
 | Kubernetes | Future deployment model, not implemented now |
 | CI/CD | GitHub Actions first; Jenkins is an alternative |
-| Quality | SonarQube quality gate |
+| Quality | SonarQube Cloud quality gate |
 | Security | Trivy scans |
 | Observability | Prometheus and Grafana |
 
 ## Local Development Note
 
-The existing `docker-compose.yml` is an early skeleton. Before application
-implementation starts, it should be aligned with the architecture handbook,
-especially the PostgreSQL + pgvector decision and the external Java submodule
-workflow.
+The existing `docker-compose.yml` is still an early skeleton. As implementation
+continues, it should stay aligned with the architecture handbook, especially
+the PostgreSQL + pgvector decision and the real service workspaces in
+`frontend/`, `OrbitDocs-backend/`, and `rag-backend/`.

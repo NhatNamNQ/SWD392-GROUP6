@@ -1,4 +1,4 @@
-# ADR-004: Treat Java Backend As External Submodule
+# ADR-004: Keep Java Backend As A Separate Service Boundary
 
 ## Status
 
@@ -6,16 +6,17 @@ Accepted
 
 ## Context
 
-The Java backend will come from another GitHub repository.
+The Java backend is developed inside this repository at `OrbitDocs-backend/`,
+but it still needs a clear boundary from the frontend and Python RAG service.
 
 ## Decision
 
-Treat the Java backend as an external Git submodule with API-contract based
+Treat the Java backend as a separate Spring Boot service with API-contract based
 integration.
 
 ## Consequences
 
-- This repository pins the Java backend to a reviewed commit.
-- Java internals remain owned by the external backend team.
+- The Java service remains independently buildable and reviewable.
+- Java internals stay behind HTTP/API contracts.
 - Frontend and Python services depend on stable HTTP/API contracts, not Java
   implementation details.

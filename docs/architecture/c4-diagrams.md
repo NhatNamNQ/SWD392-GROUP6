@@ -37,7 +37,7 @@ flowchart TD
     end
 
     subgraph Services["Backend Services"]
-        Java[Java Backend Submodule]
+        Java[Spring Boot Java Backend]
         Python[Python FastAPI RAG Service]
     end
 
@@ -51,7 +51,7 @@ flowchart TD
 
     subgraph PlatformOps["Platform Engineering"]
         GHA[GitHub Actions]
-        Quality[Tests + SonarQube + Trivy]
+        Quality[Tests + SonarQube Cloud + Trivy]
         Prom[Prometheus]
         Grafana[Grafana]
     end

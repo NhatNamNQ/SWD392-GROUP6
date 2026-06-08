@@ -1,0 +1,21 @@
+import { createAuthJsonResponse, readBackendAuthError, requestBackend } from "@/features/auth/server/backend";
+
+export async function POST(request: Request) {
+  const payload = await request.json();
+  const backendResponse = await requestBackend("/api/auth/register", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!backendResponse.ok) {
+    return createAuthJsonResponse(await readBackendAuthError(backendResponse), backendResponse.status);
+  }
+
+  return createAuthJsonResponse({
+    email: payload.email,
+    message: "Registration started. Check your email for the OTP code.",
+  });
+}
