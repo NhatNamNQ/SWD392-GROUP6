@@ -1,0 +1,6 @@
+sonar.sources=frontend,OrbitDocs-backend/src/main/java,rag-backend
+sonar.sourceEncoding=UTF-8
+sonar.java.binaries=OrbitDocs-backend/target/classes
+sonar.qualitygate.wait=true
+sonar.qualitygate.timeout=300
+sonar.exclusions=**/.github/workflows/**,**/.next/**,**/.pytest_cache/**,**/.venv/**,**/__pycache__/**,**/build/**,**/coverage/**,**/dist/**,**/node_modules/**,**/target/**,**/*.min.js

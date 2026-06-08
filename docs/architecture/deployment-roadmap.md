@@ -22,9 +22,12 @@ Use GitHub Actions for pull request checks.
 Goals:
 
 - Test each service independently.
-- Run SonarQube quality checks.
+- Run SonarQube Cloud quality checks.
 - Run Trivy security scans.
 - Build service images after checks pass.
+
+The implementation notes for these gates live in
+[`security/`](../../security/README.md).
 
 ## Stage 3: Production-Like Deployment Design
 

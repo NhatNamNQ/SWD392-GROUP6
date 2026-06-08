@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typegen": "next typegen",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "npm run typegen && tsc --noEmit",
@@ -24,7 +26,6 @@
     "husky": "^9.1.7",
     "lucide-react": "^1.16.0",
     "next": "^16.2.6",
-    "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -32,14 +33,20 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^25.9.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.5.0",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.6",
+    "jsdom": "^29.1.1",
     "postcss": "^8.5.15",
     "tailwindcss": "^3.4.19",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.8"
   }
 }
