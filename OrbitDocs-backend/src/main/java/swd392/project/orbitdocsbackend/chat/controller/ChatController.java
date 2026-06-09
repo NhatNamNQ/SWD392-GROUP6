@@ -10,7 +10,7 @@ import swd392.project.orbitdocsbackend.chat.dto.ChatRequest;
 import swd392.project.orbitdocsbackend.chat.dto.ChatResponse;
 import swd392.project.orbitdocsbackend.chat.dto.ChatSessionDto;
 import swd392.project.orbitdocsbackend.chat.service.IChatService;
-import swd392.project.orbitdocsbackend.identity.dtos.user.CustomUserDetails;
+import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.shared.response.ApiResponse;
 
 import java.util.List;

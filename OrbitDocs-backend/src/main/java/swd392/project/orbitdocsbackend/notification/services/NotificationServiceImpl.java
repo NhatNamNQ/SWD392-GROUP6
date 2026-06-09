@@ -3,6 +3,7 @@ package swd392.project.orbitdocsbackend.notification.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import swd392.project.orbitdocsbackend.identity.exception.auth.otp.OtpSavedFailException;
 import swd392.project.orbitdocsbackend.notification.abstractions.IEmailSender;
 import swd392.project.orbitdocsbackend.notification.abstractions.INotificationService;
 import swd392.project.orbitdocsbackend.notification.abstractions.cache.IRedisIdempotencyService;
@@ -34,8 +35,8 @@ public class NotificationServiceImpl implements INotificationService {
             return; // NOT throw
         }
 
-        if(!otpService.saveOtp(request.getOtpRequest().email(), request.getOtpRequest().otp())){
-            throw new RuntimeException("Fail to save otp code with email: " + request.getOtpRequest().email());
+        if(!otpService.saveOtp(request.getOtpType().toString(),request.getOtpRequest().email(), request.getOtpRequest().otp())){
+            throw new OtpSavedFailException();
         }
 
         //SEND EMAIL

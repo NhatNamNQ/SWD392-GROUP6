@@ -13,20 +13,22 @@ import swd392.project.orbitdocsbackend.identity.abstractions.repositories.RoleRe
 import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
 import swd392.project.orbitdocsbackend.identity.abstractions.services.IAuthService;
 import swd392.project.orbitdocsbackend.identity.dto.auth.PendingUser;
-import swd392.project.orbitdocsbackend.identity.dto.auth.request.ConfirmOtpRequest;
-import swd392.project.orbitdocsbackend.identity.dto.auth.request.LoginRequest;
-import swd392.project.orbitdocsbackend.identity.dto.auth.request.RefreshRequest;
-import swd392.project.orbitdocsbackend.identity.dto.auth.request.RegisterRequest;
+import swd392.project.orbitdocsbackend.identity.dto.auth.request.*;
+import swd392.project.orbitdocsbackend.identity.dto.auth.response.ConfirmOtpResult;
+import swd392.project.orbitdocsbackend.identity.dto.auth.response.EmailActionResponse;
+import swd392.project.orbitdocsbackend.identity.dto.auth.response.ForgotPasswordResponse;
 import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
-import swd392.project.orbitdocsbackend.identity.dto.user.response.AuthResponse;
+import swd392.project.orbitdocsbackend.identity.dto.auth.response.AuthResponse;
 import swd392.project.orbitdocsbackend.identity.dto.user.response.UserResponse;
 import swd392.project.orbitdocsbackend.identity.entity.RefreshToken;
 import swd392.project.orbitdocsbackend.identity.entity.Role;
 import swd392.project.orbitdocsbackend.identity.entity.User;
+import swd392.project.orbitdocsbackend.identity.exception.RedisDataNotFoundException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.EmailNotFoundException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.OtpLockoutException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.WrongOtpCodeException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.WrongPasswordException;
+import swd392.project.orbitdocsbackend.identity.exception.token.TokenExpiredException;
 import swd392.project.orbitdocsbackend.identity.mapper.UserMapper;
 import swd392.project.orbitdocsbackend.identity.services.cache.OtpAttemptTracker;
 import swd392.project.orbitdocsbackend.identity.services.cache.RefreshTokenServiceImpl;
@@ -38,8 +40,13 @@ import swd392.project.orbitdocsbackend.notification.dto.OtpRequest;
 import swd392.project.orbitdocsbackend.shared.enums.RoleName;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
 
+import javax.management.relation.RoleNotFoundException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
+
+import static swd392.project.orbitdocsbackend.notification.dto.Enums.OtpType.FORGET_PASSWORD;
+import static swd392.project.orbitdocsbackend.notification.dto.Enums.OtpType.REGISTER;
 
 @Service
 @RequiredArgsConstructor
@@ -91,65 +98,91 @@ public class AuthServiceImpl implements IAuthService {
         notificationService.OtpNotificationHandler(new OtpNotificationRequest(
                 new OtpRequest(request.email(), otp),
                 request.email()+ otp,
-                OtpType.REGISTER
+                REGISTER
         ));
     }
 
     @Override
+    public EmailActionResponse forgetPassword(ForgetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(EmailNotFoundException::new);
+        if (user.isActive()) {
+            throw new RuntimeException("User is unActive");
+        }
+        String key = FORGET_PASSWORD + request.email();
+        String otp = generateOtp();
+
+        saveToRedis(key,otp,Duration.ofMinutes(5));
+
+        notificationService.OtpNotificationHandler(new OtpNotificationRequest(
+                new OtpRequest(request.email(), otp),
+                request.email() + otp,
+                FORGET_PASSWORD));
+
+        return EmailActionResponse.builder()
+                .email(request.email())
+                .expireIn(5 * 60)
+                .build();
+    }
+
+    @Override
+    public EmailActionResponse reSendOtp(ResendOtpRequest request) {
+        String otp = generateOtp();
+
+        notificationService.OtpNotificationHandler(
+                new OtpNotificationRequest(
+                        new OtpRequest(request.email(), otp),
+                        request.email() + System.currentTimeMillis(),
+                        request.type()
+                )
+        );
+
+        return EmailActionResponse.builder()
+                .email(request.email())
+                .expireIn(5 * 60)
+                .build();
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequest request) {
+        String key = "reset:" + request.resetToken();
+
+        String email = (String) redisTemplate.opsForValue().get(key);
+
+        if (email == null) {
+            throw new TokenExpiredException();
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(EmailNotFoundException::new);
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        redisTemplate.delete(key);
+    }
+
+    @Override
     @Transactional
-    public UserResponse confirmOtp(ConfirmOtpRequest request) {
+    public ConfirmOtpResult confirmOtp(ConfirmOtpRequest request) {
 
         String email = request.email();
 
-        // 1. Check if email is locked out
-        if (otpAttemptTracker.isLockedOut(email)) {
-            long remainingTime = otpAttemptTracker.getLockoutRemainingTime(email);
-            throw new OtpLockoutException(remainingTime);
-        }
+        validateOtpOrThrow(request.type().toString(),email, request.otp());
 
-        String key = "PENDING_USER:" + email;
-        String json = (String) redisTemplate.opsForValue().get(key);
+        return switch (request.type()) {
 
-        PendingUser pendingUser = null;
-        try {
-            pendingUser = objectMapper.readValue(json, PendingUser.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (pendingUser == null) {
-            throw new RuntimeException(ErrorCode.PENDING_USER_NOT_FOUND.getMessage());
-        }
-
-        // 2. Validate OTP using Lua script
-        if (request.otp() == null || !otpService.validateOtp(email, request.otp())) {
-            int remainingAttempts = otpAttemptTracker.recordFailedAttempt(email);
-            
-            if (remainingAttempts <= 0) {
-                long lockoutTime = otpAttemptTracker.getLockoutRemainingTime(email);
-                throw new OtpLockoutException(lockoutTime);
+            case REGISTER -> {
+                try {
+                    yield confirmRegisterOtp(email);
+                } catch (RoleNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            throw new WrongOtpCodeException();
-        }
 
-        // 3. Create user
-        User user = new User();
-        user.setEmail(pendingUser.email());
-        user.setFullName(pendingUser.username());
-        user.setPasswordHash(passwordEncoder.encode(pendingUser.password()));
-        RoleName roleName = RoleName.STUDENT;
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException(ErrorCode.ROLE_NOT_FOUND.getMessage()));
-        user.setRole(role);
-        user.setCreatedAt(Instant.now());
+            case FORGET_PASSWORD -> confirmForgotPasswordOtp(email);
 
-        userRepository.save(user);
-        
-        // 4. Cleanup: delete pending user and reset OTP attempts
-        redisTemplate.delete(key);
-        otpAttemptTracker.resetAttempts(email);
-        
-        return userMapper.toResponse(user);
+            default -> throw new IllegalStateException("Unexpected value: " + request.type());
+        };
     }
 
     @Override
@@ -204,6 +237,114 @@ public class AuthServiceImpl implements IAuthService {
     }
     private String generateOtp() {
         return String.valueOf((int)(Math.random() * 900000) + 100000);
+    }
+
+    private void saveToRedis(String key, Object value, Duration ttl) {
+        try {
+            if (redisTemplate.hasKey(key)) {
+                redisTemplate.delete(key);
+            }
+
+            redisTemplate.opsForValue()
+                    .set(key, objectMapper.writeValueAsString(value), ttl);
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to save data to Redis", e);
+        }
+    }
+    private <T> T getFromRedis(
+            String key,
+            Class<T> clazz
+    ) {
+        String json = (String) redisTemplate.opsForValue().get(key);
+
+        if (json == null) {
+            throw new RedisDataNotFoundException();
+        }
+
+        try {
+            return objectMapper.readValue(json, clazz);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void validateOtpOrThrow(String type, String email, String otp) {
+
+        if (otpAttemptTracker.isLockedOut(email)) {
+            long remainingTime = otpAttemptTracker.getLockoutRemainingTime(email);
+
+            throw new OtpLockoutException(remainingTime);
+        }
+
+        boolean valid = otpService.validateOtp(type,email, otp);
+
+        if (!valid) {
+            int remainingAttempts = otpAttemptTracker.recordFailedAttempt(email);
+
+            if (remainingAttempts <= 0) {
+                long lockoutTime = otpAttemptTracker.getLockoutRemainingTime(email);
+
+                throw new OtpLockoutException(lockoutTime);
+            }
+
+            throw new WrongOtpCodeException();
+        }
+    }
+
+    private ConfirmOtpResult confirmRegisterOtp(String email) throws RoleNotFoundException {
+
+        String key = REGISTER + email;
+
+        PendingUser pendingUser =
+                getFromRedis(key, PendingUser.class);
+
+        User user = new User();
+
+        user.setEmail(pendingUser.email());
+        user.setFullName(pendingUser.username());
+        user.setPasswordHash(passwordEncoder.encode(pendingUser.password()));
+        user.setActive(true);
+        MapPendingUserToUser(email, key, user);
+
+        return new ConfirmOtpResult(
+                REGISTER.toString(),
+                userMapper.toResponse(user)
+        );
+    }
+
+    private void MapPendingUserToUser(String email, String key, User user) {
+        RoleName roleName = RoleName.STUDENT;
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException(ErrorCode.ROLE_NOT_FOUND.getMessage()));
+        user.setRole(role);
+        user.setCreatedAt(Instant.now());
+        userRepository.save(user);
+
+        redisTemplate.delete(key);
+        otpAttemptTracker.resetAttempts(email);
+    }
+
+    private ConfirmOtpResult confirmForgotPasswordOtp(
+            String email
+    ) {
+
+        String key = FORGET_PASSWORD + email;
+
+        String resetToken = UUID.randomUUID().toString();
+        redisTemplate.opsForValue().set(
+                "reset:" + resetToken,
+                email,
+                Duration.ofMinutes(5)
+        );
+
+        redisTemplate.delete(key);
+        otpAttemptTracker.resetAttempts(email);
+
+        return new ConfirmOtpResult(
+                REGISTER.toString(),
+                new ForgotPasswordResponse(email, true,"OTP verified. You can now reset your password",resetToken)
+        );
     }
 }
 

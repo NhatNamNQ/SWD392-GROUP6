@@ -10,6 +10,13 @@ public enum ErrorCode {
     TOKEN_REVOKED(401, "Token revoked"),
     MISSING_COOKIE(401, "Missing cookie"),
 
+    //Redis
+    REDIS_DATA_NOT_FOUND(404, "Redis data not found"),
+    OTP_SAVE_FAILED (401 ,"OTP_SAVE_FAILED"),
+    OTP_DELETE_FAILED (401 ,"OTP_DELETE_FAILED"),
+    OTP_RATE_LIMIT_EXCEEDED (401 ,"OTP_RATE_LIMIT_EXCEEDED"),
+    tp_Expired (401, "OTP_EXPIRED"),
+
     // Auth
     EMAIL_NOT_FOUND(404, "Email not found"),
     EMAIL_ALREADY_REGISTERED(400, "Email already registered"),
