@@ -6,9 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatSessionRepository extends JpaRepository<ChatSession, UUID> {
-    List<ChatSession> findByUserId(UUID userId);
+    List<ChatSession> findByUserIdAndActiveTrueOrderByLastMessageAtDesc(UUID userId);
+    Optional<ChatSession> findByIdAndUserIdAndActiveTrue(UUID id, UUID userId);
 }
 

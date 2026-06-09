@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header, HTTPException
+
+# ... existing imports
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -13,6 +15,10 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+def verify_internal_key(x_api_key: str = Header(None)):
+    if x_api_key != settings.internal_api_key:
+        raise HTTPException(status_code=403, detail="Forbidden: Invalid internal API key")
+
 class ChatRequest(BaseModel):
     document_id: str
     query: str
@@ -23,7 +29,7 @@ class ChatResponse(BaseModel):
     answer: str
     citations: list[dict]
 
-@router.post("/chat", response_model=ChatResponse)
+@router.post("/chat", response_model=ChatResponse, dependencies=[Depends(verify_internal_key)])
 def chat_with_document(req: ChatRequest, db: Session = Depends(get_db)):
     """
     RAG Retrieval Endpoint using PgVector + Gemini LLM.
