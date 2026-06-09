@@ -42,8 +42,9 @@ public class UserServiceImpl implements IUserService {
         }
 
         User user = userMapper.fromCreateRequest(request);
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         if (userCommonRequest.getRoleId() != null) {
-            Role role = roleRepository.findById(UUID.fromString(userCommonRequest.getRoleId()))
+            Role role = roleRepository.findById(Short.valueOf(userCommonRequest.getRoleId()))
                     .orElseThrow(() -> new RuntimeException(ErrorCode.ROLE_NOT_FOUND.getMessage()));
             user.setRole(role);
         }
@@ -51,6 +52,7 @@ public class UserServiceImpl implements IUserService {
         return userMapper.toResponse(savedUser);
     }
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException());
@@ -58,6 +60,7 @@ public class UserServiceImpl implements IUserService {
         return userMapper.toResponse(user);
     }
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAll() {
         return userRepository.findAll()
                 .stream()
@@ -75,7 +78,7 @@ public class UserServiceImpl implements IUserService {
 
         // Role set thủ công
         if (request.getRoleId() != null) {
-            Role role = roleRepository.findById(UUID.fromString(request.getRoleId()))
+            Role role = roleRepository.findById(Short.valueOf(request.getRoleId()))
                     .orElseThrow(RuntimeException::new);
             user.setRole(role);
         }

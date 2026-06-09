@@ -42,7 +42,7 @@ public class RoleServiceImpl implements IRoleService {
     }
 
     @Override
-    public RoleResponse getById(UUID id) {
+    public RoleResponse getById(Short id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -57,7 +57,7 @@ public class RoleServiceImpl implements IRoleService {
     }
 
     @Override
-    public RoleResponse update(UUID id, CommonRoleRequest request) {
+    public RoleResponse update(Short id, CommonRoleRequest request) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -68,10 +68,9 @@ public class RoleServiceImpl implements IRoleService {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        if (!roleRepository.existsById(id)) {
-            throw new RuntimeException("Role not found");
-        }
-        roleRepository.deleteById(id);
+    public void deleteById(Short id) {
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        roleRepository.delete(role);
     }
 }
