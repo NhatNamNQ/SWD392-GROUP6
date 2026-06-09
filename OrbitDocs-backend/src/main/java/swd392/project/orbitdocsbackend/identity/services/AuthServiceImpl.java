@@ -19,7 +19,6 @@ import swd392.project.orbitdocsbackend.identity.dto.auth.response.EmailActionRes
 import swd392.project.orbitdocsbackend.identity.dto.auth.response.ForgotPasswordResponse;
 import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.identity.dto.auth.response.AuthResponse;
-import swd392.project.orbitdocsbackend.identity.dto.user.response.UserResponse;
 import swd392.project.orbitdocsbackend.identity.entity.RefreshToken;
 import swd392.project.orbitdocsbackend.identity.entity.Role;
 import swd392.project.orbitdocsbackend.identity.entity.User;
@@ -306,7 +305,7 @@ public class AuthServiceImpl implements IAuthService {
         user.setFullName(pendingUser.username());
         user.setPasswordHash(passwordEncoder.encode(pendingUser.password()));
         user.setActive(true);
-        MapPendingUserToUser(email, key, user);
+        MapStudentRoleToUser(email, key, user);
 
         return new ConfirmOtpResult(
                 REGISTER.toString(),
@@ -314,7 +313,7 @@ public class AuthServiceImpl implements IAuthService {
         );
     }
 
-    private void MapPendingUserToUser(String email, String key, User user) {
+    private void MapStudentRoleToUser(String email, String key, User user) {
         RoleName roleName = RoleName.STUDENT;
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RuntimeException(ErrorCode.ROLE_NOT_FOUND.getMessage()));
