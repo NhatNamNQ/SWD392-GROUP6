@@ -38,6 +38,7 @@ import swd392.project.orbitdocsbackend.notification.dto.Enums.OtpType;
 import swd392.project.orbitdocsbackend.notification.dto.OtpNotificationRequest;
 import swd392.project.orbitdocsbackend.notification.dto.OtpRequest;
 import swd392.project.orbitdocsbackend.shared.enums.RoleName;
+import swd392.project.orbitdocsbackend.shared.exception.AppException;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
 
 import javax.management.relation.RoleNotFoundException;
@@ -70,7 +71,7 @@ public class AuthServiceImpl implements IAuthService {
     @Transactional
     public void register(RegisterRequest request) {
 
-        String key = "PENDING_USER:" + request.email();
+        String key = OtpType.REGISTER + request.email();
         // 1. generate OTP
         String otp = generateOtp();
 
@@ -106,8 +107,8 @@ public class AuthServiceImpl implements IAuthService {
     public EmailActionResponse forgetPassword(ForgetPasswordRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(EmailNotFoundException::new);
-        if (user.isActive()) {
-            throw new RuntimeException("User is unActive");
+        if (!user.isActive()) {
+            throw new AppException(ErrorCode.USER_INACTIVE);
         }
         String key = FORGET_PASSWORD + request.email();
         String otp = generateOtp();
@@ -192,7 +193,7 @@ public class AuthServiceImpl implements IAuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(EmailNotFoundException::new);
         if (!user.isActive()) {
-            throw new RuntimeException("User is unactive.");
+            throw new AppException(ErrorCode.USER_INACTIVE);
         }
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new WrongPasswordException();
