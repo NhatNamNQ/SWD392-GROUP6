@@ -10,7 +10,6 @@ import swd392.project.orbitdocsbackend.identity.dtos.role.response.RoleResponse;
 
 import java.net.URI;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -36,7 +35,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RoleResponse> getById(@PathVariable UUID id) {
+    public ResponseEntity<RoleResponse> getById(@PathVariable Short id) {
         return ResponseEntity.ok(roleService.getById(id));
     }
 
@@ -47,14 +46,14 @@ public class RoleController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<RoleResponse> update(
-            @PathVariable UUID id,
+            @PathVariable Short id,
             @RequestBody CommonRoleRequest request
     ) {
         return ResponseEntity.ok(roleService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable Short id) {
         roleService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
