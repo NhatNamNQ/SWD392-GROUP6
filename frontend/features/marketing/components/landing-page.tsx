@@ -86,7 +86,7 @@ export function LandingPage() {
 
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
-                href="/dashboard"
+                href="/student"
                 className={cn(buttonVariants({ size: "lg" }), "inline-flex items-center gap-2")}
               >
                 Launch workspace
@@ -197,8 +197,8 @@ export function LandingPage() {
               Open the workspace and continue your SWD392 sessions.
             </p>
           </div>
-          <Link href="/dashboard" className={buttonVariants({ size: "lg" })}>
-            Launch Dashboard
+          <Link href="/student" className={buttonVariants({ size: "lg" })}>
+            Launch Workspace
           </Link>
         </section>
       </main>

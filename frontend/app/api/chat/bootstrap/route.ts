@@ -1,9 +1,9 @@
-import { createChatJsonResponse, requireChatRequestSession, toChatErrorResponse } from "@/features/dashboard/server/chat-route";
+import { createChatJsonResponse, requireChatRequestSession, toChatErrorResponse } from "@/features/student/server/chat-route";
 import {
   DEFAULT_PROMPT_SUGGESTIONS,
   fetchCourseCatalogFromBackend,
-} from "@/features/dashboard/server/chat-backend";
-import { listChatSessions } from "@/features/dashboard/server/chat-store";
+} from "@/features/student/server/chat-backend";
+import { listChatSessions } from "@/features/student/server/chat-store";
 
 export async function GET(request: Request) {
   try {

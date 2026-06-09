@@ -1,5 +1,5 @@
-import { createChatJsonResponse, requireChatRequestSession, toChatErrorResponse } from "@/features/dashboard/server/chat-route";
-import { getChatSession } from "@/features/dashboard/server/chat-store";
+import { createChatJsonResponse, requireChatRequestSession, toChatErrorResponse } from "@/features/student/server/chat-route";
+import { getChatSession } from "@/features/student/server/chat-store";
 
 export async function GET(
   request: Request,

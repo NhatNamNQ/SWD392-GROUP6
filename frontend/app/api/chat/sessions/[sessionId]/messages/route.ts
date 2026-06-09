@@ -1,6 +1,6 @@
-import { createChatJsonResponse, requireChatRequestSession, toChatErrorResponse } from "@/features/dashboard/server/chat-route";
-import { fetchCourseCatalogFromBackend } from "@/features/dashboard/server/chat-backend";
-import { appendChatMessage } from "@/features/dashboard/server/chat-store";
+import { createChatJsonResponse, requireChatRequestSession, toChatErrorResponse } from "@/features/student/server/chat-route";
+import { fetchCourseCatalogFromBackend } from "@/features/student/server/chat-backend";
+import { appendChatMessage } from "@/features/student/server/chat-store";
 
 export async function POST(
   request: Request,

@@ -9,7 +9,7 @@ type PageProps = {
 
 export default async function Page({ params }: PageProps) {
   const { courseId } = await params;
-  await requireAuthSession(`/admin/courses/${courseId}`);
+  await requireAuthSession(`/admin/courses/${courseId}`, { role: "ADMIN" });
 
   return <CourseDetailPage courseId={courseId} />;
 }

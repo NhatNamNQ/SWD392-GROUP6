@@ -9,7 +9,7 @@ type PageProps = {
 
 export default async function Page({ params }: PageProps) {
   const { documentId } = await params;
-  await requireAuthSession(`/teacher/knowledge-base/${documentId}`);
+  await requireAuthSession(`/teacher/knowledge-base/${documentId}`, { role: "LECTURER" });
 
   return <DocumentDetailPage documentId={documentId} />;
 }

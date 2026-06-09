@@ -62,4 +62,115 @@ describe("requireAuthSession", () => {
       },
     });
   });
+
+  test("returns the decoded session when the user matches the required role", async () => {
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
+      "@/features/auth/server/session"
+    );
+    const encoded = await encodeAuthSession({
+      accessToken: "access-token",
+      user: {
+        id: "admin-1",
+        email: "admin@example.edu",
+        fullName: "Admin Example",
+        role: "ADMIN",
+        avatarUrl: null,
+      },
+    });
+
+    cookiesMock.mockResolvedValue({
+      get: (name: string) => (name === AUTH_SESSION_COOKIE ? { value: encoded } : undefined),
+    });
+
+    const { requireAuthSession } = await import("@/features/auth/server/require-session");
+
+    await expect(requireAuthSession("/admin/users", { role: "ADMIN" })).resolves.toEqual({
+      accessToken: "access-token",
+      user: {
+        id: "admin-1",
+        email: "admin@example.edu",
+        fullName: "Admin Example",
+        role: "ADMIN",
+        avatarUrl: null,
+      },
+    });
+  });
+
+  test("redirects an authenticated student away from admin routes", async () => {
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
+      "@/features/auth/server/session"
+    );
+    const encoded = await encodeAuthSession({
+      accessToken: "access-token",
+      user: {
+        id: "student-1",
+        email: "student@example.edu",
+        fullName: "Student Example",
+        role: "STUDENT",
+        avatarUrl: null,
+      },
+    });
+
+    cookiesMock.mockResolvedValue({
+      get: (name: string) => (name === AUTH_SESSION_COOKIE ? { value: encoded } : undefined),
+    });
+
+    const { requireAuthSession } = await import("@/features/auth/server/require-session");
+
+    await expect(requireAuthSession("/admin/users", { role: "ADMIN" })).rejects.toThrow(
+      "REDIRECT:/student",
+    );
+  });
+
+  test("redirects an authenticated lecturer away from admin routes", async () => {
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
+      "@/features/auth/server/session"
+    );
+    const encoded = await encodeAuthSession({
+      accessToken: "access-token",
+      user: {
+        id: "lecturer-1",
+        email: "lecturer@example.edu",
+        fullName: "Lecturer Example",
+        role: "LECTURER",
+        avatarUrl: null,
+      },
+    });
+
+    cookiesMock.mockResolvedValue({
+      get: (name: string) => (name === AUTH_SESSION_COOKIE ? { value: encoded } : undefined),
+    });
+
+    const { requireAuthSession } = await import("@/features/auth/server/require-session");
+
+    await expect(requireAuthSession("/admin/courses", { role: "ADMIN" })).rejects.toThrow(
+      "REDIRECT:/teacher",
+    );
+  });
+
+  test("redirects an authenticated admin away from teacher routes", async () => {
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
+      "@/features/auth/server/session"
+    );
+    const encoded = await encodeAuthSession({
+      accessToken: "access-token",
+      user: {
+        id: "admin-1",
+        email: "admin@example.edu",
+        fullName: "Admin Example",
+        role: "ADMIN",
+        avatarUrl: null,
+      },
+    });
+
+    cookiesMock.mockResolvedValue({
+      get: (name: string) => (name === AUTH_SESSION_COOKIE ? { value: encoded } : undefined),
+    });
+
+    const { requireAuthSession } = await import("@/features/auth/server/require-session");
+
+    await expect(
+      requireAuthSession("/teacher/knowledge-base", { role: "LECTURER" }),
+    ).rejects.toThrow("REDIRECT:/admin");
+  });
 });

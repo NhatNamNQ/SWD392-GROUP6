@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
+import type { AuthUser } from "@/features/auth/model/contracts";
+import { getRoleHomePath } from "@/features/auth/model/role-home";
 import {
   changePassword,
   toAuthNotice,
@@ -15,11 +17,16 @@ import {
   type AuthNotice,
 } from "@/features/auth/model/forms";
 
-export function PasswordForm() {
+type PasswordFormProps = {
+  user: AuthUser;
+};
+
+export function PasswordForm({ user }: PasswordFormProps) {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<AuthNotice | null>(null);
+  const backHref = getRoleHomePath(user.role);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,11 +68,11 @@ export function PasswordForm() {
             </h1>
           </div>
           <Link
-            href="/dashboard"
+            href={backHref}
             className="inline-flex items-center gap-2 rounded-sm border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-chip transition hover:border-slate-400"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to dashboard
+            Back to workspace
           </Link>
         </div>
 

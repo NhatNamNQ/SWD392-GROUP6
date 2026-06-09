@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default async function PasswordSettingsRoute() {
-  await requireAuthSession("/settings/password");
-  return <PasswordPage />;
+  const session = await requireAuthSession("/settings/password");
+  return <PasswordPage user={session.user} />;
 }

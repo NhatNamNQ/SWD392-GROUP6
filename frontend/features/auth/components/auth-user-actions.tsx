@@ -2,36 +2,44 @@ import Link from "next/link";
 
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import type { AuthUser } from "@/features/auth/model/contracts";
+import { getRoleHomePath } from "@/features/auth/model/role-home";
 
 type AuthUserActionsProps = {
   user: AuthUser;
 };
 
 export function AuthUserActions({ user }: AuthUserActionsProps) {
+  const roleHomePath = getRoleHomePath(user.role);
+  const roleLinks =
+    user.role === "ADMIN"
+      ? [
+          { href: roleHomePath, label: "Admin home" },
+          { href: "/admin/users", label: "Users" },
+          { href: "/admin/courses", label: "Courses" },
+          { href: "/admin/roles", label: "Roles" },
+        ]
+      : user.role === "LECTURER"
+        ? [
+            { href: roleHomePath, label: "Teacher home" },
+            { href: "/teacher/knowledge-base", label: "Knowledge" },
+          ]
+        : [{ href: roleHomePath, label: "Student home" }];
+
   return (
     <div className="flex flex-wrap items-center justify-end gap-3">
       <div className="hidden text-right md:block">
         <p className="text-sm font-black text-slate-800">{user.fullName}</p>
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{user.role}</p>
       </div>
-      <Link
-        href="/teacher/knowledge-base"
-        className="rounded-sm border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-chip transition hover:border-slate-400"
-      >
-        Knowledge
-      </Link>
-      <Link
-        href="/admin/courses"
-        className="rounded-sm border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-chip transition hover:border-slate-400"
-      >
-        Admin
-      </Link>
-      <Link
-        href="/ops"
-        className="rounded-sm border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-chip transition hover:border-slate-400"
-      >
-        Ops
-      </Link>
+      {roleLinks.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className="rounded-sm border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-chip transition hover:border-slate-400"
+        >
+          {link.label}
+        </Link>
+      ))}
       <Link
         href="/settings/password"
         className="rounded-sm border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-chip transition hover:border-slate-400"
