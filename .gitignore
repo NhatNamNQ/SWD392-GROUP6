@@ -30,6 +30,9 @@ env/
 .pytest_cache/
 .env
 
+# Understand Anything generated artifacts
+.understand-anything/
+
 # Docker & OS
 .DS_Store
 .idea/

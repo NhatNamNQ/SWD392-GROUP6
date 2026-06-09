@@ -1,5 +1,5 @@
-import { LandingPage } from "@/components/orbit/landing-page";
+import { MarketingLandingPage } from "@/features/marketing/landing-page";
 
 export default function HomePage() {
-  return <LandingPage />;
+  return <MarketingLandingPage />;
 }

@@ -12,7 +12,7 @@ flowchart LR
     subgraph CI["GitHub Actions CI"]
         Checkout[Checkout repo and submodules]
         Test[Unit and integration tests]
-        Sonar[SonarQube quality gate]
+        Sonar[SonarQube Cloud quality gate]
         Trivy[Trivy dependency and image scan]
         Build[Build container images]
     end
@@ -56,9 +56,22 @@ If selected later, Jenkins should run the same logical stages:
 Do not maintain GitHub Actions and Jenkins as equal production pipelines unless
 there is a strong reason. Duplicate pipelines drift quickly.
 
-## SonarQube
+## Security Tooling Layout
 
-SonarQube should be used as a quality gate for maintainability and reliability.
+The implementation notes for the current security-first phase live under
+[`security/`](../../security/README.md):
+
+- [`security/sonarqube/`](../../security/sonarqube/README.md)
+- [`security/trivy/`](../../security/trivy/README.md)
+
+## SonarQube Cloud
+
+SonarQube Cloud should be used as a quality gate for maintainability and
+reliability. The repository uses a single repo-level SonarQube Cloud project
+backed by GitHub Actions, with the project key, organization, and host URL
+stored in GitHub repository variables and the token stored as the
+`SONAR_TOKEN` secret.
+
 The initial quality gate should focus on:
 
 - No blocker or critical issues on new code.
