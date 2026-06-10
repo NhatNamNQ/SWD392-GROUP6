@@ -11,5 +11,6 @@ import java.util.List;
 public interface CourseLecturerRepository extends JpaRepository<CourseLecturer, UUID> {
     List<CourseLecturer> findByCourseId(UUID courseId);
     List<CourseLecturer> findByLecturerId(UUID lecturerId);
+    boolean existsByCourseIdAndLecturerId(UUID courseId, UUID lecturerId);
 }
 

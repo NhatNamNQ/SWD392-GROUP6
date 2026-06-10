@@ -27,6 +27,7 @@ public enum ErrorCode {
     PENDING_USER_NOT_FOUND(404, "Pending user not found"),
 
     // User
+    REQUIRE_PASSWORD_CHANGE(403, "You must change your generated password before continuing"),
     USER_NOT_FOUND(404, "User not found"),
     USER_ALREADY_REGISTERED(400, "User already registered"),
     USER_INACTIVE(403, "User is inactive"),
@@ -42,6 +43,7 @@ public enum ErrorCode {
 
     // Document
     DOCUMENT_NOT_FOUND(404, "Document not found"),
+    CHAPTER_NOT_FOUND(404, "Chapter not found"),
     COURSE_NOT_FOUND(404, "Course not found"),
     INVALID_FILE_TYPE(400, "Only PDF files are supported"),
     FILE_STORAGE_FAILED(500, "Failed to store file"),

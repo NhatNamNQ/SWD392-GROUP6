@@ -1,6 +1,9 @@
 package swd392.project.orbitdocsbackend.course.dto.request;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +17,7 @@ public class CourseRequest {
     private String name;
 
     private String description;
+
+    @NotNull(message = "Head lecturer ID is required")
+    private UUID headLecturerId;
 }

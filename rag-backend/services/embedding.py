@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from models.chunk import DocumentChunk, ChunkEmbedding
 from langchain_ollama import OllamaEmbeddings
+from services.chunking import BatchedOllamaEmbeddings
 from core.config import settings
 import uuid
 
@@ -10,10 +11,11 @@ def process_and_store_chunks(db: Session, document_id: str, chunks: list[str], p
     Generate embeddings for each chunk and store them in PostgreSQL (pgvector).
     We also map chunks to pages/chapters via basic heuristic (finding text substring).
     """
-    embeddings_model = OllamaEmbeddings(
+    base_embeddings_model = OllamaEmbeddings(
         model=settings.embedding_model,
         base_url=settings.ollama_base_url
     )
+    embeddings_model = BatchedOllamaEmbeddings(base_embeddings_model, batch_size=50)
     
     # Generate embeddings for all chunks locally (no rate limits)
     vectors = embeddings_model.embed_documents(chunks)

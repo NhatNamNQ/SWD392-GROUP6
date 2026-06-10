@@ -113,6 +113,36 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/force-change-password")
+    public ResponseEntity<ApiResponse<AuthResponse>> forceChangePassword(
+            @Valid @RequestBody ForceChangePasswordRequest request,
+            org.springframework.security.core.Authentication authentication,
+            HttpServletResponse response) {
+
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName(); // This maps to User.fullName because of JwtService
+        AuthResponse authResponse = authService.forceChangePassword(username, request);
+
+        Cookie refreshToken = new Cookie(
+                "refreshToken",
+                authResponse.getRefreshToken()
+        );
+
+        refreshToken.setHttpOnly(true);
+        refreshToken.setPath("/");
+        refreshToken.setMaxAge(60 * 60 * 24 * 7);
+
+        response.addCookie(refreshToken);
+        authResponse.setRefreshToken("");
+
+        return ResponseEntity.ok(
+                ApiResponse.success(authResponse, "Password changed successfully")
+        );
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @CookieValue(value = "refreshToken", required = false) String refreshToken,

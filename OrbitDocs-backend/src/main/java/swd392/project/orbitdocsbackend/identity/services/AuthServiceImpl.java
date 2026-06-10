@@ -25,9 +25,11 @@ import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.identity.exception.RedisDataNotFoundException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.EmailNotFoundException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.OtpLockoutException;
+import swd392.project.orbitdocsbackend.identity.exception.auth.RequirePasswordChangeException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.WrongOtpCodeException;
 import swd392.project.orbitdocsbackend.identity.exception.auth.WrongPasswordException;
 import swd392.project.orbitdocsbackend.identity.exception.token.TokenExpiredException;
+import swd392.project.orbitdocsbackend.identity.exception.user.UserNotFoundException;
 import swd392.project.orbitdocsbackend.identity.mapper.UserMapper;
 import swd392.project.orbitdocsbackend.identity.services.cache.OtpAttemptTracker;
 import swd392.project.orbitdocsbackend.identity.services.cache.RefreshTokenServiceImpl;
@@ -198,6 +200,12 @@ public class AuthServiceImpl implements IAuthService {
             throw new WrongPasswordException();
         }
         UserDetails userDetails = new CustomUserDetails(user);
+
+        if (!user.isPasswordChanged()) {
+            String tempToken = jwtService.generateToken(userDetails);
+            throw new RequirePasswordChangeException(tempToken);
+        }
+
         String accessToken = jwtService.generateToken(userDetails);
         String refreshToken = refreshTokenService.createRefreshToken(user);
 
@@ -228,6 +236,27 @@ public class AuthServiceImpl implements IAuthService {
         long ttl = getRemainingTime(accessToken);
         redisTokenService.blacklistToken(jti, ttl);
 
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse forceChangePassword(String username, ForceChangePasswordRequest request) {
+        User user = userRepository.findByFullName(username)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        user.setPasswordChanged(true);
+        userRepository.save(user);
+
+        UserDetails userDetails = new CustomUserDetails(user);
+        String accessToken = jwtService.generateToken(userDetails);
+        String refreshToken = refreshTokenService.createRefreshToken(user);
+
+        return new AuthResponse(
+                userMapper.toResponse(user),
+                accessToken,
+                refreshToken
+        );
     }
 
 // Function Helper

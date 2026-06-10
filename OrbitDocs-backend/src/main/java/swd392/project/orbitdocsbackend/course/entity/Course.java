@@ -3,6 +3,7 @@ package swd392.project.orbitdocsbackend.course.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import swd392.project.orbitdocsbackend.document.entity.Document;
+import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.entity.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,14 @@ public class Course extends BaseEntity {
     @Builder.Default
     private boolean active = true;
 
+    @Column(name = "join_code", unique = true, length = 10)
+    private String joinCode;
+
     // ─────────── Relationships ───────────
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "head_lecturer_id")
+    private User headLecturer;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default

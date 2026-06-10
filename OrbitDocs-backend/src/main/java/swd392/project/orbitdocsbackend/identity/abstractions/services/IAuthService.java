@@ -18,5 +18,6 @@ public interface IAuthService {
 
     AuthResponse login(LoginRequest request);
     AuthResponse refresh(RefreshRequest request);
+    AuthResponse forceChangePassword(String userId, ForceChangePasswordRequest request);
     void logout(String accessToken);
 }

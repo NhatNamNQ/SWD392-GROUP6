@@ -17,11 +17,17 @@ import swd392.project.orbitdocsbackend.document.service.IChapterService;
 import swd392.project.orbitdocsbackend.shared.enums.DocumentStatus;
 import swd392.project.orbitdocsbackend.shared.exception.AppException;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
+import swd392.project.orbitdocsbackend.identity.entity.User;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import swd392.project.orbitdocsbackend.course.service.ICourseService;
 
 @Slf4j
 @Service
@@ -33,8 +39,25 @@ public class ChapterServiceImpl implements IChapterService {
         private final IndexingJobRepository indexingJobRepository;
         private final ChapterMapper chapterMapper;
 
+        private final ICourseService courseService;
+
         @Override
         public List<ChapterResponse> getChaptersByDocumentId(UUID documentId) {
+                Document document = documentRepository.findById(documentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
+
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                        User user = userDetails.user();
+                        
+                        if (user.getRole().getName().name().equals("STUDENT")) {
+                                if (!courseService.isStudentEnrolled(document.getCourse().getId(), user.getId())) {
+                                        throw new AppException(ErrorCode.UNAUTHORIZED);
+                                }
+                        }
+                }
+
                 return chapterRepository.findByDocumentId(documentId)
                                 .stream()
                                 .map(chapterMapper::toResponse)
@@ -77,5 +100,11 @@ public class ChapterServiceImpl implements IChapterService {
 
                 log.info("Successfully synced {} chapters and marked document {} as INDEXED",
                                 chapters.size(), document.getId());
+        }
+
+        @Override
+        public Chapter getChapterEntityById(UUID id) {
+                return chapterRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.CHAPTER_NOT_FOUND)); // Or something similar, let's just throw generic exception if errorcode not found
         }
 }

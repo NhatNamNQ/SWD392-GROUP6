@@ -21,12 +21,8 @@ import swd392.project.orbitdocsbackend.chat.repository.ChatMessageRepository;
 import swd392.project.orbitdocsbackend.chat.repository.ChatSessionRepository;
 import swd392.project.orbitdocsbackend.chat.service.IChatService;
 import swd392.project.orbitdocsbackend.course.entity.Course;
-import swd392.project.orbitdocsbackend.course.repository.CourseRepository;
 import swd392.project.orbitdocsbackend.document.entity.Chapter;
 import swd392.project.orbitdocsbackend.document.entity.Document;
-import swd392.project.orbitdocsbackend.document.repository.ChapterRepository;
-import swd392.project.orbitdocsbackend.document.repository.DocumentRepository;
-import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.enums.MessageRole;
 
@@ -35,6 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import swd392.project.orbitdocsbackend.identity.abstractions.services.IUserService;
+import swd392.project.orbitdocsbackend.course.service.ICourseService;
+import swd392.project.orbitdocsbackend.document.service.IDocumentService;
+import swd392.project.orbitdocsbackend.document.service.IChapterService;
 
 @Slf4j
 @Service
@@ -43,10 +43,10 @@ public class ChatServiceImpl implements IChatService {
 
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final UserRepository userRepository;
-    private final CourseRepository courseRepository;
-    private final DocumentRepository documentRepository;
-    private final ChapterRepository chapterRepository;
+    private final IUserService userService;
+    private final ICourseService courseService;
+    private final IDocumentService documentService;
+    private final IChapterService chapterService;
     private final RestClient restClient = RestClient.create();
 
     @Value("${rag.internal-url}")
@@ -58,16 +58,26 @@ public class ChatServiceImpl implements IChatService {
     @Override
     @Transactional
     public ChatResponse sendMessage(ChatRequest request, UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.getUserEntityById(userId);
 
         ChatSession session;
         if (request.getSessionId() != null) {
             session = chatSessionRepository.findByIdAndUserIdAndActiveTrue(request.getSessionId(), userId)
                     .orElseThrow(() -> new RuntimeException("Session not found or inactive"));
         } else {
-            Course course = courseRepository.findById(request.getCourseId())
-                    .orElseThrow(() -> new RuntimeException("Course not found"));
+            Course course = courseService.getCourseEntityById(request.getCourseId());
+
+            // Access control check
+            if (user.getRole().getName().name().equals("STUDENT")) {
+                if (!courseService.isStudentEnrolled(course.getId(), userId)) {
+                    throw new RuntimeException("You are not enrolled in this course");
+                }
+            } else if (user.getRole().getName().name().equals("LECTURER")) {
+                if (course.getHeadLecturer() == null || !course.getHeadLecturer().getId().equals(userId)) {
+                    throw new RuntimeException("You are not the head lecturer of this course");
+                }
+            }
+
             session = ChatSession.builder()
                     .user(user)
                     .course(course)
@@ -76,14 +86,18 @@ public class ChatServiceImpl implements IChatService {
                     .build();
 
             if (request.getDocumentId() != null) {
-                Document doc = documentRepository.findById(request.getDocumentId())
-                        .orElseThrow(() -> new RuntimeException("Document not found"));
+                Document doc = documentService.getDocumentEntityById(request.getDocumentId());
+
+                // Access control check for document
+                if (!doc.getCourse().getId().equals(course.getId())) {
+                    throw new RuntimeException("Document does not belong to this course");
+                }
+
                 session.getDocuments().add(doc);
             }
 
             if (request.getChapterId() != null) {
-                Chapter chapter = chapterRepository.findById(request.getChapterId())
-                        .orElseThrow(() -> new RuntimeException("Chapter not found"));
+                Chapter chapter = chapterService.getChapterEntityById(request.getChapterId());
                 session.getChapters().add(chapter);
             }
             session = chatSessionRepository.save(session);

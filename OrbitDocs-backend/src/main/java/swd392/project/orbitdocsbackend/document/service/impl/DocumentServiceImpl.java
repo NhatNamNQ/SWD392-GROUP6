@@ -2,8 +2,12 @@ package swd392.project.orbitdocsbackend.document.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import swd392.project.orbitdocsbackend.course.entity.Course;
 import swd392.project.orbitdocsbackend.course.repository.CourseRepository;
 import swd392.project.orbitdocsbackend.document.dto.request.DocumentUploadRequest;
@@ -15,6 +19,7 @@ import swd392.project.orbitdocsbackend.document.service.IDocumentService;
 import swd392.project.orbitdocsbackend.document.service.IRagIntegrationService;
 import swd392.project.orbitdocsbackend.document.service.IStorageService;
 import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
+import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.enums.DocumentStatus;
 import swd392.project.orbitdocsbackend.shared.enums.FileType;
@@ -26,6 +31,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import swd392.project.orbitdocsbackend.course.service.ICourseService;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,7 +40,7 @@ public class DocumentServiceImpl implements IDocumentService {
 
     private final DocumentRepository documentRepository;
     private final CourseRepository courseRepository;
-    private final UserRepository userRepository; // TODO: Replace with SecurityContext after auth integration
+    private final ICourseService courseService;
     private final IStorageService storageService;
     private final IRagIntegrationService ragIntegrationService;
     private final DocumentMapper documentMapper;
@@ -44,9 +51,19 @@ public class DocumentServiceImpl implements IDocumentService {
         Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
-        // TODO: Replace with SecurityContext.getCurrentUser() after auth integration
-        User uploadedBy = userRepository.findAll().stream().findFirst()
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        // Get current authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User uploadedBy = userDetails.user();
+
+        // Check if uploader is the Head Lecturer of this course
+        if (course.getHeadLecturer() == null || !course.getHeadLecturer().getId().equals(uploadedBy.getId())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED); // Only head lecturer can upload
+        }
 
         // Validate file type
         String originalFilename = request.getFile().getOriginalFilename();
@@ -119,6 +136,22 @@ public class DocumentServiceImpl implements IDocumentService {
 
     @Override
     public List<DocumentResponse> getDocumentsByCourseId(UUID courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = userDetails.user();
+
+            // Allow if user is ADMIN or LECTURER or enrolled STUDENT
+            if (user.getRole().getName().name().equals("STUDENT")) {
+                if (!courseService.isStudentEnrolled(courseId, user.getId())) {
+                    throw new AppException(ErrorCode.UNAUTHORIZED);
+                }
+            }
+        }
+
         return documentRepository.findByCourseId(courseId)
                 .stream()
                 .map(documentMapper::toResponse)
@@ -145,5 +178,11 @@ public class DocumentServiceImpl implements IDocumentService {
         }
 
         documentRepository.delete(document);
+    }
+
+    @Override
+    public Document getDocumentEntityById(UUID id) {
+        return documentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
     }
 }

@@ -43,6 +43,10 @@ public class User extends BaseEntity {
         @Builder.Default
         private boolean active = true;
 
+        @Column(name = "is_password_changed", nullable = false)
+        @Builder.Default
+        private boolean passwordChanged = true;
+
         // ─────────── Relationships ───────────
 
         @ManyToOne(fetch = FetchType.LAZY, optional = false)

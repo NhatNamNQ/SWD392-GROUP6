@@ -107,4 +107,10 @@ public class UserServiceImpl implements IUserService {
         }
         userRepository.deleteById(id);
     }
+
+    @Override
+    public User getUserEntityById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+    }
 }
