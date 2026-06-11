@@ -25,16 +25,16 @@ import swd392.project.orbitdocsbackend.document.entity.Chapter;
 import swd392.project.orbitdocsbackend.document.entity.Document;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.enums.MessageRole;
+import swd392.project.orbitdocsbackend.identity.abstractions.services.IUserService;
+import swd392.project.orbitdocsbackend.course.service.ICourseService;
+import swd392.project.orbitdocsbackend.document.service.IDocumentService;
+import swd392.project.orbitdocsbackend.document.service.IChapterService;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import swd392.project.orbitdocsbackend.identity.abstractions.services.IUserService;
-import swd392.project.orbitdocsbackend.course.service.ICourseService;
-import swd392.project.orbitdocsbackend.document.service.IDocumentService;
-import swd392.project.orbitdocsbackend.document.service.IChapterService;
 
 @Slf4j
 @Service
@@ -67,16 +67,7 @@ public class ChatServiceImpl implements IChatService {
         } else {
             Course course = courseService.getCourseEntityById(request.getCourseId());
 
-            // Access control check
-            if (user.getRole().getName().name().equals("STUDENT")) {
-                if (!courseService.isStudentEnrolled(course.getId(), userId)) {
-                    throw new RuntimeException("You are not enrolled in this course");
-                }
-            } else if (user.getRole().getName().name().equals("LECTURER")) {
-                if (course.getHeadLecturer() == null || !course.getHeadLecturer().getId().equals(userId)) {
-                    throw new RuntimeException("You are not the head lecturer of this course");
-                }
-            }
+            // Access control: Everyone can chat on any course freely.
 
             session = ChatSession.builder()
                     .user(user)
@@ -165,7 +156,7 @@ public class ChatServiceImpl implements IChatService {
             for (RagChatResponse.RagCitation rc : ragResponse.getCitations()) {
                 MessageCitation citation = MessageCitation.builder()
                         .message(assistantMessage)
-                        .similarityScore(rc.getDistance()) // Assuming distance is score for now
+                        .similarityScore(rc.getDistance())
                         .excerpt("Chunk " + rc.getChunk_index() + " on page " + rc.getPage_num())
                         .build();
                 citations.add(citation);
@@ -221,7 +212,7 @@ public class ChatServiceImpl implements IChatService {
                     CitationDto.builder()
                             .excerpt(cit.getExcerpt())
                             .similarityScore(cit.getSimilarityScore())
-                            .pageNum(null) // we don't store pageNum in db directly yet, but can get from Chunk if needed
+                            .pageNum(null)
                             .build()
             ).collect(Collectors.toList());
 

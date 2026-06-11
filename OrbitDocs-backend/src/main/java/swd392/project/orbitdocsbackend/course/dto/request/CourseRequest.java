@@ -18,6 +18,6 @@ public class CourseRequest {
 
     private String description;
 
-    @NotNull(message = "Head lecturer ID is required")
-    private UUID headLecturerId;
+    @NotNull(message = "Lecturer ID is required")
+    private UUID lecturerId;
 }

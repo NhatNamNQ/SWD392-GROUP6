@@ -11,10 +11,8 @@ import java.util.UUID;
 
 /**
  * A university course (e.g. SWD392, PRN211).
- * Contains chapters and can have multiple assigned lecturers.
- * <p>
- * Module: course
- * </p>
+ * Each course has exactly one assigned lecturer who can upload documents.
+ * Students can access all courses freely without enrollment.
  */
 @Entity
 @Table(name = "courses", uniqueConstraints = @UniqueConstraint(name = "uk_courses_code", columnNames = "code"))
@@ -44,20 +42,14 @@ public class Course extends BaseEntity {
     @Builder.Default
     private boolean active = true;
 
-    @Column(name = "join_code", unique = true, length = 10)
-    private String joinCode;
-
     // ─────────── Relationships ───────────
 
+    /** The single lecturer assigned to this course. This person uploads documents. */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "head_lecturer_id")
-    private User headLecturer;
+    @JoinColumn(name = "lecturer_id")
+    private User lecturer;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Document> documents = new ArrayList<>();
-
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<CourseLecturer> courseLecturers = new ArrayList<>();
 }

@@ -16,5 +16,7 @@ public class CourseResponse {
     private String name;
     private String description;
     private boolean active;
+    private UUID lecturerId;
+    private String lecturerName;
     private Instant createdAt;
 }

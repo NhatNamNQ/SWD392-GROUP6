@@ -18,7 +18,6 @@ import swd392.project.orbitdocsbackend.document.repository.DocumentRepository;
 import swd392.project.orbitdocsbackend.document.service.IDocumentService;
 import swd392.project.orbitdocsbackend.document.service.IRagIntegrationService;
 import swd392.project.orbitdocsbackend.document.service.IStorageService;
-import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
 import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.enums.DocumentStatus;
@@ -31,8 +30,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import swd392.project.orbitdocsbackend.course.service.ICourseService;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,7 +37,6 @@ public class DocumentServiceImpl implements IDocumentService {
 
     private final DocumentRepository documentRepository;
     private final CourseRepository courseRepository;
-    private final ICourseService courseService;
     private final IStorageService storageService;
     private final IRagIntegrationService ragIntegrationService;
     private final DocumentMapper documentMapper;
@@ -60,9 +56,9 @@ public class DocumentServiceImpl implements IDocumentService {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User uploadedBy = userDetails.user();
 
-        // Check if uploader is the Head Lecturer of this course
-        if (course.getHeadLecturer() == null || !course.getHeadLecturer().getId().equals(uploadedBy.getId())) {
-            throw new AppException(ErrorCode.UNAUTHORIZED); // Only head lecturer can upload
+        // Check if uploader is the assigned lecturer of this course
+        if (course.getLecturer() == null || !course.getLecturer().getId().equals(uploadedBy.getId())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED); // Only the assigned lecturer can upload
         }
 
         // Validate file type
@@ -136,22 +132,10 @@ public class DocumentServiceImpl implements IDocumentService {
 
     @Override
     public List<DocumentResponse> getDocumentsByCourseId(UUID courseId) {
-        Course course = courseRepository.findById(courseId)
+        courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            User user = userDetails.user();
-
-            // Allow if user is ADMIN or LECTURER or enrolled STUDENT
-            if (user.getRole().getName().name().equals("STUDENT")) {
-                if (!courseService.isStudentEnrolled(courseId, user.getId())) {
-                    throw new AppException(ErrorCode.UNAUTHORIZED);
-                }
-            }
-        }
-
+        // All authenticated users (student, lecturer, admin) can view documents
         return documentRepository.findByCourseId(courseId)
                 .stream()
                 .map(documentMapper::toResponse)
