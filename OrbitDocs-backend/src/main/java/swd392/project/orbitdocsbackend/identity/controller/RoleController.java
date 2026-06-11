@@ -1,12 +1,12 @@
-package swd392.project.orbitdocsbackend.identity.controllers;
+package swd392.project.orbitdocsbackend.identity.controller;
 
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import swd392.project.orbitdocsbackend.identity.abstractions.services.IRoleService;
-import swd392.project.orbitdocsbackend.identity.dtos.role.request.CommonRoleRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.role.response.RoleResponse;
+import swd392.project.orbitdocsbackend.identity.dto.role.request.CommonRoleRequest;
+import swd392.project.orbitdocsbackend.identity.dto.role.response.RoleResponse;
 
 import java.net.URI;
 import java.util.List;

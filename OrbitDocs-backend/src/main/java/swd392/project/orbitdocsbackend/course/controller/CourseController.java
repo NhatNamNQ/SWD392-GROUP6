@@ -46,10 +46,4 @@ public class CourseController {
     public ApiResponse<CourseResponse> updateCourse(@PathVariable UUID id, @RequestBody @Valid CourseRequest request) {
         return ApiResponse.success(courseService.updateCourse(id, request));
     }
-
-    @PostMapping("/{courseId}/lecturers/{lecturerId}")
-    public ApiResponse<Void> assignLecturer(@PathVariable UUID courseId, @PathVariable UUID lecturerId) {
-        courseService.assignLecturer(courseId, lecturerId);
-        return ApiResponse.success(null);
-    }
 }

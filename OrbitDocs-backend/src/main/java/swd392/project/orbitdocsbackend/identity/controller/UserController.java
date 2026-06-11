@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.controllers;
+package swd392.project.orbitdocsbackend.identity.controller;
 
 
 import jakarta.validation.Valid;
@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import swd392.project.orbitdocsbackend.identity.abstractions.services.IUserService;
-import swd392.project.orbitdocsbackend.identity.dtos.user.request.ChangePasswordRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.user.request.CreateUserRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.user.request.UserCommonRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.user.response.UserResponse;
+import swd392.project.orbitdocsbackend.identity.dto.user.request.ChangePasswordRequest;
+import swd392.project.orbitdocsbackend.identity.dto.user.request.CreateUserRequest;
+import swd392.project.orbitdocsbackend.identity.dto.user.request.UserCommonRequest;
+import swd392.project.orbitdocsbackend.identity.dto.user.response.UserResponse;
 
 import java.net.URI;
 import java.util.List;

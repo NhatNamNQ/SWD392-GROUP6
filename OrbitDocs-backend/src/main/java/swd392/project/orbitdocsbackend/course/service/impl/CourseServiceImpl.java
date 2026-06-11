@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 import swd392.project.orbitdocsbackend.course.dto.request.CourseRequest;
 import swd392.project.orbitdocsbackend.course.dto.response.CourseResponse;
 import swd392.project.orbitdocsbackend.course.entity.Course;
-import swd392.project.orbitdocsbackend.course.entity.CourseLecturer;
 import swd392.project.orbitdocsbackend.course.mapper.CourseMapper;
-import swd392.project.orbitdocsbackend.course.repository.CourseLecturerRepository;
 import swd392.project.orbitdocsbackend.course.repository.CourseRepository;
 import swd392.project.orbitdocsbackend.course.service.ICourseService;
-import swd392.project.orbitdocsbackend.identity.abstractions.repositories.UserRepository;
+import swd392.project.orbitdocsbackend.identity.abstractions.services.IUserService;
 import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.exception.AppException;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
@@ -27,16 +25,16 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements ICourseService {
 
     private final CourseRepository courseRepository;
-    private final CourseLecturerRepository courseLecturerRepository;
     private final CourseMapper courseMapper;
-    
-    // Khuyen dung: Trong tuong lai nen goi qua IUserService thay vi goi truc tiep UserRepository
-    // de giu dung nguyen tac dong goi cua Modular Monolith.
-    private final UserRepository userRepository;
+    private final IUserService userService;
 
     @Override
     public CourseResponse createCourse(CourseRequest request) {
+        User lecturer = userService.getUserEntityById(request.getLecturerId());
+
         Course course = courseMapper.toEntity(request);
+        course.setLecturer(lecturer);
+
         course = courseRepository.save(course);
         return courseMapper.toResponse(course);
     }
@@ -58,7 +56,6 @@ public class CourseServiceImpl implements ICourseService {
     @Override
     public Page<CourseResponse> searchCoursesByCode(String code, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-
         return courseRepository.findByCodeContainingIgnoreCase(code, pageable)
                 .map(courseMapper::toResponse);
     }
@@ -67,28 +64,23 @@ public class CourseServiceImpl implements ICourseService {
     public CourseResponse updateCourse(UUID id, CourseRequest request) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
-        
+
         course.setCode(request.getCode());
         course.setName(request.getName());
         course.setDescription(request.getDescription());
-        
+
+        if (request.getLecturerId() != null) {
+            User lecturer = userService.getUserEntityById(request.getLecturerId());
+            course.setLecturer(lecturer);
+        }
+
         course = courseRepository.save(course);
         return courseMapper.toResponse(course);
     }
 
     @Override
-    public void assignLecturer(UUID courseId, UUID lecturerId) {
-        Course course = courseRepository.findById(courseId)
+    public Course getCourseEntityById(UUID courseId) {
+        return courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
-                
-        User lecturer = userRepository.findById(lecturerId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-        CourseLecturer assignment = CourseLecturer.builder()
-                .course(course)
-                .lecturer(lecturer)
-                .build();
-                
-        courseLecturerRepository.save(assignment);
     }
 }

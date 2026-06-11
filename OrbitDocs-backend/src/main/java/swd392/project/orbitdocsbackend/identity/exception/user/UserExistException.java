@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.exceptions.user;
+package swd392.project.orbitdocsbackend.identity.exception.user;
 
 import org.springframework.http.HttpStatus;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;

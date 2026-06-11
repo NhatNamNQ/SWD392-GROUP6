@@ -6,12 +6,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import swd392.project.orbitdocsbackend.identity.abstractions.repositories.RefreshTokenRepository;
 import swd392.project.orbitdocsbackend.identity.abstractions.services.IRefreshTokenService;
-import swd392.project.orbitdocsbackend.identity.dtos.user.CustomUserDetails;
+import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.identity.entity.RefreshToken;
 import swd392.project.orbitdocsbackend.identity.entity.User;
-import swd392.project.orbitdocsbackend.identity.exceptions.token.InvalidTokenException;
-import swd392.project.orbitdocsbackend.identity.exceptions.token.TokenExpiredException;
-import swd392.project.orbitdocsbackend.identity.exceptions.token.TokenRevokedException;
+import swd392.project.orbitdocsbackend.identity.exception.token.InvalidTokenException;
+import swd392.project.orbitdocsbackend.identity.exception.token.TokenExpiredException;
+import swd392.project.orbitdocsbackend.identity.exception.token.TokenRevokedException;
 import swd392.project.orbitdocsbackend.identity.services.JwtServiceImpl;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
 

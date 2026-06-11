@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.notification.dtos.Enums;
+package swd392.project.orbitdocsbackend.notification.dto.Enums;
 
 public enum OtpType {
     REGISTER,

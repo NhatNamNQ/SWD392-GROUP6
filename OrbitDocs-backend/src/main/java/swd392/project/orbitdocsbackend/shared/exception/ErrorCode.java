@@ -8,6 +8,14 @@ public enum ErrorCode {
     TOKEN_EXPIRED(401, "Token expired"),
     TOKEN_INVALID(401, "Token invalid"),
     TOKEN_REVOKED(401, "Token revoked"),
+    MISSING_COOKIE(401, "Missing cookie"),
+
+    //Redis
+    REDIS_DATA_NOT_FOUND(404, "Redis data not found"),
+    OTP_SAVE_FAILED (401 ,"OTP_SAVE_FAILED"),
+    OTP_DELETE_FAILED (401 ,"OTP_DELETE_FAILED"),
+    OTP_RATE_LIMIT_EXCEEDED (401 ,"OTP_RATE_LIMIT_EXCEEDED"),
+    tp_Expired (401, "OTP_EXPIRED"),
 
     // Auth
     EMAIL_NOT_FOUND(404, "Email not found"),
@@ -19,8 +27,10 @@ public enum ErrorCode {
     PENDING_USER_NOT_FOUND(404, "Pending user not found"),
 
     // User
+    REQUIRE_PASSWORD_CHANGE(403, "You must change your generated password before continuing"),
     USER_NOT_FOUND(404, "User not found"),
     USER_ALREADY_REGISTERED(400, "User already registered"),
+    USER_INACTIVE(403, "User is inactive"),
 
     // Role
     ROLE_NOT_FOUND(404, "Role not found"),
@@ -33,6 +43,7 @@ public enum ErrorCode {
 
     // Document
     DOCUMENT_NOT_FOUND(404, "Document not found"),
+    CHAPTER_NOT_FOUND(404, "Chapter not found"),
     COURSE_NOT_FOUND(404, "Course not found"),
     INVALID_FILE_TYPE(400, "Only PDF files are supported"),
     FILE_STORAGE_FAILED(500, "Failed to store file"),

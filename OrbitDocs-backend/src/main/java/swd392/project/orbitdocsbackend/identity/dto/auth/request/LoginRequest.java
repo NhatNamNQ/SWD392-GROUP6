@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.dtos.auth.request;
+package swd392.project.orbitdocsbackend.identity.dto.auth.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

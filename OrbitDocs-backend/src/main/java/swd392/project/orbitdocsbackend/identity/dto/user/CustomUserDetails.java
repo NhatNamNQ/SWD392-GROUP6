@@ -1,4 +1,4 @@
-package swd392.project.orbitdocsbackend.identity.dtos.user;
+package swd392.project.orbitdocsbackend.identity.dto.user;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

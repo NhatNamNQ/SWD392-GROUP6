@@ -1,8 +1,8 @@
 package swd392.project.orbitdocsbackend.identity.mapper;
 
 import org.mapstruct.*;
-import swd392.project.orbitdocsbackend.identity.dtos.role.request.CommonRoleRequest;
-import swd392.project.orbitdocsbackend.identity.dtos.role.response.RoleResponse;
+import swd392.project.orbitdocsbackend.identity.dto.role.request.CommonRoleRequest;
+import swd392.project.orbitdocsbackend.identity.dto.role.response.RoleResponse;
 import swd392.project.orbitdocsbackend.identity.entity.Role;
 import swd392.project.orbitdocsbackend.shared.enums.RoleName;
 

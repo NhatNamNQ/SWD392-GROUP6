@@ -35,6 +35,10 @@ public class ChapterServiceImpl implements IChapterService {
 
         @Override
         public List<ChapterResponse> getChaptersByDocumentId(UUID documentId) {
+                documentRepository.findById(documentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
+
+                // All authenticated users can view chapters — no enrollment check needed
                 return chapterRepository.findByDocumentId(documentId)
                                 .stream()
                                 .map(chapterMapper::toResponse)
@@ -77,5 +81,11 @@ public class ChapterServiceImpl implements IChapterService {
 
                 log.info("Successfully synced {} chapters and marked document {} as INDEXED",
                                 chapters.size(), document.getId());
+        }
+
+        @Override
+        public Chapter getChapterEntityById(UUID id) {
+                return chapterRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.CHAPTER_NOT_FOUND));
         }
 }

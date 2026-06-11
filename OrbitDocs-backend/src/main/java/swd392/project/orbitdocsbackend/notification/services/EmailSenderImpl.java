@@ -60,6 +60,25 @@ public class EmailSenderImpl implements IEmailSender {
         }
     }
 
+    @Override
+    @Async
+    public CompletableFuture<Void> sendLecturerCredentialsAsync(String toEmail, String randomPassword) {
+        try {
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("password", randomPassword);
+            context.setVariable("year", LocalDateTime.now().getYear());
+
+            String html = templateEngine.process("lecturer-credentials", context);
+
+            sendHtmlEmail(toEmail, "OrbitDocs - Lecturer Account Created", html);
+
+            return CompletableFuture.completedFuture(null);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
     private void sendHtmlEmail(String to, String subject, String html) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
