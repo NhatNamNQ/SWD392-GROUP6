@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,11 +14,14 @@ import {
   searchCourses,
 } from "@/features/course-management/api/course-client";
 import type { CoursePayload, CourseRecord } from "@/features/course-management/model/types";
+import { fetchUsers } from "@/features/admin-governance/api/admin-client";
+import type { UserRecord } from "@/features/admin-governance/model/types";
 
 const emptyPayload: CoursePayload = {
   code: "",
   name: "",
   description: "",
+  lecturerId: "",
 };
 
 function toMessage(error: unknown) {
@@ -31,28 +34,37 @@ function toMessage(error: unknown) {
 
 export function CoursesPage() {
   const [courses, setCourses] = useState<CourseRecord[]>([]);
+  const [users, setUsers] = useState<UserRecord[]>([]);
   const [query, setQuery] = useState("");
   const [form, setForm] = useState<CoursePayload>(emptyPayload);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadCourses() {
+  const loadCourses = useCallback(async () => {
     setLoading(true);
     try {
-      setCourses(await fetchCourses());
+      const [nextCourses, nextUsers] = await Promise.all([fetchCourses(), fetchUsers()]);
+      setCourses(nextCourses);
+      setUsers(nextUsers);
       setNotice(null);
     } catch (error) {
       setNotice(toMessage(error));
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     startTransition(() => {
       void loadCourses();
     });
-  }, []);
+  }, [loadCourses]);
+
+  const lecturers = useMemo(
+    () => users.filter((user) => user.roleResponse?.name === "LECTURER"),
+    [users],
+  );
+  const resolvedLecturerId = form.lecturerId || lecturers[0]?.id || "";
 
   const visibleCourses = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -79,13 +91,13 @@ export function CoursesPage() {
   async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!form.code.trim() || !form.name.trim()) {
-      setNotice("Course code and name are required.");
+    if (!form.code.trim() || !form.name.trim() || !resolvedLecturerId) {
+      setNotice("Course code, name, and lecturer are required.");
       return;
     }
 
     try {
-      await createCourse(form);
+      await createCourse({ ...form, lecturerId: resolvedLecturerId });
       setForm(emptyPayload);
       await loadCourses();
       setNotice("Course created.");
@@ -143,6 +155,9 @@ export function CoursesPage() {
                   <span className="text-sm font-semibold text-slate-500">
                     {course.description || "No description"}
                   </span>
+                  <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                    Lecturer: {course.lecturerName || "Unassigned"}
+                  </span>
                 </Link>
               ))}
               {!loading && !visibleCourses.length ? (
@@ -174,6 +189,26 @@ export function CoursesPage() {
                   }
                   placeholder="Description"
                 />
+                <select
+                  className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
+                  value={resolvedLecturerId}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, lecturerId: event.target.value }))
+                  }
+                  disabled={!lecturers.length}
+                >
+                  <option value="">Select lecturer</option>
+                  {lecturers.map((lecturer) => (
+                    <option key={lecturer.id} value={lecturer.id}>
+                      {lecturer.fullName || lecturer.email}
+                    </option>
+                  ))}
+                </select>
+                {!lecturers.length ? (
+                  <p className="text-xs font-bold text-slate-500">
+                    Create a lecturer account first before creating a course.
+                  </p>
+                ) : null}
                 <Button type="submit">
                   <Plus className="mr-2 h-4 w-4" />
                   Create
@@ -186,4 +221,3 @@ export function CoursesPage() {
     </main>
   );
 }
-

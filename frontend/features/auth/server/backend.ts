@@ -4,6 +4,7 @@ import {
   type AuthError,
   type BackendApiError,
   type BackendAuthResponse,
+  type BackendApiResponse,
 } from "@/features/auth/model/contracts";
 
 const DEFAULT_BACKEND_URL = "http://localhost:8080";
@@ -66,6 +67,28 @@ async function parseJsonBody<T>(response: Response) {
   return (await response.json()) as T;
 }
 
+function isApiEnvelope<T>(payload: BackendApiResponse<T> | T | null): payload is BackendApiResponse<T> {
+  return typeof payload === "object" && payload !== null && "data" in payload;
+}
+
+export async function readBackendApiResponse<T>(response: Response) {
+  const payload = await parseJsonBody<BackendApiResponse<T> | T>(response);
+
+  if (!payload) {
+    throw new Error("Missing backend payload.");
+  }
+
+  if (isApiEnvelope(payload)) {
+    return payload;
+  }
+
+  return {
+    status: response.status,
+    message: "Success",
+    data: payload as T,
+  } satisfies BackendApiResponse<T>;
+}
+
 export async function requestBackend(path: string, init: RequestInit) {
   return fetch(`${getBackendBaseUrl()}${path}`, {
     ...init,
@@ -83,11 +106,12 @@ export async function readBackendAuthError(response: Response): Promise<AuthErro
 }
 
 export async function readBackendAuthSession(response: Response) {
-  const payload = await parseJsonBody<BackendAuthResponse>(response);
+  const payload = await readBackendApiResponse<BackendAuthResponse>(response);
+  const authResponse = payload.data;
 
-  if (!payload) {
+  if (!authResponse) {
     throw new Error("Missing auth payload.");
   }
 
-  return normalizeAuthSession(payload);
+  return normalizeAuthSession(authResponse);
 }

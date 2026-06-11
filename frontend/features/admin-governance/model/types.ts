@@ -28,8 +28,12 @@ export type CreateUserPayload = {
   password: string;
 };
 
+export type CreateLecturerPayload = {
+  email: string;
+  fullName: string;
+};
+
 export type RolePayload = {
   name: string;
   description: string;
 };
-

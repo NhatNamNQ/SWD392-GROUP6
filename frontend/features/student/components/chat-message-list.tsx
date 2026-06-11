@@ -68,14 +68,14 @@ export function ChatMessageList({
           <Card className="w-full max-w-3xl bg-paper">
             <CardHeader className="space-y-4">
               <Badge variant="blue" className="w-fit">
-                SWD392 study helper
+                OrbitDocs shared workspace
               </Badge>
               <CardTitle className="text-3xl md:text-4xl">
                 What would you like to learn today?
               </CardTitle>
               <p className="max-w-2xl text-sm font-semibold text-slate-600 md:text-base">
-                Ask about models, patterns, or diagrams. OrbitDocs stays inside the selected
-                course scope and shows the exact source.
+                Ask about models, patterns, or diagrams. Responses come from the selected
+                course document and keep citations attached to the live backend session.
               </p>
               <p className="text-xs font-black uppercase tracking-[0.08em] text-slate-500">
                 Active scope: {activeScopeLabel}

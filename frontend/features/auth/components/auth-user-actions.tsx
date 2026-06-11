@@ -14,6 +14,7 @@ export function AuthUserActions({ user }: AuthUserActionsProps) {
     user.role === "ADMIN"
       ? [
           { href: roleHomePath, label: "Admin home" },
+          { href: "/student", label: "Chat workspace" },
           { href: "/admin/users", label: "Users" },
           { href: "/admin/courses", label: "Courses" },
           { href: "/admin/roles", label: "Roles" },
@@ -21,9 +22,10 @@ export function AuthUserActions({ user }: AuthUserActionsProps) {
       : user.role === "LECTURER"
         ? [
             { href: roleHomePath, label: "Teacher home" },
+            { href: "/student", label: "Chat workspace" },
             { href: "/teacher/knowledge-base", label: "Knowledge" },
           ]
-        : [{ href: roleHomePath, label: "Student home" }];
+        : [{ href: "/student", label: "Chat workspace" }];
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-3">

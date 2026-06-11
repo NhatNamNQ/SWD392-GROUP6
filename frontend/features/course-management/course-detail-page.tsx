@@ -1,18 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Save, UserPlus } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  assignLecturer,
-  fetchCourse,
-  updateCourse,
-} from "@/features/course-management/api/course-client";
+import { fetchCourse, updateCourse } from "@/features/course-management/api/course-client";
 import type { CoursePayload, CourseRecord } from "@/features/course-management/model/types";
 import { fetchUsers } from "@/features/admin-governance/api/admin-client";
 import type { UserRecord } from "@/features/admin-governance/model/types";
@@ -27,9 +23,13 @@ function toMessage(error: unknown) {
 
 export function CourseDetailPage({ courseId }: { courseId: string }) {
   const [course, setCourse] = useState<CourseRecord | null>(null);
-  const [form, setForm] = useState<CoursePayload>({ code: "", name: "", description: "" });
+  const [form, setForm] = useState<CoursePayload>({
+    code: "",
+    name: "",
+    description: "",
+    lecturerId: "",
+  });
   const [users, setUsers] = useState<UserRecord[]>([]);
-  const [lecturerId, setLecturerId] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,6 +41,7 @@ export function CourseDetailPage({ courseId }: { courseId: string }) {
           code: nextCourse.code,
           name: nextCourse.name,
           description: nextCourse.description ?? "",
+          lecturerId: nextCourse.lecturerId ?? "",
         });
         setUsers(nextUsers);
       } catch (error) {
@@ -57,24 +58,15 @@ export function CourseDetailPage({ courseId }: { courseId: string }) {
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    try {
-      const updated = await updateCourse(courseId, form);
-      setCourse(updated);
-      setNotice("Course updated.");
-    } catch (error) {
-      setNotice(toMessage(error));
-    }
-  }
-
-  async function handleAssign() {
-    if (!lecturerId) {
-      setNotice("Select a lecturer first.");
+    if (!form.lecturerId) {
+      setNotice("Select a lecturer before saving.");
       return;
     }
 
     try {
-      await assignLecturer(courseId, lecturerId);
-      setNotice("Lecturer assigned. Unassign is not exposed by the current Java API.");
+      const updated = await updateCourse(courseId, form);
+      setCourse(updated);
+      setNotice("Course updated.");
     } catch (error) {
       setNotice(toMessage(error));
     }
@@ -101,7 +93,7 @@ export function CourseDetailPage({ courseId }: { courseId: string }) {
           <CardHeader>
             <CardTitle>{course ? `${course.code} - ${course.name}` : "Course detail"}</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          <CardContent className="space-y-3">
             <form className="space-y-3" onSubmit={handleSave}>
               <Input
                 value={form.code}
@@ -120,39 +112,35 @@ export function CourseDetailPage({ courseId }: { courseId: string }) {
                 }
                 placeholder="Description"
               />
+              <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+                Lecturer
+                <select
+                  className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
+                  value={form.lecturerId}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, lecturerId: event.target.value }))
+                  }
+                  disabled={!lecturers.length}
+                >
+                  <option value="">Select lecturer</option>
+                  {lecturers.map((lecturer) => (
+                    <option key={lecturer.id} value={lecturer.id}>
+                      {lecturer.fullName || lecturer.email}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <Button type="submit">
                 <Save className="mr-2 h-4 w-4" />
                 Save
               </Button>
             </form>
-
-            <div className="space-y-3 rounded-md border border-slate-200 bg-slate-50 p-4">
-              <h2 className="text-sm font-black text-slate-800">Lecturer assignment</h2>
-              <select
-                className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
-                value={lecturerId}
-                onChange={(event) => setLecturerId(event.target.value)}
-              >
-                <option value="">Select lecturer</option>
-                {lecturers.map((lecturer) => (
-                  <option key={lecturer.id} value={lecturer.id}>
-                    {lecturer.fullName || lecturer.email}
-                  </option>
-                ))}
-              </select>
-              <Button type="button" onClick={handleAssign}>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Assign lecturer
-              </Button>
-              <p className="text-xs font-bold text-slate-500">
-                Course access policy management is limited to lecturer assignment in the current
-                Java API.
-              </p>
-            </div>
           </CardContent>
         </Card>
+        <p className="text-xs font-bold text-slate-500">
+          Current lecturer: {course?.lecturerName || "Unassigned"}
+        </p>
       </div>
     </main>
   );
 }
-

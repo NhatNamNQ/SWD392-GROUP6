@@ -4,6 +4,8 @@ export type CourseRecord = {
   name: string;
   description: string | null;
   active: boolean;
+  lecturerId: string | null;
+  lecturerName: string | null;
   createdAt: string;
 };
 
@@ -11,6 +13,7 @@ export type CoursePayload = {
   code: string;
   name: string;
   description: string;
+  lecturerId: string;
 };
 
 export type CourseSearchResponse = {
@@ -20,4 +23,3 @@ export type CourseSearchResponse = {
   number?: number;
   size?: number;
 };
-

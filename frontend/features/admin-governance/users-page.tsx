@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
+  createLecturer,
   createUser,
   deleteUser,
   fetchRoles,
@@ -15,6 +16,7 @@ import {
   updateUser,
 } from "@/features/admin-governance/api/admin-client";
 import type {
+  CreateLecturerPayload,
   CreateUserPayload,
   RoleRecord,
   UserPayload,
@@ -51,6 +53,10 @@ export function UsersPage() {
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [roles, setRoles] = useState<RoleRecord[]>([]);
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [lecturerForm, setLecturerForm] = useState<CreateLecturerPayload>({
+    email: "",
+    fullName: "",
+  });
   const [createForm, setCreateForm] = useState<CreateUserPayload>({
     userCommonRequest: emptyUserPayload,
     password: "",
@@ -108,8 +114,12 @@ export function UsersPage() {
   async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!createForm.userCommonRequest.email || !createForm.password) {
-      setNotice("Email and password are required.");
+    if (
+      !createForm.userCommonRequest.email ||
+      !createForm.password ||
+      !createForm.userCommonRequest.roleId
+    ) {
+      setNotice("Email, password, and role are required.");
       return;
     }
 
@@ -118,6 +128,24 @@ export function UsersPage() {
       setCreateForm({ userCommonRequest: emptyUserPayload, password: "" });
       await loadGovernance();
       setNotice("User created.");
+    } catch (error) {
+      setNotice(toMessage(error));
+    }
+  }
+
+  async function handleCreateLecturer(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!lecturerForm.email || !lecturerForm.fullName) {
+      setNotice("Lecturer email and full name are required.");
+      return;
+    }
+
+    try {
+      await createLecturer(lecturerForm);
+      setLecturerForm({ email: "", fullName: "" });
+      await loadGovernance();
+      setNotice("Lecturer created and credential email sent.");
     } catch (error) {
       setNotice(toMessage(error));
     }
@@ -211,9 +239,40 @@ export function UsersPage() {
           <div className="space-y-5">
             <Card>
               <CardHeader>
-                <CardTitle>Create user</CardTitle>
+                <CardTitle>Create lecturer</CardTitle>
               </CardHeader>
               <CardContent>
+                <form className="space-y-3" onSubmit={handleCreateLecturer}>
+                  <Input
+                    value={lecturerForm.email}
+                    onChange={(event) =>
+                      setLecturerForm((current) => ({ ...current, email: event.target.value }))
+                    }
+                    placeholder="Email"
+                  />
+                  <Input
+                    value={lecturerForm.fullName}
+                    onChange={(event) =>
+                      setLecturerForm((current) => ({ ...current, fullName: event.target.value }))
+                    }
+                    placeholder="Full name"
+                  />
+                  <Button type="submit">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Create lecturer
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Create user</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-xs font-bold text-slate-500">
+                  Lecturer accounts use the dedicated lecturer form above.
+                </p>
                 <form className="space-y-3" onSubmit={handleCreate}>
                   <Input
                     value={createForm.userCommonRequest.email}
@@ -263,15 +322,17 @@ export function UsersPage() {
                     }
                   >
                     <option value="">Select role</option>
-                    {roles.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
-                      </option>
-                    ))}
+                    {roles
+                      .filter((role) => role.name !== "LECTURER")
+                      .map((role) => (
+                        <option key={role.id} value={role.id}>
+                          {role.name}
+                        </option>
+                      ))}
                   </select>
                   <Button type="submit">
                     <UserPlus className="mr-2 h-4 w-4" />
-                    Create
+                    Create user
                   </Button>
                 </form>
               </CardContent>

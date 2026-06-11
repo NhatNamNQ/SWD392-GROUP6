@@ -67,10 +67,3 @@ export function updateCourse(courseId: string, payload: CoursePayload) {
     body: JSON.stringify(payload),
   });
 }
-
-export function assignLecturer(courseId: string, lecturerId: string) {
-  return request<null>(`/api/admin/courses/${courseId}/lecturers/${lecturerId}`, {
-    method: "POST",
-  });
-}
-

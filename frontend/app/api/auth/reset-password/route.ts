@@ -7,7 +7,7 @@ import {
 
 export async function POST(request: Request) {
   const payload = await request.json();
-  const backendResponse = await requestBackend("/api/auth/confirm-otp", {
+  const backendResponse = await requestBackend("/api/auth/reset-password", {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -19,6 +19,8 @@ export async function POST(request: Request) {
     return createAuthJsonResponse(await readBackendAuthError(backendResponse), backendResponse.status);
   }
 
-  const response = await readBackendApiResponse<unknown>(backendResponse);
-  return createAuthJsonResponse(response.data);
+  const response = await readBackendApiResponse<null>(backendResponse);
+  return createAuthJsonResponse({
+    message: response.message ?? "Password reset successfully.",
+  });
 }

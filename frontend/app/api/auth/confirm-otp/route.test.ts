@@ -14,8 +14,15 @@ describe("POST /api/auth/confirm-otp", () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
-          id: "user-1",
-          email: "student@example.edu",
+          status: 200,
+          message: "OTP confirmed successfully",
+          data: {
+            type: "REGISTER",
+            data: {
+              id: "user-1",
+              email: "student@example.edu",
+            },
+          },
         }),
         {
           status: 200,
@@ -42,8 +49,11 @@ describe("POST /api/auth/confirm-otp", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      email: "student@example.edu",
-      message: "Account verified. You can sign in now.",
+      type: "REGISTER",
+      data: {
+        id: "user-1",
+        email: "student@example.edu",
+      },
     });
   });
 });

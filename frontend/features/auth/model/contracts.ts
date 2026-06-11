@@ -17,6 +17,16 @@ export type AuthError = {
   status: number;
   message: string;
   code: "AUTH_ERROR";
+  errorCode?: string;
+  tempToken?: string;
+  data?: unknown;
+};
+
+export type BackendApiResponse<T> = {
+  status?: number;
+  statusCode?: number;
+  message?: string;
+  data?: T;
 };
 
 export type BackendRoleResponse = {
@@ -44,6 +54,9 @@ export type BackendAuthResponse = {
 export type BackendApiError = {
   status?: number;
   message?: string;
+  errorCode?: string;
+  tempToken?: string;
+  data?: unknown;
 };
 
 const FALLBACK_AUTH_MESSAGE = "Something went wrong. Please try again.";
@@ -70,5 +83,8 @@ export function createAuthError(status: number, payload: BackendApiError | null)
     status: payload?.status ?? status,
     message: payload?.message ?? FALLBACK_AUTH_MESSAGE,
     code: "AUTH_ERROR",
+    errorCode: payload?.errorCode,
+    tempToken: payload?.tempToken,
+    data: payload?.data,
   };
 }

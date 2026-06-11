@@ -9,20 +9,34 @@ import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
-import { confirmOtp, toAuthNotice, validateOtpPayload, type AuthNotice } from "@/features/auth/model/forms";
+import {
+  confirmOtp,
+  resendOtp,
+  toAuthNotice,
+  validateOtpPayload,
+  type AuthNotice,
+  type OtpType,
+} from "@/features/auth/model/forms";
+
+function normalizeOtpType(value: string | null): OtpType {
+  return value === "FORGET_PASSWORD" ? "FORGET_PASSWORD" : "REGISTER";
+}
 
 export function VerifyOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [otp, setOtp] = useState("");
+  const [resending, setResending] = useState(false);
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<AuthNotice | null>(null);
+  const otpType = normalizeOtpType(searchParams.get("type"));
+  const isForgotPassword = otpType === "FORGET_PASSWORD";
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const validationError = validateOtpPayload({ email, otp });
+    const validationError = validateOtpPayload({ email, otp, type: otpType });
 
     if (validationError) {
       setNotice({ tone: "error", message: validationError });
@@ -34,8 +48,27 @@ export function VerifyOtpForm() {
 
     startTransition(async () => {
       try {
-        const result = await confirmOtp({ email, otp });
-        router.replace(`/login?email=${encodeURIComponent(result.email)}&verified=1`);
+        const result = await confirmOtp({ email, otp, type: otpType });
+
+        if (isForgotPassword) {
+          if (
+            typeof result.data !== "object" ||
+            result.data === null ||
+            !("resetToken" in result.data) ||
+            typeof (result.data as { resetToken?: unknown }).resetToken !== "string"
+          ) {
+            throw new Error("Reset token missing from OTP confirmation response.");
+          }
+
+          router.replace(
+            `/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(
+              (result.data as { resetToken: string }).resetToken,
+            )}`,
+          );
+          return;
+        }
+
+        router.replace(`/login?email=${encodeURIComponent(email)}&verified=1`);
       } catch (error) {
         setNotice(toAuthNotice(error));
       } finally {
@@ -44,14 +77,43 @@ export function VerifyOtpForm() {
     });
   }
 
+  function handleResend() {
+    if (!email.trim()) {
+      setNotice({ tone: "error", message: "Email is required." });
+      return;
+    }
+
+    setResending(true);
+    setNotice(null);
+
+    startTransition(async () => {
+      try {
+        const result = await resendOtp({ email, type: otpType });
+        setNotice({
+          tone: "success",
+          message: `OTP sent to ${result.email}. It expires in ${Math.max(
+            1,
+            Math.ceil(result.expireIn / 60),
+          )} minutes.`,
+        });
+      } catch (error) {
+        setNotice(toAuthNotice(error));
+      } finally {
+        setResending(false);
+      }
+    });
+  }
+
   return (
     <div className="flex w-full flex-col items-center justify-center space-y-8 p-6 sm:p-12">
       <div className="flex w-full flex-col space-y-2 text-center">
         <CardTitle className="text-4xl font-black tracking-tight text-slate-900">
-          Verify Email
+          {isForgotPassword ? "Reset access" : "Verify Email"}
         </CardTitle>
         <p className="text-sm font-medium text-slate-500">
-          Enter the OTP sent to your school email.
+          {isForgotPassword
+            ? "Enter the OTP sent to your email so you can reset your password."
+            : "Enter the OTP sent to your school email."}
         </p>
       </div>
 
@@ -106,6 +168,16 @@ export function VerifyOtpForm() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </>
             )}
+          </Button>
+
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full h-12 gap-2 font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+            disabled={resending || pending}
+            onClick={handleResend}
+          >
+            {resending ? "Resending..." : "Resend code"}
           </Button>
         </form>
 

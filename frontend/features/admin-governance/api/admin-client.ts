@@ -1,5 +1,6 @@
 import type {
   CreateUserPayload,
+  CreateLecturerPayload,
   RolePayload,
   RoleRecord,
   UserPayload,
@@ -38,6 +39,16 @@ export function fetchUsers() {
 
 export function createUser(payload: CreateUserPayload) {
   return request<UserRecord>("/api/admin/users", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function createLecturer(payload: CreateLecturerPayload) {
+  return request<UserRecord>("/api/admin/lecturers", {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -91,4 +102,3 @@ export function deleteRole(roleId: string) {
     method: "DELETE",
   });
 }
-

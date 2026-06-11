@@ -1,5 +1,9 @@
 import type { AuthError, AuthSession } from "@/features/auth/model/contracts";
 
+export const FORCE_CHANGE_TEMP_TOKEN_KEY = "orbitdocs_force_change_temp_token";
+
+export type OtpType = "REGISTER" | "FORGET_PASSWORD" | "LOGIN_VERIFY";
+
 export type AuthNotice = {
   tone: "error" | "success" | "info";
   message: string;
@@ -19,10 +23,29 @@ export type LoginPayload = {
 export type ConfirmOtpPayload = {
   email: string;
   otp: string;
+  type: OtpType;
 };
 
 export type ChangePasswordPayload = {
   oldPassword: string;
+  newPassword: string;
+};
+
+export type ForgotPasswordPayload = {
+  email: string;
+};
+
+export type ResendOtpPayload = {
+  email: string;
+  type: OtpType;
+};
+
+export type ResetPasswordPayload = {
+  resetToken: string;
+  newPassword: string;
+};
+
+export type ForceChangePasswordPayload = {
   newPassword: string;
 };
 
@@ -58,6 +81,38 @@ export function validateOtpPayload(payload: ConfirmOtpPayload) {
   return null;
 }
 
+export function validateForgotPasswordPayload(payload: ForgotPasswordPayload) {
+  if (!payload.email.trim()) {
+    return "Email is required.";
+  }
+
+  return null;
+}
+
+export function validateResetPasswordPayload(payload: ResetPasswordPayload) {
+  if (!payload.resetToken.trim() || !payload.newPassword) {
+    return "Reset token and new password are required.";
+  }
+
+  if (payload.newPassword.length < 6) {
+    return "New password must be at least 6 characters.";
+  }
+
+  return null;
+}
+
+export function validateForceChangePasswordPayload(payload: ForceChangePasswordPayload) {
+  if (!payload.newPassword) {
+    return "New password is required.";
+  }
+
+  if (payload.newPassword.length < 6) {
+    return "New password must be at least 6 characters.";
+  }
+
+  return null;
+}
+
 export function validateChangePasswordPayload(payload: ChangePasswordPayload) {
   if (!payload.oldPassword || !payload.newPassword) {
     return "Current password and new password are required.";
@@ -80,15 +135,15 @@ async function readJson<T>(response: Response) {
   return (await response.json()) as T;
 }
 
-async function postJson<T>(url: string, payload?: unknown) {
+async function postJson<T>(url: string, payload?: unknown, init?: RequestInit) {
   const response = await fetch(url, {
+    ...init,
     method: "POST",
     credentials: "same-origin",
-    headers: payload
-      ? {
-          "content-type": "application/json",
-        }
-      : undefined,
+    headers: {
+      ...(payload ? { "content-type": "application/json" } : {}),
+      ...(init?.headers ?? {}),
+    },
     body: payload ? JSON.stringify(payload) : undefined,
   });
 
@@ -131,8 +186,23 @@ export async function registerAccount(payload: RegisterPayload) {
   return postJson<{ email: string; message: string }>("/api/auth/register", payload);
 }
 
+export async function forgotPassword(payload: ForgotPasswordPayload) {
+  return postJson<{ email: string; expireIn: number; message: string }>("/api/auth/forgot-password", payload);
+}
+
+export async function resendOtp(payload: ResendOtpPayload) {
+  return postJson<{ email: string; expireIn: number; message: string }>("/api/auth/resend-otp", payload);
+}
+
 export async function confirmOtp(payload: ConfirmOtpPayload) {
-  return postJson<{ email: string; message: string }>("/api/auth/confirm-otp", payload);
+  return postJson<{
+    type: OtpType;
+    data: unknown;
+  }>("/api/auth/confirm-otp", payload);
+}
+
+export async function resetPassword(payload: ResetPasswordPayload) {
+  return postJson<{ message: string }>("/api/auth/reset-password", payload);
 }
 
 export async function logoutSession() {
@@ -141,4 +211,19 @@ export async function logoutSession() {
 
 export async function changePassword(payload: ChangePasswordPayload) {
   return postJson<{ message: string }>("/api/auth/change-password", payload);
+}
+
+export async function forceChangePassword(
+  payload: ForceChangePasswordPayload,
+  tempToken: string,
+) {
+  return postJson<AuthSession>(
+    "/api/auth/force-change-password",
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${tempToken}`,
+      },
+    },
+  );
 }

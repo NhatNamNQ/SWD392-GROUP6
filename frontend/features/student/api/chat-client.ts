@@ -1,7 +1,7 @@
 import type {
   ChatApiError,
   ChatBootstrap,
-  ChatMessageResponse,
+  ChatResponse,
   ChatSessionDetail,
   ChatSessionSummary,
 } from "@/features/student/model/chat-types";
@@ -30,36 +30,26 @@ export function fetchChatBootstrap() {
   return request<ChatBootstrap>("/api/chat/bootstrap");
 }
 
-export function fetchChatSessions(courseId?: string) {
-  const query = courseId ? `?courseId=${encodeURIComponent(courseId)}` : "";
-  return request<ChatSessionSummary[]>(`/api/chat/sessions${query}`);
+export function fetchChatSessions() {
+  return request<ChatSessionSummary[]>("/api/chats/sessions");
 }
 
 export function fetchChatSession(sessionId: string) {
-  return request<ChatSessionDetail>(`/api/chat/sessions/${sessionId}`);
+  return request<ChatSessionDetail>(`/api/chats/sessions/${sessionId}`);
 }
 
-export function createChatSession(payload: {
+export function sendChatMessage(payload: {
   courseId: string;
-  chapterId: string | null;
-  mode: "chapter" | "all";
-  initialMessage?: string;
+  documentId?: string;
+  chapterId?: string | null;
+  sessionId?: string;
+  query: string;
 }) {
-  return request<ChatSessionDetail>("/api/chat/sessions", {
+  return request<ChatResponse>("/api/chats", {
     method: "POST",
     headers: {
       "content-type": "application/json",
     },
     body: JSON.stringify(payload),
-  });
-}
-
-export function sendChatMessage(sessionId: string, content: string) {
-  return request<ChatMessageResponse>(`/api/chat/sessions/${sessionId}/messages`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({ content }),
   });
 }

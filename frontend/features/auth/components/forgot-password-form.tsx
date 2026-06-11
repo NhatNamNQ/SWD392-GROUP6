@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,24 +10,22 @@ import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
 import {
-  registerAccount,
+  forgotPassword,
   toAuthNotice,
-  validateRegisterPayload,
+  validateForgotPasswordPayload,
   type AuthNotice,
 } from "@/features/auth/model/forms";
 
-export function RegisterForm() {
+export function ForgotPasswordForm() {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<AuthNotice | null>(null);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const validationError = validateRegisterPayload({ fullName, email, password });
+    const validationError = validateForgotPasswordPayload({ email });
 
     if (validationError) {
       setNotice({ tone: "error", message: validationError });
@@ -39,8 +37,8 @@ export function RegisterForm() {
 
     startTransition(async () => {
       try {
-        const result = await registerAccount({ fullName, email, password });
-        router.replace(`/verify-otp?email=${encodeURIComponent(result.email)}&type=REGISTER`);
+        const result = await forgotPassword({ email });
+        router.replace(`/verify-otp?email=${encodeURIComponent(result.email)}&type=FORGET_PASSWORD`);
       } catch (error) {
         setNotice(toAuthNotice(error));
       } finally {
@@ -53,10 +51,10 @@ export function RegisterForm() {
     <div className="flex w-full flex-col items-center justify-center space-y-8 p-6 sm:p-12">
       <div className="flex w-full flex-col space-y-2 text-center">
         <CardTitle className="text-4xl font-black tracking-tight text-slate-900">
-          Create an account
+          Forgot password
         </CardTitle>
         <p className="text-sm font-medium text-slate-500">
-          Register with your school email to get started.
+          We will send a one-time code to your email so you can reset access.
         </p>
       </div>
 
@@ -64,21 +62,6 @@ export function RegisterForm() {
         <AuthNoticeBanner notice={notice} />
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700" htmlFor="name">
-              Full name
-            </label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Your name"
-              autoComplete="name"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-              className="h-12 bg-white/50 transition-all focus:bg-white focus:ring-2 focus:ring-sky-500/20"
-            />
-          </div>
-
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700" htmlFor="email">
               Email address
@@ -94,21 +77,6 @@ export function RegisterForm() {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700" htmlFor="password">
-              Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="h-12 bg-white/50 transition-all focus:bg-white focus:ring-2 focus:ring-sky-500/20"
-            />
-          </div>
-
           <Button
             type="submit"
             className="w-full h-12 gap-2 mt-4 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
@@ -117,11 +85,11 @@ export function RegisterForm() {
             {pending ? (
               <div className="flex items-center gap-2">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                Creating account...
+                Sending code...
               </div>
             ) : (
               <>
-                Create account
+                Send reset code
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </>
             )}
@@ -129,13 +97,12 @@ export function RegisterForm() {
         </form>
 
         <div className="text-center text-sm font-medium text-slate-500">
-          Already have an account?{" "}
           <Link href="/login" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
-            Sign in
+            Back to login
           </Link>
           <span className="mx-2 text-slate-300">|</span>
-          <Link href="/verify-otp" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
-            Verify OTP
+          <Link href="/register" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
+            Create account
           </Link>
         </div>
       </div>

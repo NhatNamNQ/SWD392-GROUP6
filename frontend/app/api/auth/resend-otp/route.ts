@@ -7,7 +7,7 @@ import {
 
 export async function POST(request: Request) {
   const payload = await request.json();
-  const backendResponse = await requestBackend("/api/auth/confirm-otp", {
+  const backendResponse = await requestBackend("/api/auth/resend-otp", {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -19,6 +19,10 @@ export async function POST(request: Request) {
     return createAuthJsonResponse(await readBackendAuthError(backendResponse), backendResponse.status);
   }
 
-  const response = await readBackendApiResponse<unknown>(backendResponse);
-  return createAuthJsonResponse(response.data);
+  const response = await readBackendApiResponse<{ email: string; expireIn: number }>(backendResponse);
+  return createAuthJsonResponse({
+    email: response.data?.email ?? payload.email,
+    expireIn: response.data?.expireIn ?? 0,
+    message: response.message ?? "OTP resent successfully.",
+  });
 }

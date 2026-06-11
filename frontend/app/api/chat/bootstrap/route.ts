@@ -1,20 +1,10 @@
 import { createChatJsonResponse, requireChatRequestSession, toChatErrorResponse } from "@/features/student/server/chat-route";
-import {
-  DEFAULT_PROMPT_SUGGESTIONS,
-  fetchCourseCatalogFromBackend,
-} from "@/features/student/server/chat-backend";
-import { listChatSessions } from "@/features/student/server/chat-store";
+import { fetchChatBootstrapFromBackend } from "@/features/student/server/chat-backend";
 
 export async function GET(request: Request) {
   try {
     const session = await requireChatRequestSession(request);
-    const courses = await fetchCourseCatalogFromBackend(session.accessToken);
-
-    return createChatJsonResponse({
-      courses,
-      sessions: listChatSessions(session.user.id),
-      promptSuggestions: DEFAULT_PROMPT_SUGGESTIONS,
-    });
+    return createChatJsonResponse(await fetchChatBootstrapFromBackend(session.accessToken));
   } catch (error) {
     return toChatErrorResponse(error);
   }

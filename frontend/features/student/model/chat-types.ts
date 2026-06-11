@@ -2,33 +2,13 @@ export type ViewMode = "chat" | "knowledge";
 export type ChatMode = "chapter" | "all";
 export type ChatRole = "user" | "assistant";
 
-export type ChatChapterOption = {
-  id: string;
-  label: string;
-  documentTitle?: string;
-};
-
-export type ChatCourseOption = {
-  id: string;
-  name: string;
-  chapters: ChatChapterOption[];
-};
-
-export type ChatScope = {
-  courseId: string;
-  courseName: string;
-  chapterId: string | null;
-  chapterLabel: string;
-  mode: ChatMode;
-};
-
 export type ChatCitation = {
   id: string;
-  documentTitle: string;
-  chapterTitle: string;
   excerpt: string;
-  pageNumber?: number;
-  similarityScore?: number;
+  similarityScore?: number | null;
+  pageNum?: number | null;
+  documentName?: string | null;
+  chapterTitle?: string | null;
 };
 
 export type ChatMessage = {
@@ -41,14 +21,47 @@ export type ChatMessage = {
 
 export type ChatSessionSummary = {
   id: string;
+  courseId: string;
   title: string;
-  lastMessagePreview: string;
   lastMessageAt: string;
-  scope: ChatScope;
+  courseName?: string | null;
 };
 
 export type ChatSessionDetail = ChatSessionSummary & {
   messages: ChatMessage[];
+};
+
+export type ChatResponse = {
+  sessionId: string;
+  messageId: string;
+  answer: string;
+  citations: ChatCitation[];
+};
+
+export type ChatChapterOption = {
+  id: string;
+  documentId: string;
+  documentTitle: string;
+  orderIndex: number;
+  title: string;
+  description: string | null;
+};
+
+export type ChatDocumentOption = {
+  id: string;
+  originalFilename: string;
+  status: string;
+  chapters: ChatChapterOption[];
+};
+
+export type ChatCourseOption = {
+  id: string;
+  code: string;
+  name: string;
+  active: boolean;
+  lecturerId: string | null;
+  lecturerName: string | null;
+  documents: ChatDocumentOption[];
 };
 
 export type ChatBootstrap = {
@@ -57,11 +70,13 @@ export type ChatBootstrap = {
   promptSuggestions: string[];
 };
 
-export type ChatMessageResponse = {
-  sessionId: string;
-  userMessage: ChatMessage;
-  assistantMessage: ChatMessage;
-  sessionSummary: ChatSessionSummary;
+export type ChatSelection = {
+  courseId: string;
+  courseName: string;
+  documentId: string;
+  documentTitle: string;
+  chapterId: string | null;
+  chapterTitle: string | null;
 };
 
 export type ChatApiError = {

@@ -11,7 +11,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("AuthUserActions", () => {
-  test("shows student-safe navigation without teacher or admin shortcuts", () => {
+  test("shows shared chat workspace navigation for students", () => {
     render(
       <AuthUserActions
         user={{
@@ -24,10 +24,11 @@ describe("AuthUserActions", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Password" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Chat workspace" })).toHaveAttribute(
       "href",
-      "/settings/password",
+      "/student",
     );
+    expect(screen.getByRole("link", { name: "Password" })).toHaveAttribute("href", "/settings/password");
     expect(screen.queryByRole("link", { name: "Knowledge" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Admin" })).not.toBeInTheDocument();
   });
@@ -46,6 +47,10 @@ describe("AuthUserActions", () => {
     );
 
     expect(screen.getByRole("link", { name: "Teacher home" })).toHaveAttribute("href", "/teacher");
+    expect(screen.getByRole("link", { name: "Chat workspace" })).toHaveAttribute(
+      "href",
+      "/student",
+    );
     expect(screen.getByRole("link", { name: "Knowledge" })).toHaveAttribute(
       "href",
       "/teacher/knowledge-base",
@@ -67,6 +72,10 @@ describe("AuthUserActions", () => {
     );
 
     expect(screen.getByRole("link", { name: "Admin home" })).toHaveAttribute("href", "/admin");
+    expect(screen.getByRole("link", { name: "Chat workspace" })).toHaveAttribute(
+      "href",
+      "/student",
+    );
     expect(screen.getByRole("link", { name: "Users" })).toHaveAttribute("href", "/admin/users");
     expect(screen.getByRole("link", { name: "Courses" })).toHaveAttribute(
       "href",

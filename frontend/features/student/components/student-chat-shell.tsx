@@ -1,30 +1,32 @@
 "use client";
 
-import { startTransition, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
-import type { FormEvent } from "react";
 import { Menu } from "lucide-react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 
 import { SiteHeader } from "@/components/shared/site-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { createChatSession, fetchChatBootstrap, fetchChatSession, sendChatMessage } from "@/features/student/api/chat-client";
-import { buildScopeFromSelection } from "@/features/student/api/course-client";
+import { AuthUserActions } from "@/features/auth/components/auth-user-actions";
+import type { AuthUser } from "@/features/auth/model/contracts";
+import { fetchChatBootstrap, fetchChatSession, sendChatMessage } from "@/features/student/api/chat-client";
+import {
+  buildSelectionFromDraft,
+  findCourseById,
+  summarizeSelection,
+} from "@/features/student/api/course-client";
 import { ChatComposer } from "@/features/student/components/chat-composer";
 import { ChatHistoryList } from "@/features/student/components/chat-history-list";
 import { ChatMessageList } from "@/features/student/components/chat-message-list";
 import { ChatScopePicker } from "@/features/student/components/chat-scope-picker";
-import { DocumentLibrary } from "@/features/student/components/document-library";
-import { initialDocuments } from "@/features/student/data/mock-dashboard";
 import type {
   ChatApiError,
   ChatBootstrap,
+  ChatCourseOption,
   ChatSessionDetail,
-  ViewMode,
+  ChatSessionSummary,
 } from "@/features/student/model/chat-types";
-import { AuthUserActions } from "@/features/auth/components/auth-user-actions";
-import type { AuthUser } from "@/features/auth/model/contracts";
 
 type StudentChatShellProps = {
   user?: AuthUser;
@@ -38,27 +40,62 @@ function normalizeError(error: unknown) {
   return "Something went wrong while loading chat.";
 }
 
+function summarizeSession(detail: ChatSessionDetail, courseName?: string | null): ChatSessionSummary {
+  return {
+    id: detail.id,
+    courseId: detail.courseId,
+    title: detail.title,
+    lastMessageAt: detail.lastMessageAt,
+    courseName: courseName ?? null,
+  };
+}
+
+function getSelectionLabel(
+  draftSelection: ReturnType<typeof buildSelectionFromDraft>,
+  activeSessionTitle: string | null,
+  activeCourseName: string | null,
+) {
+  if (activeSessionTitle) {
+    return [activeCourseName, activeSessionTitle].filter(Boolean).join(" · ");
+  }
+
+  return summarizeSelection(draftSelection) ?? "Select a course and document";
+}
+
+function setDraftSelectionFromCourse(
+  courses: ChatCourseOption[],
+  courseId: string,
+): {
+  courseId: string;
+  documentId: string;
+  chapterId: string | null;
+} {
+  const course = findCourseById(courses, courseId);
+  const document = course?.documents[0] ?? null;
+
+  return {
+    courseId: course?.id ?? "",
+    documentId: document?.id ?? "",
+    chapterId: document?.chapters[0]?.id ?? null,
+  };
+}
+
 export function StudentChatShell({ user }: StudentChatShellProps) {
-  const fileInputId = useId();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [view, setView] = useState<ViewMode>("chat");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [bootstrap, setBootstrap] = useState<ChatBootstrap | null>(null);
   const [historyQuery, setHistoryQuery] = useState("");
-  const [docQuery, setDocQuery] = useState("");
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(true);
   const [chatSubmitting, setChatSubmitting] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
-  const [bootstrap, setBootstrap] = useState<ChatBootstrap | null>(null);
-  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [selectedChapterValue, setSelectedChapterValue] = useState("all");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+  const [selectedDocumentId, setSelectedDocumentId] = useState("");
+  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [activeSession, setActiveSession] = useState<ChatSessionDetail | null>(null);
   const [openCitationId, setOpenCitationId] = useState<string | null>(null);
-  const [documents, setDocuments] = useState(initialDocuments);
 
   const deferredHistoryQuery = useDeferredValue(historyQuery);
-  const deferredDocQuery = useDeferredValue(docQuery);
 
   useEffect(() => {
     let cancelled = false;
@@ -74,7 +111,11 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
         }
 
         setBootstrap(payload);
-        setSelectedCourseId(payload.courses[0]?.id ?? null);
+
+        const initialDraft = setDraftSelectionFromCourse(payload.courses, payload.courses[0]?.id ?? "");
+        setSelectedCourseId(initialDraft.courseId);
+        setSelectedDocumentId(initialDraft.documentId);
+        setSelectedChapterId(initialDraft.chapterId);
       } catch (error) {
         if (!cancelled) {
           setChatError(normalizeError(error));
@@ -93,68 +134,97 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
     };
   }, []);
 
-  const normalizedHistoryQuery = deferredHistoryQuery.trim().toLowerCase();
-  const normalizedDocQuery = deferredDocQuery.trim().toLowerCase();
-
-  const sessions = useMemo(() => bootstrap?.sessions ?? [], [bootstrap]);
   const courses = useMemo(() => bootstrap?.courses ?? [], [bootstrap]);
+  const sessions = useMemo(() => bootstrap?.sessions ?? [], [bootstrap]);
   const promptSuggestions = useMemo(() => bootstrap?.promptSuggestions ?? [], [bootstrap]);
+  const courseNameById = useMemo(
+    () => new Map(courses.map((course) => [course.id, course.name])),
+    [courses],
+  );
+  const resolvedCourseId = useMemo(() => {
+    if (!courses.length) {
+      return "";
+    }
 
-  const filteredSessions = useMemo(
+    return findCourseById(courses, selectedCourseId)?.id ?? courses[0]?.id ?? "";
+  }, [courses, selectedCourseId]);
+
+  const resolvedCourse = useMemo(
+    () => findCourseById(courses, resolvedCourseId),
+    [courses, resolvedCourseId],
+  );
+
+  const resolvedDocumentId = useMemo(() => {
+    if (!resolvedCourse) {
+      return "";
+    }
+
+    const document = resolvedCourse.documents.find((entry) => entry.id === selectedDocumentId)
+      ?? resolvedCourse.documents[0];
+    return document?.id ?? "";
+  }, [resolvedCourse, selectedDocumentId]);
+
+  const resolvedDocument = useMemo(() => {
+    if (!resolvedCourse || !resolvedDocumentId) {
+      return null;
+    }
+
+    return resolvedCourse.documents.find((entry) => entry.id === resolvedDocumentId) ?? null;
+  }, [resolvedCourse, resolvedDocumentId]);
+
+  const resolvedChapterId = useMemo(() => {
+    if (!resolvedDocument) {
+      return null;
+    }
+
+    if (
+      selectedChapterId &&
+      resolvedDocument.chapters.some((chapter) => chapter.id === selectedChapterId)
+    ) {
+      return selectedChapterId;
+    }
+
+    return resolvedDocument.chapters[0]?.id ?? null;
+  }, [resolvedDocument, selectedChapterId]);
+
+  const draftSelection = useMemo(
     () =>
-      sessions.filter((session) =>
-        `${session.title} ${session.lastMessagePreview} ${session.scope.chapterLabel}`
-          .toLowerCase()
-          .includes(normalizedHistoryQuery),
-      ),
-    [normalizedHistoryQuery, sessions],
+      buildSelectionFromDraft(courses, resolvedCourseId, resolvedDocumentId, resolvedChapterId),
+    [courses, resolvedCourseId, resolvedDocumentId, resolvedChapterId],
   );
 
-  const filteredDocuments = useMemo(
-    () =>
-      documents.filter((document) =>
-        `${document.title} ${document.tag} ${document.status}`
-          .toLowerCase()
-          .includes(normalizedDocQuery),
-      ),
-    [documents, normalizedDocQuery],
+  const draftScopeLabel = summarizeSelection(draftSelection);
+  const activeSessionCourseName = activeSession
+    ? courseNameById.get(activeSession.courseId) ?? null
+    : null;
+  const activeScopeLabel = getSelectionLabel(
+    draftSelection,
+    activeSession?.title ?? null,
+    activeSessionCourseName,
   );
+  const filteredSessions = useMemo(() => {
+    const normalizedQuery = deferredHistoryQuery.trim().toLowerCase();
 
-  const draftScope = useMemo(
-    () => buildScopeFromSelection(courses, selectedCourseId, selectedChapterValue),
-    [courses, selectedChapterValue, selectedCourseId],
-  );
-
-  const activeScopeLabel = activeSession?.scope.chapterLabel ?? draftScope?.chapterLabel ?? "All chapters";
-  const draftScopeLabel =
-    activeSession && draftScope && draftScope.chapterLabel !== activeSession.scope.chapterLabel
-      ? draftScope.chapterLabel
-      : activeSession
-        ? null
-        : draftScope?.chapterLabel ?? null;
-
-  function updateSessionList(nextDetail: ChatSessionDetail) {
-    setBootstrap((current) => {
-      if (!current) {
-        return current;
-      }
-
-      const withoutCurrent = current.sessions.filter((session) => session.id !== nextDetail.id);
-
-      return {
-        ...current,
-        sessions: [
-          {
-            id: nextDetail.id,
-            title: nextDetail.title,
-            lastMessagePreview: nextDetail.lastMessagePreview,
-            lastMessageAt: nextDetail.lastMessageAt,
-            scope: nextDetail.scope,
-          },
-          ...withoutCurrent,
-        ],
-      };
+    return sessions.filter((session) => {
+      const courseName = session.courseName ?? courseNameById.get(session.courseId) ?? "";
+      return `${session.title} ${courseName}`.toLowerCase().includes(normalizedQuery);
     });
+  }, [courseNameById, deferredHistoryQuery, sessions]);
+
+  function upsertSession(detail: ChatSessionDetail) {
+    const courseName = courseNameById.get(detail.courseId) ?? null;
+
+    setBootstrap((current) =>
+      current
+        ? {
+            ...current,
+            sessions: [
+              summarizeSession(detail, courseName),
+              ...current.sessions.filter((session) => session.id !== detail.id),
+            ],
+          }
+        : current,
+    );
   }
 
   async function openSession(sessionId: string) {
@@ -165,7 +235,6 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       setActiveSession(detail);
       setActiveSessionId(detail.id);
       setOpenCitationId(null);
-      setView("chat");
       setSheetOpen(false);
     } catch (error) {
       setChatError(normalizeError(error));
@@ -176,31 +245,49 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
 
   function handleNewChat() {
     startTransition(() => {
-      setActiveSessionId(null);
       setActiveSession(null);
+      setActiveSessionId(null);
       setChatInput("");
       setOpenCitationId(null);
-      setView("chat");
-      setSheetOpen(false);
       setChatError(null);
+      setSheetOpen(false);
     });
   }
 
-  function handleCourseChange(value: string) {
-    setSelectedCourseId(value);
-    setSelectedChapterValue("all");
+  function handleCourseChange(courseId: string) {
+    const draft = setDraftSelectionFromCourse(courses, courseId);
+    setSelectedCourseId(draft.courseId);
+    setSelectedDocumentId(draft.documentId);
+    setSelectedChapterId(draft.chapterId);
+  }
+
+  function handleDocumentChange(documentId: string) {
+    const course = resolvedCourse;
+    const document = course?.documents.find((entry) => entry.id === documentId) ?? null;
+
+    setSelectedDocumentId(document?.id ?? "");
+    setSelectedChapterId(document?.chapters[0]?.id ?? null);
+  }
+
+  function handleChapterChange(chapterId: string) {
+    setSelectedChapterId(chapterId === "all" ? null : chapterId);
   }
 
   function handlePromptClick(prompt: string) {
     setChatInput(prompt);
-    setView("chat");
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     const trimmed = chatInput.trim();
 
-    if (!trimmed || !draftScope) {
+    if (!trimmed) {
+      return;
+    }
+
+    if (!draftSelection && !activeSession) {
+      setChatError("Select a course and document first.");
       return;
     }
 
@@ -209,66 +296,31 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       setChatError(null);
       setOpenCitationId(null);
 
-      if (!activeSessionId) {
-        const created = await createChatSession({
-          courseId: draftScope.courseId,
-          chapterId: draftScope.chapterId,
-          mode: draftScope.mode,
-          initialMessage: trimmed,
-        });
+      const response = await sendChatMessage(
+        activeSession
+          ? {
+              courseId: activeSession.courseId,
+              sessionId: activeSession.id,
+              query: trimmed,
+            }
+          : {
+              courseId: draftSelection!.courseId,
+              documentId: draftSelection!.documentId,
+              chapterId: draftSelection!.chapterId,
+              query: trimmed,
+            },
+      );
 
-        setActiveSession(created);
-        setActiveSessionId(created.id);
-        updateSessionList(created);
-        setChatInput("");
-        return;
-      }
-
-      const messageResponse = await sendChatMessage(activeSessionId, trimmed);
-
-      setActiveSession((current) => {
-        if (!current || current.id !== activeSessionId) {
-          return current;
-        }
-
-        const updated: ChatSessionDetail = {
-          ...current,
-          lastMessageAt: messageResponse.sessionSummary.lastMessageAt,
-          lastMessagePreview: messageResponse.sessionSummary.lastMessagePreview,
-          messages: [...current.messages, messageResponse.userMessage, messageResponse.assistantMessage],
-        };
-
-        updateSessionList(updated);
-        return updated;
-      });
+      const detail = await fetchChatSession(response.sessionId);
+      setActiveSession(detail);
+      setActiveSessionId(detail.id);
+      upsertSession(detail);
       setChatInput("");
     } catch (error) {
       setChatError(normalizeError(error));
     } finally {
       setChatSubmitting(false);
     }
-  }
-
-  function addFiles(fileList: FileList | null) {
-    if (!fileList?.length || !selectedCourseId) {
-      return;
-    }
-
-    const courseName = courses.find((course) => course.id === selectedCourseId)?.name ?? "SWD392";
-
-    startTransition(() => {
-      setDocuments((current) => [
-        ...Array.from(fileList).map((file) => ({
-          id: `${file.name}-${file.lastModified}`,
-          title: file.name,
-          status: "Processing" as const,
-          tag: courseName.replace("SWD392: ", ""),
-          size: `${Math.max(1, Math.round(file.size / 1024))} KB`,
-        })),
-        ...current,
-      ]);
-      setView("knowledge");
-    });
   }
 
   const sidebar = (
@@ -278,12 +330,15 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       onHistoryQueryChange={setHistoryQuery}
       onNewChat={handleNewChat}
       onSelectSession={(sessionId) => void openSession(sessionId)}
-      onViewChange={setView}
       sessions={filteredSessions}
       user={user}
-      view={view}
     />
   );
+
+  const scopeLabel = activeSession
+    ? [activeSessionCourseName, activeSession.title].filter(Boolean).join(" · ") ||
+      activeSession.title
+    : draftScopeLabel ?? "Select a course and document";
 
   return (
     <div className="min-h-screen">
@@ -313,26 +368,26 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
 
                   <div>
                     <h2 className="text-3xl font-black tracking-[-0.04em] text-slate-800 md:text-4xl">
-                      {activeSession?.title ?? "New Chat"}
+                      {activeSession?.title ?? "New chat"}
                     </h2>
                     <p className="mt-1 text-sm font-semibold text-slate-600 md:text-base">
-                      Build one scoped study thread at a time, then revisit it from history with
-                      citations intact.
+                      Select a course, document, and chapter before starting a new RAG session.
+                      Ongoing sessions stay pinned to their saved backend session id.
                     </p>
                   </div>
                 </div>
 
-                {courses.length ? (
-                  <ChatScopePicker
-                    activeScopeLabel={activeSession?.scope.chapterLabel ?? null}
-                    chapterValue={selectedChapterValue}
-                    courseValue={selectedCourseId ?? courses[0].id}
-                    courses={courses}
-                    draftScopeLabel={draftScopeLabel}
-                    onChapterChange={setSelectedChapterValue}
-                    onCourseChange={handleCourseChange}
-                  />
-                ) : null}
+                <ChatScopePicker
+                  activeScopeLabel={activeSession ? activeScopeLabel : null}
+                  chapterValue={resolvedChapterId ?? "all"}
+                  courseValue={resolvedCourseId}
+                  courses={courses}
+                  draftScopeLabel={draftScopeLabel}
+                  documentValue={resolvedDocumentId}
+                  onChapterChange={handleChapterChange}
+                  onCourseChange={handleCourseChange}
+                  onDocumentChange={handleDocumentChange}
+                />
 
                 {chatError ? (
                   <div className="rounded-sm border-2 border-rose-300 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
@@ -342,46 +397,27 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
               </CardContent>
             </Card>
 
-            <Tabs
-              value={view}
-              onValueChange={(value) => setView(value as ViewMode)}
-              className="flex-1"
-            >
-              <TabsContent value="chat" className="mt-0">
-                <div className="orbit-frame flex min-h-[720px] flex-col overflow-hidden">
-                  <ChatMessageList
-                    activeScopeLabel={activeScopeLabel}
-                    loading={chatLoading}
-                    messages={activeSession?.messages ?? []}
-                    onCitationToggle={(citationId) =>
-                      setOpenCitationId((current) => (current === citationId ? null : citationId))
-                    }
-                    onPromptClick={handlePromptClick}
-                    openCitationId={openCitationId}
-                    promptSuggestions={promptSuggestions}
-                  />
-                  <ChatComposer
-                    disabled={!draftScope}
-                    input={chatInput}
-                    loading={chatSubmitting}
-                    onInputChange={setChatInput}
-                    onSubmit={handleSubmit}
-                    scopeLabel={activeSession?.scope.chapterLabel ?? draftScope?.chapterLabel ?? "All chapters"}
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="knowledge" className="mt-0">
-                <DocumentLibrary
-                  docQuery={docQuery}
-                  fileInputId={fileInputId}
-                  fileInputRef={fileInputRef}
-                  filteredDocuments={filteredDocuments}
-                  onAddFiles={addFiles}
-                  onDocQueryChange={setDocQuery}
-                />
-              </TabsContent>
-            </Tabs>
+            <div className="orbit-frame flex min-h-[720px] flex-col overflow-hidden">
+              <ChatMessageList
+                activeScopeLabel={scopeLabel}
+                loading={chatLoading || (chatSubmitting && !activeSession)}
+                messages={activeSession?.messages ?? []}
+                onCitationToggle={(citationId) =>
+                  setOpenCitationId((current) => (current === citationId ? null : citationId))
+                }
+                onPromptClick={handlePromptClick}
+                openCitationId={openCitationId}
+                promptSuggestions={promptSuggestions}
+              />
+              <ChatComposer
+                disabled={!draftSelection && !activeSession}
+                input={chatInput}
+                loading={chatSubmitting}
+                onInputChange={setChatInput}
+                onSubmit={handleSubmit}
+                scopeLabel={scopeLabel}
+              />
+            </div>
           </div>
         </div>
       </div>

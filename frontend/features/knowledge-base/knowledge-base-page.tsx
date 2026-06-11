@@ -21,6 +21,7 @@ import type {
   KnowledgeDocument,
   KnowledgeBaseError,
 } from "@/features/knowledge-base/model/types";
+import type { AuthUser } from "@/features/auth/model/contracts";
 
 const statusOptions: Array<"ALL" | DocumentStatus> = [
   "ALL",
@@ -46,7 +47,11 @@ function toMessage(error: unknown) {
   return "Unable to load knowledge base data.";
 }
 
-export function KnowledgeBasePage() {
+type KnowledgeBasePageProps = {
+  user: AuthUser;
+};
+
+export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState("");
@@ -66,10 +71,6 @@ export function KnowledgeBasePage() {
 
         if (!ignore) {
           setCourses(nextCourses);
-          setSelectedCourseId((current) => current || nextCourses[0]?.id || "");
-          if (!nextCourses.length) {
-            setLoading(false);
-          }
         }
       } catch (error) {
         if (!ignore) {
@@ -82,7 +83,7 @@ export function KnowledgeBasePage() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [user.id]);
 
   useEffect(() => {
     if (!selectedCourseId) {
@@ -115,6 +116,19 @@ export function KnowledgeBasePage() {
     };
   }, [selectedCourseId]);
 
+  const ownedCourses = useMemo(
+    () => courses.filter((course) => course.lecturerId === user.id),
+    [courses, user.id],
+  );
+  const resolvedCourseId = useMemo(() => {
+    if (!ownedCourses.length) {
+      return "";
+    }
+
+    const currentSelection = ownedCourses.find((course) => course.id === selectedCourseId);
+    return currentSelection?.id ?? ownedCourses[0].id;
+  }, [ownedCourses, selectedCourseId]);
+
   const filteredDocuments = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -126,13 +140,13 @@ export function KnowledgeBasePage() {
   }, [documents, query, statusFilter]);
 
   async function refreshDocuments() {
-    if (!selectedCourseId) {
+    if (!resolvedCourseId) {
       return;
     }
 
     setLoading(true);
     try {
-      setDocuments(await fetchCourseDocuments(selectedCourseId));
+      setDocuments(await fetchCourseDocuments(resolvedCourseId));
       setNotice(null);
     } catch (error) {
       setNotice(toMessage(error));
@@ -149,14 +163,14 @@ export function KnowledgeBasePage() {
   async function handleUpload(fileList: FileList | null) {
     const file = fileList?.[0];
 
-    if (!file || !selectedCourseId) {
+    if (!file || !resolvedCourseId) {
       return;
     }
 
     setUploading(true);
 
     try {
-      await uploadDocument(selectedCourseId, file);
+      await uploadDocument(resolvedCourseId, file);
       await refreshDocuments();
       setNotice("Document uploaded and indexing was triggered.");
     } catch (error) {
@@ -201,7 +215,11 @@ export function KnowledgeBasePage() {
               accept=".pdf"
               onChange={(event) => handleUpload(event.target.files)}
             />
-            <Button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading || !selectedCourseId}>
+            <Button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading || !resolvedCourseId || !ownedCourses.length}
+            >
               <FileUp className="mr-2 h-4 w-4" />
               {uploading ? "Uploading..." : "Upload PDF"}
             </Button>
@@ -220,10 +238,11 @@ export function KnowledgeBasePage() {
               Course
               <select
                 className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip"
-                value={selectedCourseId}
+                value={resolvedCourseId}
                 onChange={(event) => handleCourseChange(event.target.value)}
+                disabled={!ownedCourses.length}
               >
-                {courses.map((course) => (
+                {ownedCourses.map((course) => (
                   <option key={course.id} value={course.id}>
                     {course.code} - {course.name}
                   </option>
@@ -257,11 +276,13 @@ export function KnowledgeBasePage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
-              Tag filtering and indexing failure reasons are not available from the current Java API.
+              {ownedCourses.length
+                ? "Upload only appears for courses assigned to your lecturer account."
+                : "No assigned course is available yet. Ask an admin to assign a course before uploading."}
             </div>
             {loading ? (
               <p className="text-sm font-bold text-slate-500">Loading documents...</p>
-            ) : filteredDocuments.length ? (
+            ) : resolvedCourseId && filteredDocuments.length ? (
               <div className="grid gap-3">
                 {filteredDocuments.map((document) => (
                   <article
@@ -297,8 +318,13 @@ export function KnowledgeBasePage() {
                   </article>
                 ))}
               </div>
-            ) : (
+            ) : ownedCourses.length ? (
               <p className="text-sm font-bold text-slate-500">No documents match this view.</p>
+            ) : (
+              <p className="text-sm font-bold text-slate-500">
+                No assigned course is available yet. Ask an admin to assign a course before
+                uploading.
+              </p>
             )}
           </CardContent>
         </Card>

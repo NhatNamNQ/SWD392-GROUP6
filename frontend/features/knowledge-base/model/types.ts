@@ -5,6 +5,8 @@ export type CourseOption = {
   code: string;
   name: string;
   active: boolean;
+  lecturerId: string | null;
+  lecturerName: string | null;
 };
 
 export type KnowledgeDocument = {
@@ -40,4 +42,3 @@ export type KnowledgeBaseError = {
   code: string;
   message: string;
 };
-

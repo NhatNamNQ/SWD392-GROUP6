@@ -1,8 +1,8 @@
 import type {
   ChatChapterOption,
   ChatCourseOption,
-  ChatMode,
-  ChatScope,
+  ChatDocumentOption,
+  ChatSelection,
 } from "@/features/student/model/chat-types";
 
 export function findCourseById(courses: ChatCourseOption[], courseId: string | null) {
@@ -13,48 +13,70 @@ export function findCourseById(courses: ChatCourseOption[], courseId: string | n
   return courses.find((course) => course.id === courseId) ?? null;
 }
 
-export function getChapterOptions(course: ChatCourseOption | null): ChatChapterOption[] {
-  return course?.chapters ?? [];
+export function getDocumentOptions(course: ChatCourseOption | null): ChatDocumentOption[] {
+  return course?.documents ?? [];
 }
 
-export function buildScopeFromSelection(
+export function getChapterOptions(document: ChatDocumentOption | null): ChatChapterOption[] {
+  return document?.chapters ?? [];
+}
+
+export function findDocumentById(course: ChatCourseOption | null, documentId: string | null) {
+  if (!course || !documentId) {
+    return null;
+  }
+
+  return course.documents.find((document) => document.id === documentId) ?? null;
+}
+
+export function findChapterById(document: ChatDocumentOption | null, chapterId: string | null) {
+  if (!document || !chapterId) {
+    return null;
+  }
+
+  return document.chapters.find((chapter) => chapter.id === chapterId) ?? null;
+}
+
+export function buildSelectionFromDraft(
   courses: ChatCourseOption[],
   courseId: string | null,
-  chapterValue: string | null,
-): ChatScope | null {
+  documentId: string | null,
+  chapterId: string | null,
+): ChatSelection | null {
   const course = findCourseById(courses, courseId);
 
   if (!course) {
     return null;
   }
 
-  if (!chapterValue || chapterValue === "all") {
-    return {
-      courseId: course.id,
-      courseName: course.name,
-      chapterId: null,
-      chapterLabel: "All chapters",
-      mode: "all",
-    };
+  const document = findDocumentById(course, documentId);
+
+  if (!document) {
+    return null;
   }
 
-  const chapter = course.chapters.find((entry) => entry.id === chapterValue);
-
-  if (!chapter) {
-    return {
-      courseId: course.id,
-      courseName: course.name,
-      chapterId: null,
-      chapterLabel: "All chapters",
-      mode: "all",
-    };
-  }
+  const chapter = chapterId ? findChapterById(document, chapterId) : null;
 
   return {
     courseId: course.id,
     courseName: course.name,
-    chapterId: chapter.id,
-    chapterLabel: chapter.label,
-    mode: "chapter" satisfies ChatMode,
+    documentId: document.id,
+    documentTitle: document.originalFilename,
+    chapterId: chapter?.id ?? null,
+    chapterTitle: chapter?.title ?? null,
   };
+}
+
+export function summarizeSelection(selection: ChatSelection | null) {
+  if (!selection) {
+    return null;
+  }
+
+  return [
+    selection.courseName,
+    selection.documentTitle,
+    selection.chapterTitle ?? "All chapters",
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }

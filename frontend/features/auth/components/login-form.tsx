@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,6 +10,7 @@ import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
 import {
+  FORCE_CHANGE_TEMP_TOKEN_KEY,
   loginWithPassword,
   toAuthNotice,
   validateLoginPayload,
@@ -31,7 +32,12 @@ export function LoginForm() {
           tone: "success" as const,
           message: "Account verified. Sign in to continue.",
         }
-      : null);
+      : searchParams.get("reset") === "1"
+        ? {
+            tone: "success" as const,
+            message: "Password reset successfully. Sign in with your new password.",
+          }
+        : null);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,6 +56,7 @@ export function LoginForm() {
       try {
         const session = await loginWithPassword({ email, password });
         let next = searchParams.get("next");
+
         if (!next) {
           if (session.user.role === "ADMIN") {
             next = "/admin";
@@ -59,9 +66,26 @@ export function LoginForm() {
             next = "/student";
           }
         }
+
         router.replace(next);
         router.refresh();
       } catch (error) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "errorCode" in error &&
+          (error as { errorCode?: string }).errorCode === "REQUIRE_PASSWORD_CHANGE" &&
+          "tempToken" in error &&
+          typeof (error as { tempToken?: unknown }).tempToken === "string"
+        ) {
+          window.sessionStorage.setItem(
+            FORCE_CHANGE_TEMP_TOKEN_KEY,
+            (error as { tempToken: string }).tempToken,
+          );
+          router.replace("/force-change-password");
+          return;
+        }
+
         setNotice(toAuthNotice(error));
       } finally {
         setPending(false);
@@ -104,7 +128,10 @@ export function LoginForm() {
               <label className="text-sm font-semibold text-slate-700" htmlFor="password">
                 Password
               </label>
-              <Link href="/settings/password" className="text-xs font-semibold text-sky-600 hover:text-sky-500 transition-colors">
+              <Link
+                href="/forgot-password"
+                className="text-xs font-semibold text-sky-600 transition-colors hover:text-sky-500"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -123,8 +150,8 @@ export function LoginForm() {
             type="submit"
             className={cn(
               buttonVariants({ size: "lg" }),
-              "w-full h-12 gap-2 mt-4 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm",
-              pending && "opacity-70 pointer-events-none"
+              "group mt-4 h-12 w-full gap-2 font-bold shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]",
+              pending && "pointer-events-none opacity-70",
             )}
             disabled={pending}
           >
@@ -144,11 +171,17 @@ export function LoginForm() {
 
         <div className="text-center text-sm font-medium text-slate-500">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
+          <Link
+            href="/register"
+            className="font-semibold text-sky-600 transition-colors hover:text-sky-500"
+          >
             Sign up
           </Link>
           <span className="mx-2 text-slate-300">|</span>
-          <Link href="/verify-otp" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
+          <Link
+            href="/verify-otp"
+            className="font-semibold text-sky-600 transition-colors hover:text-sky-500"
+          >
             Verify OTP
           </Link>
         </div>
