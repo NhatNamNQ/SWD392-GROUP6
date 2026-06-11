@@ -7,14 +7,13 @@ import { startTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
+import { useToast } from "@/hooks/use-toast";
 import type { AuthUser } from "@/features/auth/model/contracts";
 import { getRoleHomePath } from "@/features/auth/model/role-home";
 import {
   changePassword,
   toAuthNotice,
   validateChangePasswordPayload,
-  type AuthNotice,
 } from "@/features/auth/model/forms";
 
 type PasswordFormProps = {
@@ -25,7 +24,7 @@ export function PasswordForm({ user }: PasswordFormProps) {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const [notice, setNotice] = useState<AuthNotice | null>(null);
+  const { toast } = useToast();
   const backHref = getRoleHomePath(user.role);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -34,21 +33,21 @@ export function PasswordForm({ user }: PasswordFormProps) {
     const validationError = validateChangePasswordPayload({ oldPassword, newPassword });
 
     if (validationError) {
-      setNotice({ tone: "error", message: validationError });
+      toast({ title: "Error", description: validationError , variant: "destructive" });
       return;
     }
 
     setPending(true);
-    setNotice(null);
 
     startTransition(async () => {
       try {
         const result = await changePassword({ oldPassword, newPassword });
-        setNotice({ tone: "success", message: result.message });
+        toast({ title: "Success", description: result.message  });
         setOldPassword("");
         setNewPassword("");
       } catch (error) {
-        setNotice(toAuthNotice(error));
+        const authNotice = toAuthNotice(error);
+        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
       } finally {
         setPending(false);
       }
@@ -84,12 +83,9 @@ export function PasswordForm({ user }: PasswordFormProps) {
                 Password settings
               </CardTitle>
               <p className="text-sm font-semibold text-slate-600">
-                This flow uses the Java backend `PATCH /api/users/change-password` contract through
-                the frontend BFF session.
+                Please enter your current password and the new password you wish to use.
               </p>
             </div>
-
-            <AuthNoticeBanner notice={notice} />
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">

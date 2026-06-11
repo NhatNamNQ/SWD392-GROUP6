@@ -8,13 +8,12 @@ import { startTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
+import { useToast } from "@/hooks/use-toast";
 import {
   FORCE_CHANGE_TEMP_TOKEN_KEY,
   forceChangePassword,
   toAuthNotice,
   validateForceChangePasswordPayload,
-  type AuthNotice,
 } from "@/features/auth/model/forms";
 import { getRoleHomePath } from "@/features/auth/model/role-home";
 
@@ -27,28 +26,24 @@ export function ForceChangePasswordForm() {
   );
   const [newPassword, setNewPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const [notice, setNotice] = useState<AuthNotice | null>(null);
+  const { toast } = useToast();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!tempToken) {
-      setNotice({
-        tone: "error",
-        message: "Missing temporary access token. Please sign in again.",
-      });
+      toast({ title: "Error", description: "Missing temporary access token. Please sign in again.", variant: "destructive" });
       return;
     }
 
     const validationError = validateForceChangePasswordPayload({ newPassword });
 
     if (validationError) {
-      setNotice({ tone: "error", message: validationError });
+      toast({ title: "Error", description: validationError , variant: "destructive" });
       return;
     }
 
     setPending(true);
-    setNotice(null);
 
     startTransition(async () => {
       try {
@@ -57,7 +52,8 @@ export function ForceChangePasswordForm() {
         router.replace(getRoleHomePath(session.user.role));
         router.refresh();
       } catch (error) {
-        setNotice(toAuthNotice(error));
+        const authNotice = toAuthNotice(error);
+        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
       } finally {
         setPending(false);
       }
@@ -96,8 +92,6 @@ export function ForceChangePasswordForm() {
                 password to continue.
               </p>
             </div>
-
-            <AuthNoticeBanner notice={notice} />
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">

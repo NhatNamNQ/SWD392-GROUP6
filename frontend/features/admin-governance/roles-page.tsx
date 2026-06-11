@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useState } from "react";
 import { Save, ShieldPlus, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,15 +35,14 @@ export function RolesPage() {
   const [editingRoleId, setEditingRoleId] = useState("");
   const [editForm, setEditForm] = useState<RolePayload>(emptyRolePayload);
   const [loading, setLoading] = useState(true);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { toast } = useToast();
 
   async function loadRoles() {
     setLoading(true);
     try {
       setRoles(await fetchRoles());
-      setNotice(null);
     } catch (error) {
-      setNotice(toMessage(error));
+      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -52,6 +52,7 @@ export function RolesPage() {
     startTransition(() => {
       void loadRoles();
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function selectRole(role: RoleRecord) {
@@ -66,7 +67,7 @@ export function RolesPage() {
     event.preventDefault();
 
     if (!createForm.name.trim()) {
-      setNotice("Role name is required.");
+      toast({ title: "Error", description: "Role name is required.", variant: "destructive" });
       return;
     }
 
@@ -74,9 +75,9 @@ export function RolesPage() {
       await createRole(createForm);
       setCreateForm(emptyRolePayload);
       await loadRoles();
-      setNotice("Role created.");
+      toast({ title: "Success", description: "Role created." });
     } catch (error) {
-      setNotice(toMessage(error));
+      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     }
   }
 
@@ -84,16 +85,16 @@ export function RolesPage() {
     event.preventDefault();
 
     if (!editingRoleId) {
-      setNotice("Select a role first.");
+      toast({ title: "Error", description: "Select a role first.", variant: "destructive" });
       return;
     }
 
     try {
       await updateRole(editingRoleId, editForm);
       await loadRoles();
-      setNotice("Role updated.");
+      toast({ title: "Success", description: "Role updated." });
     } catch (error) {
-      setNotice(toMessage(error));
+      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     }
   }
 
@@ -105,27 +106,25 @@ export function RolesPage() {
         setEditingRoleId("");
         setEditForm(emptyRolePayload);
       }
-      setNotice("Role deleted.");
+      toast({ title: "Success", description: "Role deleted." });
     } catch (error) {
-      setNotice(toMessage(error));
+      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     }
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 md:px-6">
-      <div className="mx-auto max-w-6xl space-y-5">
-        <div>
+    <div className="p-6 md:p-8 mx-auto max-w-[1600px] space-y-6 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-slate-700 pb-6">
+        <div className="space-y-2">
           <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">
             Admin governance
           </p>
-          <h1 className="text-4xl font-black text-slate-800">Roles</h1>
+          <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">Role Governance</h1>
         </div>
-
-        {notice ? (
-          <div className="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700">
-            {notice}
-          </div>
-        ) : null}
+        <Button onClick={() => { setEditingRoleId(""); setEditForm(emptyRolePayload); }} className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip">
+          <ShieldPlus className="mr-2 h-4 w-4" /> New Role
+        </Button>
+      </div>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_380px]">
           <Card>
@@ -223,7 +222,6 @@ export function RolesPage() {
             </Card>
           </div>
         </div>
-      </div>
-    </main>
+    </div>
   );
 }

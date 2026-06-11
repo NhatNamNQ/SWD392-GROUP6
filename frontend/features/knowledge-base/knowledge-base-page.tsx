@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BookOpen, FileUp, RefreshCcw, Search, Trash2 } from "lucide-react";
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,7 +61,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
   const [statusFilter, setStatusFilter] = useState<"ALL" | DocumentStatus>("ALL");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     let ignore = false;
@@ -74,7 +75,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
         }
       } catch (error) {
         if (!ignore) {
-          setNotice(toMessage(error));
+          toast({ title: "Error", description: toMessage(error), variant: "destructive" });
           setLoading(false);
         }
       }
@@ -83,7 +84,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     return () => {
       ignore = true;
     };
-  }, [user.id]);
+  }, [user.id, toast]);
 
   useEffect(() => {
     if (!selectedCourseId) {
@@ -98,11 +99,10 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
 
         if (!ignore) {
           setDocuments(nextDocuments);
-          setNotice(null);
         }
       } catch (error) {
         if (!ignore) {
-          setNotice(toMessage(error));
+          toast({ title: "Error", description: toMessage(error), variant: "destructive" });
         }
       } finally {
         if (!ignore) {
@@ -114,7 +114,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     return () => {
       ignore = true;
     };
-  }, [selectedCourseId]);
+  }, [selectedCourseId, toast]);
 
   const ownedCourses = useMemo(
     () => courses.filter((course) => course.lecturerId === user.id),
@@ -147,9 +147,8 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     setLoading(true);
     try {
       setDocuments(await fetchCourseDocuments(resolvedCourseId));
-      setNotice(null);
     } catch (error) {
-      setNotice(toMessage(error));
+      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -172,9 +171,9 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     try {
       await uploadDocument(resolvedCourseId, file);
       await refreshDocuments();
-      setNotice("Document uploaded and indexing was triggered.");
+      toast({ title: "Success", description: "Document uploaded and indexing was triggered." });
     } catch (error) {
-      setNotice(toMessage(error));
+      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -187,15 +186,14 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     try {
       await deleteDocument(documentId);
       setDocuments((current) => current.filter((document) => document.id !== documentId));
-      setNotice("Document deleted.");
+      toast({ title: "Success", description: "Document deleted." });
     } catch (error) {
-      setNotice(toMessage(error));
+      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     }
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 md:px-6">
-      <div className="mx-auto max-w-7xl space-y-5">
+    <div className="mx-auto max-w-7xl space-y-5 animate-in fade-in duration-500">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">
@@ -225,12 +223,6 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
             </Button>
           </div>
         </div>
-
-        {notice ? (
-          <div className="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700">
-            {notice}
-          </div>
-        ) : null}
 
         <Card>
           <CardHeader className="grid gap-3 lg:grid-cols-[1fr_1fr_180px] lg:items-end">
@@ -304,7 +296,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
                         <span>{formatSize(document.fileSizeBytes)}</span>
                         <span>{document.chunkCount ?? 0} chunks</span>
                         {document.status === "FAILED" ? (
-                          <span>Failure reason unavailable from current API</span>
+                          <span>Failure reason unavailable.</span>
                         ) : null}
                       </div>
                     </div>
@@ -328,7 +320,6 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
             )}
           </CardContent>
         </Card>
-      </div>
-    </main>
+    </div>
   );
 }

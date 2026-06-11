@@ -8,12 +8,11 @@ import { startTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
+import { useToast } from "@/hooks/use-toast";
 import {
   resetPassword,
   toAuthNotice,
   validateResetPasswordPayload,
-  type AuthNotice,
 } from "@/features/auth/model/forms";
 
 export function ResetPasswordForm() {
@@ -23,7 +22,7 @@ export function ResetPasswordForm() {
   const resetToken = searchParams.get("token") ?? "";
   const [newPassword, setNewPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const [notice, setNotice] = useState<AuthNotice | null>(null);
+  const { toast } = useToast();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,19 +30,19 @@ export function ResetPasswordForm() {
     const validationError = validateResetPasswordPayload({ resetToken, newPassword });
 
     if (validationError) {
-      setNotice({ tone: "error", message: validationError });
+      toast({ title: "Error", description: validationError , variant: "destructive" });
       return;
     }
 
     setPending(true);
-    setNotice(null);
 
     startTransition(async () => {
       try {
         await resetPassword({ resetToken, newPassword });
         router.replace(`/login?email=${encodeURIComponent(email)}&reset=1`);
       } catch (error) {
-        setNotice(toAuthNotice(error));
+        const authNotice = toAuthNotice(error);
+        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
       } finally {
         setPending(false);
       }
@@ -81,8 +80,6 @@ export function ResetPasswordForm() {
                 {email ? `Recovery code sent to ${email}.` : "Enter the recovery code from your email."}
               </p>
             </div>
-
-            <AuthNoticeBanner notice={notice} />
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">

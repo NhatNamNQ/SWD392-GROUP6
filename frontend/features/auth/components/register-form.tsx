@@ -8,12 +8,11 @@ import { startTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
+import { useToast } from "@/hooks/use-toast";
 import {
   registerAccount,
   toAuthNotice,
   validateRegisterPayload,
-  type AuthNotice,
 } from "@/features/auth/model/forms";
 
 export function RegisterForm() {
@@ -22,7 +21,7 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const [notice, setNotice] = useState<AuthNotice | null>(null);
+  const { toast } = useToast();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,19 +29,19 @@ export function RegisterForm() {
     const validationError = validateRegisterPayload({ fullName, email, password });
 
     if (validationError) {
-      setNotice({ tone: "error", message: validationError });
+      toast({ title: "Error", description: validationError , variant: "destructive" });
       return;
     }
 
     setPending(true);
-    setNotice(null);
 
     startTransition(async () => {
       try {
         const result = await registerAccount({ fullName, email, password });
         router.replace(`/verify-otp?email=${encodeURIComponent(result.email)}&type=REGISTER`);
       } catch (error) {
-        setNotice(toAuthNotice(error));
+        const authNotice = toAuthNotice(error);
+        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
       } finally {
         setPending(false);
       }
@@ -61,7 +60,6 @@ export function RegisterForm() {
       </div>
 
       <div className="w-full max-w-sm space-y-6">
-        <AuthNoticeBanner notice={notice} />
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">

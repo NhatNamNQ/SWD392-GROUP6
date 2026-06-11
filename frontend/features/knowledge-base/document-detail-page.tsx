@@ -89,7 +89,7 @@ export function DocumentDetailPage({ documentId }: { documentId: string }) {
               </div>
               {document.status === "FAILED" ? (
                 <p className="text-sm font-bold text-rose-700">
-                  Failure reason unavailable from current API.
+                  Failure reason unavailable.
                 </p>
               ) : null}
             </CardHeader>
@@ -109,7 +109,7 @@ export function DocumentDetailPage({ documentId }: { documentId: string }) {
                           {chapter.orderIndex}. {chapter.title}
                         </p>
                         <p className="text-sm font-semibold text-slate-500">
-                          {chapter.description || "No description from current API."}
+                          {chapter.description || "No description available."}
                         </p>
                       </div>
                     ))}

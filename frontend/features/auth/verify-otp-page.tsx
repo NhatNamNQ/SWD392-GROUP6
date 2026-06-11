@@ -35,7 +35,7 @@ export function VerifyOtpPage() {
         <AuthBenefits
           badge="SWD392 workspace"
           title="Verify your OrbitDocs account."
-          description="The current Java backend requires OTP confirmation after registration before the account can be used."
+          description="A verification code has been sent to your email. Please enter it below to activate your account."
           items={items}
           benefits={benefits}
         />

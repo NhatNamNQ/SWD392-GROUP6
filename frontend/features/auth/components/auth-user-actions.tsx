@@ -12,13 +12,7 @@ export function AuthUserActions({ user }: AuthUserActionsProps) {
   const roleHomePath = getRoleHomePath(user.role);
   const roleLinks =
     user.role === "ADMIN"
-      ? [
-          { href: roleHomePath, label: "Admin home" },
-          { href: "/student", label: "Chat workspace" },
-          { href: "/admin/users", label: "Users" },
-          { href: "/admin/courses", label: "Courses" },
-          { href: "/admin/roles", label: "Roles" },
-        ]
+      ? []
       : user.role === "LECTURER"
         ? [
             { href: roleHomePath, label: "Teacher home" },

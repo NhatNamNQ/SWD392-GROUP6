@@ -3,18 +3,17 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { startTransition, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
+import { useToast } from "@/hooks/use-toast";
 import {
   FORCE_CHANGE_TEMP_TOKEN_KEY,
   loginWithPassword,
   toAuthNotice,
   validateLoginPayload,
-  type AuthNotice,
 } from "@/features/auth/model/forms";
 import { cn } from "@/lib/utils";
 
@@ -24,20 +23,16 @@ export function LoginForm() {
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const [notice, setNotice] = useState<AuthNotice | null>(null);
-  const derivedNotice =
-    notice ??
-    (searchParams.get("verified") === "1"
-      ? {
-          tone: "success" as const,
-          message: "Account verified. Sign in to continue.",
-        }
-      : searchParams.get("reset") === "1"
-        ? {
-            tone: "success" as const,
-            message: "Password reset successfully. Sign in with your new password.",
-          }
-        : null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "1") {
+      toast({ title: "Success", description: "Account verified. Sign in to continue." });
+    } else if (searchParams.get("reset") === "1") {
+      toast({ title: "Success", description: "Password reset successfully. Sign in with your new password." });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,12 +40,12 @@ export function LoginForm() {
     const validationError = validateLoginPayload({ email, password });
 
     if (validationError) {
-      setNotice({ tone: "error", message: validationError });
+      toast({ title: "Error", description: validationError, variant: "destructive" });
       return;
     }
 
     setPending(true);
-    setNotice(null);
+
 
     startTransition(async () => {
       try {
@@ -86,7 +81,12 @@ export function LoginForm() {
           return;
         }
 
-        setNotice(toAuthNotice(error));
+        const authNotice = toAuthNotice(error);
+        toast({
+          title: authNotice.tone === "error" ? "Error" : "Success",
+          description: authNotice.message,
+          variant: authNotice.tone === "error" ? "destructive" : "default",
+        });
       } finally {
         setPending(false);
       }
@@ -105,7 +105,7 @@ export function LoginForm() {
       </div>
 
       <div className="w-full max-w-sm space-y-6">
-        <AuthNoticeBanner notice={derivedNotice} />
+
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">

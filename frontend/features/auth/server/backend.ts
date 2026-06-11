@@ -7,7 +7,7 @@ import {
   type BackendApiResponse,
 } from "@/features/auth/model/contracts";
 
-const DEFAULT_BACKEND_URL = "http://localhost:8080";
+const DEFAULT_BACKEND_URL = "http://127.0.0.1:8080";
 
 export const BACKEND_REFRESH_COOKIE = "orbitdocs_refresh_token";
 

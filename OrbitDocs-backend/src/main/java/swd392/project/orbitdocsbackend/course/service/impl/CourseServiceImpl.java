@@ -16,12 +16,15 @@ import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.exception.AppException;
 import swd392.project.orbitdocsbackend.shared.exception.ErrorCode;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CourseServiceImpl implements ICourseService {
 
     private final CourseRepository courseRepository;

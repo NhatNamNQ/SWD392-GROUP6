@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { BookOpen, Files, Upload } from "lucide-react";
 
-import { SiteHeader } from "@/components/shared/site-header";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AuthUserActions } from "@/features/auth/components/auth-user-actions";
 import type { AuthUser } from "@/features/auth/model/contracts";
 
 type TeacherHomePageProps = {
@@ -37,10 +35,7 @@ const teacherActions = [
 
 export function TeacherHomePage({ user }: TeacherHomePageProps) {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <SiteHeader variant="app" actions={<AuthUserActions user={user} />} />
-      <main className="px-4 py-6 md:px-6">
-        <div className="mx-auto max-w-7xl space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6 animate-in fade-in duration-500">
           <section className="orbit-frame orbit-grid overflow-hidden">
             <div className="grid gap-6 border-b-2 border-slate-700 bg-sky-50/80 px-6 py-6 lg:grid-cols-[1.6fr_0.8fr] lg:items-end">
               <div className="space-y-3">
@@ -90,8 +85,6 @@ export function TeacherHomePage({ user }: TeacherHomePageProps) {
               })}
             </div>
           </section>
-        </div>
-      </main>
     </div>
   );
 }

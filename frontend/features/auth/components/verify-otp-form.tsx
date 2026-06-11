@@ -8,13 +8,12 @@ import { startTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { AuthNoticeBanner } from "@/features/auth/components/auth-notice";
+import { useToast } from "@/hooks/use-toast";
 import {
   confirmOtp,
   resendOtp,
   toAuthNotice,
   validateOtpPayload,
-  type AuthNotice,
   type OtpType,
 } from "@/features/auth/model/forms";
 
@@ -29,7 +28,7 @@ export function VerifyOtpForm() {
   const [otp, setOtp] = useState("");
   const [resending, setResending] = useState(false);
   const [pending, setPending] = useState(false);
-  const [notice, setNotice] = useState<AuthNotice | null>(null);
+  const { toast } = useToast();
   const otpType = normalizeOtpType(searchParams.get("type"));
   const isForgotPassword = otpType === "FORGET_PASSWORD";
 
@@ -39,12 +38,11 @@ export function VerifyOtpForm() {
     const validationError = validateOtpPayload({ email, otp, type: otpType });
 
     if (validationError) {
-      setNotice({ tone: "error", message: validationError });
+      toast({ title: "Error", description: validationError , variant: "destructive" });
       return;
     }
 
     setPending(true);
-    setNotice(null);
 
     startTransition(async () => {
       try {
@@ -70,7 +68,8 @@ export function VerifyOtpForm() {
 
         router.replace(`/login?email=${encodeURIComponent(email)}&verified=1`);
       } catch (error) {
-        setNotice(toAuthNotice(error));
+        const authNotice = toAuthNotice(error);
+        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
       } finally {
         setPending(false);
       }
@@ -79,25 +78,25 @@ export function VerifyOtpForm() {
 
   function handleResend() {
     if (!email.trim()) {
-      setNotice({ tone: "error", message: "Email is required." });
+      toast({ title: "Error", description: "Email is required." , variant: "destructive" });
       return;
     }
 
     setResending(true);
-    setNotice(null);
 
     startTransition(async () => {
       try {
         const result = await resendOtp({ email, type: otpType });
-        setNotice({
-          tone: "success",
-          message: `OTP sent to ${result.email}. It expires in ${Math.max(
+        toast({
+          title: "Success",
+          description: `OTP sent to ${result.email}. It expires in ${Math.max(
             1,
             Math.ceil(result.expireIn / 60),
           )} minutes.`,
         });
       } catch (error) {
-        setNotice(toAuthNotice(error));
+        const authNotice = toAuthNotice(error);
+        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
       } finally {
         setResending(false);
       }
@@ -118,7 +117,6 @@ export function VerifyOtpForm() {
       </div>
 
       <div className="w-full max-w-sm space-y-6">
-        <AuthNoticeBanner notice={notice} />
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
