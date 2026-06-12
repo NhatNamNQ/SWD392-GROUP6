@@ -101,13 +101,13 @@ export function LandingPage() {
           <Card className="overflow-hidden rounded-md">
             <div className="orbit-panel-head bg-sky-50 text-slate-700">Chat Preview</div>
             <CardContent className="space-y-3 p-4">
-              <div className="max-w-[75%] rounded-sm border-2 border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700">
+              <div className="max-w-[75%] rounded-[1.5rem] border border-slate-200 bg-white px-5 py-4 text-sm font-bold text-slate-700 shadow-sm">
                 What is a Use Case Model?
               </div>
-              <div className="ml-auto max-w-[82%] rounded-sm border-2 border-sky-300 bg-sky-100 px-4 py-3 text-sm font-bold text-slate-700">
+              <div className="ml-auto max-w-[82%] rounded-[1.5rem] border border-sky-200 bg-sky-100/90 px-5 py-4 text-sm font-bold text-slate-700 shadow-sm">
                 Can you compare Sequence vs Communication diagrams?
               </div>
-              <div className="rounded-sm border-2 border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700">
+              <div className="rounded-[1.5rem] border border-slate-200 bg-white px-5 py-4 text-sm font-bold text-slate-700 shadow-sm">
                 Sequence diagrams focus on time order, while communication diagrams focus on object
                 collaboration [1].
               </div>
@@ -128,11 +128,11 @@ export function LandingPage() {
                     : "bg-sky-50";
 
               return (
-                <Card key={feature.title} className="overflow-hidden shadow-chip">
-                  <CardHeader className={`border-b-2 border-slate-700 ${headerTone}`}>
+                <Card key={feature.title} className="overflow-hidden shadow-sm rounded-[1.5rem] border-slate-200">
+                  <CardHeader className={`border-b border-slate-200 ${headerTone}`}>
                     <div className="flex items-center gap-3">
-                      <div className="rounded-sm border-2 border-slate-700 bg-white p-2">
-                        <Icon className="h-4 w-4" />
+                      <div className="rounded-xl border border-slate-200 bg-white p-2">
+                        <Icon className="h-4 w-4 text-slate-600" />
                       </div>
                       <CardTitle className="text-base">{feature.title}</CardTitle>
                     </div>
@@ -152,14 +152,14 @@ export function LandingPage() {
           </div>
           <div className="grid gap-4 p-4 md:grid-cols-3">
             {knowledgeCards.map((card, index) => (
-              <Card key={card.title} className="overflow-hidden shadow-chip">
+              <Card key={card.title} className="overflow-hidden shadow-sm rounded-[1.5rem] border-slate-200">
                 <CardHeader
                   className={
                     index === 0
-                      ? "border-b-2 border-slate-700 bg-emerald-50"
+                      ? "border-b border-slate-200 bg-emerald-50"
                       : index === 1
-                        ? "border-b-2 border-slate-700 bg-sky-50"
-                        : "border-b-2 border-slate-700 bg-white"
+                        ? "border-b border-slate-200 bg-sky-50"
+                        : "border-b border-slate-200 bg-white"
                   }
                 >
                   <CardTitle className="text-base">{card.title}</CardTitle>
@@ -176,9 +176,9 @@ export function LandingPage() {
           <div className="orbit-panel-head bg-sky-50 text-slate-700">How It Works</div>
           <div className="grid gap-4 p-4 md:grid-cols-4">
             {workflow.map((step, index) => (
-              <Card key={step} className="shadow-chip">
-                <CardContent className="space-y-3 p-4">
-                  <div className="inline-flex rounded-full border-2 border-slate-700 bg-emerald-100 px-3 py-1 text-xs font-black">
+              <Card key={step} className="shadow-sm rounded-[1.5rem] border-slate-200">
+                <CardContent className="space-y-3 p-5">
+                  <div className="inline-flex rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800">
                     {index + 1}
                   </div>
                   <p className="text-sm font-bold text-slate-700">{step}</p>

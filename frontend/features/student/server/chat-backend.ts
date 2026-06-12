@@ -83,7 +83,11 @@ async function requestChatBackend<T>(path: string, accessToken: string, init?: R
   const payload = await readJson<BackendEnvelope<T> | T>(response);
 
   if (!response.ok) {
-    throw createChatBackendError(response, payload as BackendEnvelope<unknown> | null, "CHAT_BACKEND_ERROR");
+    throw createChatBackendError(
+      response,
+      payload as BackendEnvelope<unknown> | null,
+      "CHAT_BACKEND_ERROR",
+    );
   }
 
   if (!payload || typeof payload !== "object" || !("data" in payload)) {
@@ -116,7 +120,7 @@ async function fetchBackendSessions(accessToken: string) {
 function mapCourseDocuments(accessToken: string, course: BackendCourse): Promise<ChatCourseOption> {
   return (async () => {
     const documents = await fetchBackendDocumentsByCourse(accessToken, course.id);
-    const indexedDocuments = documents.filter((document) => document.status === "INDEXED");
+    const indexedDocuments = (documents || []).filter((document) => document.status === "INDEXED");
 
     const mappedDocuments: ChatDocumentOption[] = await Promise.all(
       indexedDocuments.map(async (document) => {
@@ -126,7 +130,7 @@ function mapCourseDocuments(accessToken: string, course: BackendCourse): Promise
           id: document.id,
           originalFilename: document.originalFilename,
           status: document.status,
-          chapters: chapters.map(
+          chapters: (chapters || []).map(
             (chapter): ChatChapterOption => ({
               id: chapter.id,
               documentId: chapter.documentId,
@@ -152,14 +156,30 @@ function mapCourseDocuments(accessToken: string, course: BackendCourse): Promise
   })();
 }
 
-export async function fetchCourseCatalogFromBackend(accessToken: string): Promise<ChatCourseOption[]> {
+export async function fetchCourseCatalogFromBackend(
+  accessToken: string,
+): Promise<ChatCourseOption[]> {
   const courses = await fetchBackendCourses(accessToken);
 
-  return Promise.all(courses.filter((course) => course.active).map((course) => mapCourseDocuments(accessToken, course)));
+  if (!courses || !Array.isArray(courses)) {
+    return [];
+  }
+
+  return Promise.all(
+    courses
+      .filter((course) => course.active)
+      .map((course) => mapCourseDocuments(accessToken, course)),
+  );
 }
 
-export async function fetchChatSessionsFromBackend(accessToken: string): Promise<ChatSessionSummary[]> {
+export async function fetchChatSessionsFromBackend(
+  accessToken: string,
+): Promise<ChatSessionSummary[]> {
   const sessions = await fetchBackendSessions(accessToken);
+
+  if (!sessions || !Array.isArray(sessions)) {
+    return [];
+  }
 
   return sessions.map((session) => ({
     id: session.id,

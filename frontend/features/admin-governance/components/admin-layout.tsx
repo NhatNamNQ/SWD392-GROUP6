@@ -95,7 +95,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
               </span>
             </Link>
           </div>
-          
+
           {/* Breadcrumb or Page Title placeholder on desktop */}
           <div className="hidden md:block">
             <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-400">
@@ -109,9 +109,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto">
-          {children}
-        </div>
+        <div className="flex-1 overflow-auto">{children}</div>
       </main>
     </div>
   );

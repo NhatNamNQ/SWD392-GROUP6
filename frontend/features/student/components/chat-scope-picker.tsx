@@ -31,12 +31,12 @@ export function ChatScopePicker({
   const chapterOptions = selectedDocument?.chapters ?? [];
 
   return (
-    <div className="grid gap-3 rounded-md border-2 border-slate-300 bg-white/80 p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
-      <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+    <div className="flex flex-col gap-3">
+      <label className="grid gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-500">
         Course
         <select
           aria-label="Course"
-          className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2"
+          className="h-11 rounded-full border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none transition focus:ring-2 focus:ring-sky-300 focus:ring-offset-2"
           value={courseValue}
           onChange={(event) => onCourseChange(event.target.value)}
           disabled={!courses.length}
@@ -53,11 +53,11 @@ export function ChatScopePicker({
         </select>
       </label>
 
-      <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+      <label className="grid gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-500">
         Document
         <select
           aria-label="Document"
-          className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2"
+          className="h-11 rounded-full border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none transition focus:ring-2 focus:ring-sky-300 focus:ring-offset-2"
           value={documentValue}
           onChange={(event) => onDocumentChange(event.target.value)}
           disabled={!documentOptions.length}
@@ -74,11 +74,11 @@ export function ChatScopePicker({
         </select>
       </label>
 
-      <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+      <label className="grid gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-500">
         Chapter
         <select
           aria-label="Chapter"
-          className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2"
+          className="h-11 rounded-full border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none transition focus:ring-2 focus:ring-sky-300 focus:ring-offset-2"
           value={chapterValue}
           onChange={(event) => onChapterChange(event.target.value)}
           disabled={!chapterOptions.length}
@@ -92,7 +92,7 @@ export function ChatScopePicker({
         </select>
       </label>
 
-      <div className="md:col-span-3 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 mt-1">
         {activeScopeLabel ? <Badge variant="mint">Active session: {activeScopeLabel}</Badge> : null}
         {draftScopeLabel ? <Badge variant="blue">New chat: {draftScopeLabel}</Badge> : null}
       </div>

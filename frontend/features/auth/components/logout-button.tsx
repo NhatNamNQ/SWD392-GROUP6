@@ -6,7 +6,7 @@ import { startTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { logoutSession, toAuthNotice } from "@/features/auth/model/forms";
 
-export function LogoutButton() {
+export function LogoutButton({ className }: { className?: string } = {}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -28,7 +28,13 @@ export function LogoutButton() {
   }
 
   return (
-    <Button type="button" variant="secondary" onClick={handleLogout} disabled={pending}>
+    <Button
+      type="button"
+      variant="secondary"
+      onClick={handleLogout}
+      disabled={pending}
+      className={className}
+    >
       {pending ? "Signing out..." : "Sign out"}
     </Button>
   );

@@ -122,8 +122,8 @@ export function DocumentLibrary({
       </div>
 
       <div className="border-t-2 border-slate-700 bg-emerald-50 px-5 py-4 text-sm font-bold text-slate-600">
-        Knowledge Base is a teacher workspace. The student chat stays focused on questions,
-        answers, and citations.
+        Knowledge Base is a teacher workspace. The student chat stays focused on questions, answers,
+        and citations.
       </div>
     </div>
   );

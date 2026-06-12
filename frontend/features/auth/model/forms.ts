@@ -149,11 +149,13 @@ async function postJson<T>(url: string, payload?: unknown, init?: RequestInit) {
 
   if (!response.ok) {
     const error = await readJson<AuthError>(response);
-    throw error ?? {
-      status: response.status,
-      message: "Something went wrong. Please try again.",
-      code: "AUTH_ERROR",
-    };
+    throw (
+      error ?? {
+        status: response.status,
+        message: "Something went wrong. Please try again.",
+        code: "AUTH_ERROR",
+      }
+    );
   }
 
   return (await readJson<T>(response)) as T;
@@ -187,11 +189,17 @@ export async function registerAccount(payload: RegisterPayload) {
 }
 
 export async function forgotPassword(payload: ForgotPasswordPayload) {
-  return postJson<{ email: string; expireIn: number; message: string }>("/api/auth/forgot-password", payload);
+  return postJson<{ email: string; expireIn: number; message: string }>(
+    "/api/auth/forgot-password",
+    payload,
+  );
 }
 
 export async function resendOtp(payload: ResendOtpPayload) {
-  return postJson<{ email: string; expireIn: number; message: string }>("/api/auth/resend-otp", payload);
+  return postJson<{ email: string; expireIn: number; message: string }>(
+    "/api/auth/resend-otp",
+    payload,
+  );
 }
 
 export async function confirmOtp(payload: ConfirmOtpPayload) {
@@ -213,17 +221,10 @@ export async function changePassword(payload: ChangePasswordPayload) {
   return postJson<{ message: string }>("/api/auth/change-password", payload);
 }
 
-export async function forceChangePassword(
-  payload: ForceChangePasswordPayload,
-  tempToken: string,
-) {
-  return postJson<AuthSession>(
-    "/api/auth/force-change-password",
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${tempToken}`,
-      },
+export async function forceChangePassword(payload: ForceChangePasswordPayload, tempToken: string) {
+  return postJson<AuthSession>("/api/auth/force-change-password", payload, {
+    headers: {
+      Authorization: `Bearer ${tempToken}`,
     },
-  );
+  });
 }

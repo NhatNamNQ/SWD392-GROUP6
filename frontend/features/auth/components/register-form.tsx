@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,7 +29,7 @@ export function RegisterForm() {
     const validationError = validateRegisterPayload({ fullName, email, password });
 
     if (validationError) {
-      toast({ title: "Error", description: validationError , variant: "destructive" });
+      toast({ title: "Error", description: validationError, variant: "destructive" });
       return;
     }
 
@@ -41,7 +41,11 @@ export function RegisterForm() {
         router.replace(`/verify-otp?email=${encodeURIComponent(result.email)}&type=REGISTER`);
       } catch (error) {
         const authNotice = toAuthNotice(error);
-        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
+        toast({
+          title: authNotice.tone === "error" ? "Error" : "Success",
+          description: authNotice.message,
+          variant: authNotice.tone === "error" ? "destructive" : "default",
+        });
       } finally {
         setPending(false);
       }
@@ -60,7 +64,6 @@ export function RegisterForm() {
       </div>
 
       <div className="w-full max-w-sm space-y-6">
-
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700" htmlFor="name">
@@ -128,12 +131,11 @@ export function RegisterForm() {
 
         <div className="text-center text-sm font-medium text-slate-500">
           Already have an account?{" "}
-          <Link href="/login" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
+          <Link
+            href="/login"
+            className="text-sky-600 hover:text-sky-500 transition-colors font-semibold"
+          >
             Sign in
-          </Link>
-          <span className="mx-2 text-slate-300">|</span>
-          <Link href="/verify-otp" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
-            Verify OTP
           </Link>
         </div>
       </div>

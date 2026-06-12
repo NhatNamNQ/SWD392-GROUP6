@@ -67,7 +67,9 @@ async function parseJsonBody<T>(response: Response) {
   return (await response.json()) as T;
 }
 
-function isApiEnvelope<T>(payload: BackendApiResponse<T> | T | null): payload is BackendApiResponse<T> {
+function isApiEnvelope<T>(
+  payload: BackendApiResponse<T> | T | null,
+): payload is BackendApiResponse<T> {
   return typeof payload === "object" && payload !== null && "data" in payload;
 }
 

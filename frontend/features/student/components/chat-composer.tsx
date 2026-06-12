@@ -1,7 +1,5 @@
 import type { FormEvent } from "react";
-
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
 type ChatComposerProps = {
@@ -22,30 +20,33 @@ export function ChatComposer({
   scopeLabel,
 }: ChatComposerProps) {
   return (
-    <form onSubmit={onSubmit} className="border-t-2 border-slate-700 bg-slate-50/90 p-4 md:p-5">
-      <Card className="overflow-hidden">
-        <div className="border-b-2 border-slate-700 bg-sky-50 px-4 py-3 text-xs font-black uppercase tracking-[0.08em] text-slate-600">
-          Scope: {scopeLabel}
+    <form onSubmit={onSubmit} className="p-3 md:p-4">
+      <div className="rounded-[1.75rem] border border-slate-200/80 bg-white/95 shadow-[0_22px_60px_rgba(15,23,42,0.14)] backdrop-blur">
+        <div className="border-b border-slate-200/80 px-5 py-3">
+          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+            Scope: {scopeLabel}
+          </p>
         </div>
-        <CardContent className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+
+        <div className="grid gap-3 px-4 py-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:px-5">
           <Textarea
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
             placeholder="Ask about a lecture, diagram, pattern, or assignment..."
             aria-label="Chat input"
-            className="min-h-[116px]"
+            className="min-h-[132px] rounded-[1.25rem] border border-slate-200 bg-slate-50/80 px-4 py-4 text-[15px] font-semibold shadow-none focus-visible:ring-sky-300"
             disabled={disabled || loading}
           />
           <Button
             type="submit"
             size="lg"
-            className="md:h-[116px] md:w-[120px]"
+            className="h-12 rounded-full px-6 md:h-14 md:w-auto"
             disabled={disabled || loading}
           >
             {loading ? "Sending..." : "Send"}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </form>
   );
 }

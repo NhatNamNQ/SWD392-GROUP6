@@ -72,11 +72,7 @@ export function summarizeSelection(selection: ChatSelection | null) {
     return null;
   }
 
-  return [
-    selection.courseName,
-    selection.documentTitle,
-    selection.chapterTitle ?? "All chapters",
-  ]
+  return [selection.courseName, selection.documentTitle, selection.chapterTitle ?? "All chapters"]
     .filter(Boolean)
     .join(" · ");
 }

@@ -92,8 +92,8 @@ export function ChatPanel({
                   What would you like to learn today?
                 </CardTitle>
                 <p className="max-w-2xl text-sm font-semibold text-slate-600 md:text-base">
-                  Ask about models, patterns, or diagrams. OrbitDocs answers from the course
-                  library and shows the exact source.
+                  Ask about models, patterns, or diagrams. OrbitDocs answers from the course library
+                  and shows the exact source.
                 </p>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">

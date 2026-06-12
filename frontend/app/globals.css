@@ -64,15 +64,15 @@
   }
 
   .orbit-frame {
-    @apply rounded-md border-2 border-slate-700 bg-white shadow-orbit;
+    @apply rounded-[2rem] border border-slate-200/80 bg-white/95 shadow-[0_18px_48px_rgba(15,23,42,0.10)] backdrop-blur;
   }
 
   .orbit-chip {
-    @apply rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 shadow-chip;
+    @apply rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm;
   }
 
   .orbit-panel-head {
-    @apply border-b-2 border-slate-700 px-4 py-3 text-sm font-extrabold;
+    @apply border-b border-slate-200/80 px-6 py-4 text-[11px] font-black tracking-[0.16em] uppercase text-slate-500;
   }
 
   .orbit-grid {

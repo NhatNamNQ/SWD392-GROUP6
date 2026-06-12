@@ -6,4 +6,3 @@ export function DocumentStatusBadge({ status }: { status: DocumentStatus }) {
 
   return <Badge variant={variant}>{status}</Badge>;
 }
-

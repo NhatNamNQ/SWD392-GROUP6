@@ -16,10 +16,15 @@ export async function POST(request: Request) {
   });
 
   if (!backendResponse.ok) {
-    return createAuthJsonResponse(await readBackendAuthError(backendResponse), backendResponse.status);
+    return createAuthJsonResponse(
+      await readBackendAuthError(backendResponse),
+      backendResponse.status,
+    );
   }
 
-  const response = await readBackendApiResponse<{ email: string; expireIn: number }>(backendResponse);
+  const response = await readBackendApiResponse<{ email: string; expireIn: number }>(
+    backendResponse,
+  );
   return createAuthJsonResponse({
     email: response.data?.email ?? payload.email,
     expireIn: response.data?.expireIn ?? 0,

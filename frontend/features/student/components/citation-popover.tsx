@@ -25,7 +25,9 @@ export function CitationPopover({ citation, index, open, onToggle }: CitationPop
           <div className="mb-2 flex flex-wrap gap-2">
             {citation.documentName ? <Badge variant="blue">{citation.documentName}</Badge> : null}
             {citation.chapterTitle ? <Badge variant="mint">{citation.chapterTitle}</Badge> : null}
-            {citation.pageNum != null ? <Badge variant="default">Page {citation.pageNum}</Badge> : null}
+            {citation.pageNum != null ? (
+              <Badge variant="default">Page {citation.pageNum}</Badge>
+            ) : null}
           </div>
           {citation.similarityScore != null ? (
             <p className="mb-2 text-xs font-black text-slate-800">

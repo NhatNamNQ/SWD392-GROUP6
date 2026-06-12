@@ -108,9 +108,7 @@ export function TeacherLayout({ children, user }: TeacherLayoutProps) {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
-          {children}
-        </div>
+        <div className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">{children}</div>
       </main>
     </div>
   );

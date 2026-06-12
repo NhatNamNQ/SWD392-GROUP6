@@ -16,11 +16,7 @@ import {
   fetchUsers,
   updateUser,
 } from "@/features/admin-governance/api/admin-client";
-import type {
-  RoleRecord,
-  UserPayload,
-  UserRecord,
-} from "@/features/admin-governance/model/types";
+import type { RoleRecord, UserPayload, UserRecord } from "@/features/admin-governance/model/types";
 
 const emptyUserPayload: UserPayload = {
   email: "",
@@ -48,23 +44,29 @@ function toUserPayload(user: UserRecord): UserPayload {
   };
 }
 
-function CenteredModal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+function CenteredModal({
+  title,
+  children,
+  onClose,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between border-b-2 border-slate-200 px-6 py-4">
           <h2 className="text-xl font-black text-slate-800">{title}</h2>
-          <button 
+          <button
             type="button"
-            onClick={onClose} 
+            onClick={onClose}
             className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto max-h-[80vh]">
-          {children}
-        </div>
+        <div className="p-6 overflow-y-auto max-h-[80vh]">{children}</div>
       </div>
     </div>
   );
@@ -73,7 +75,7 @@ function CenteredModal({ title, children, onClose }: { title: string; children: 
 export function UsersPage() {
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [roles, setRoles] = useState<RoleRecord[]>([]);
-  
+
   // UI states
   const [isCreating, setIsCreating] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -147,7 +149,11 @@ export function UsersPage() {
     }
 
     if (!createForm.email || !createForm.fullName) {
-      toast({ title: "Error", description: "Email and full name are required.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Email and full name are required.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -157,7 +163,11 @@ export function UsersPage() {
         toast({ title: "Success", description: "Lecturer created and credential email sent." });
       } else {
         if (!createForm.password) {
-          toast({ title: "Error", description: "Temporary password is required for this role.", variant: "destructive" });
+          toast({
+            title: "Error",
+            description: "Temporary password is required for this role.",
+            variant: "destructive",
+          });
           return;
         }
         await createUser({
@@ -219,8 +229,11 @@ export function UsersPage() {
           </p>
           <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">Users Directory</h1>
         </div>
-        <Button 
-          onClick={() => { setIsCreating(true); setSelectedUserId(""); }} 
+        <Button
+          onClick={() => {
+            setIsCreating(true);
+            setSelectedUserId("");
+          }}
           className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
         >
           <UserPlus className="mr-2 h-4 w-4" /> New User
@@ -268,9 +281,9 @@ export function UsersPage() {
                     <Edit2 className="mr-2 h-4 w-4" />
                     Edit
                   </Button>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
+                  <Button
+                    type="button"
+                    variant="ghost"
                     onClick={() => handleDelete(user.id)}
                     disabled={isAdmin}
                     title={isAdmin ? "Admins cannot be deleted." : "Delete user"}
@@ -315,11 +328,12 @@ export function UsersPage() {
                 {isCreatingLecturer && (
                   <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-sm">
                     <p className="text-xs font-bold text-emerald-700">
-                      Lecturers will automatically receive a credential email to activate their account.
+                      Lecturers will automatically receive a credential email to activate their
+                      account.
                     </p>
                   </div>
                 )}
-                
+
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Email Address</label>
                   <Input
@@ -331,7 +345,7 @@ export function UsersPage() {
                     autoFocus
                   />
                 </div>
-                
+
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700">Full Name</label>
                   <Input
@@ -356,12 +370,15 @@ export function UsersPage() {
                     />
                   </div>
                 )}
-                
+
                 <div className="pt-4 flex justify-end gap-3">
                   <Button type="button" variant="secondary" onClick={() => setIsCreating(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip">
+                  <Button
+                    type="submit"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
+                  >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Create account
                   </Button>
@@ -386,7 +403,7 @@ export function UsersPage() {
                 placeholder="Email"
               />
             </div>
-            
+
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Full Name</label>
               <Input

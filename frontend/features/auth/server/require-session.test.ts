@@ -27,13 +27,14 @@ describe("requireAuthSession", () => {
 
     const { requireAuthSession } = await import("@/features/auth/server/require-session");
 
-    await expect(requireAuthSession("/dashboard")).rejects.toThrow("REDIRECT:/login?next=%2Fdashboard");
+    await expect(requireAuthSession("/dashboard")).rejects.toThrow(
+      "REDIRECT:/login?next=%2Fdashboard",
+    );
   });
 
   test("returns the decoded session when the cookie is present", async () => {
-    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
-      "@/features/auth/server/session"
-    );
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } =
+      await import("@/features/auth/server/session");
     const encoded = await encodeAuthSession({
       accessToken: "access-token",
       user: {
@@ -64,9 +65,8 @@ describe("requireAuthSession", () => {
   });
 
   test("returns the decoded session when the user matches the required role", async () => {
-    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
-      "@/features/auth/server/session"
-    );
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } =
+      await import("@/features/auth/server/session");
     const encoded = await encodeAuthSession({
       accessToken: "access-token",
       user: {
@@ -97,9 +97,8 @@ describe("requireAuthSession", () => {
   });
 
   test("redirects an authenticated student away from admin routes", async () => {
-    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
-      "@/features/auth/server/session"
-    );
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } =
+      await import("@/features/auth/server/session");
     const encoded = await encodeAuthSession({
       accessToken: "access-token",
       user: {
@@ -123,9 +122,8 @@ describe("requireAuthSession", () => {
   });
 
   test("redirects an authenticated lecturer away from admin routes", async () => {
-    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
-      "@/features/auth/server/session"
-    );
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } =
+      await import("@/features/auth/server/session");
     const encoded = await encodeAuthSession({
       accessToken: "access-token",
       user: {
@@ -149,9 +147,8 @@ describe("requireAuthSession", () => {
   });
 
   test("redirects an authenticated admin away from teacher routes", async () => {
-    const { AUTH_SESSION_COOKIE, encodeAuthSession } = await import(
-      "@/features/auth/server/session"
-    );
+    const { AUTH_SESSION_COOKIE, encodeAuthSession } =
+      await import("@/features/auth/server/session");
     const encoded = await encodeAuthSession({
       accessToken: "access-token",
       user: {

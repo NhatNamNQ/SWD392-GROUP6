@@ -34,7 +34,10 @@ export async function POST(request: Request) {
   });
 
   if (!backendResponse.ok) {
-    return createAuthJsonResponse(await readBackendAuthError(backendResponse), backendResponse.status);
+    return createAuthJsonResponse(
+      await readBackendAuthError(backendResponse),
+      backendResponse.status,
+    );
   }
 
   const session = await readBackendAuthSession(backendResponse);

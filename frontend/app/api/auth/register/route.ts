@@ -1,4 +1,8 @@
-import { createAuthJsonResponse, readBackendAuthError, requestBackend } from "@/features/auth/server/backend";
+import {
+  createAuthJsonResponse,
+  readBackendAuthError,
+  requestBackend,
+} from "@/features/auth/server/backend";
 
 export async function POST(request: Request) {
   const payload = await request.json();
@@ -11,7 +15,10 @@ export async function POST(request: Request) {
   });
 
   if (!backendResponse.ok) {
-    return createAuthJsonResponse(await readBackendAuthError(backendResponse), backendResponse.status);
+    return createAuthJsonResponse(
+      await readBackendAuthError(backendResponse),
+      backendResponse.status,
+    );
   }
 
   return createAuthJsonResponse({

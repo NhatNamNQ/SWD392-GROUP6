@@ -32,14 +32,18 @@ export function ForceChangePasswordForm() {
     event.preventDefault();
 
     if (!tempToken) {
-      toast({ title: "Error", description: "Missing temporary access token. Please sign in again.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Missing temporary access token. Please sign in again.",
+        variant: "destructive",
+      });
       return;
     }
 
     const validationError = validateForceChangePasswordPayload({ newPassword });
 
     if (validationError) {
-      toast({ title: "Error", description: validationError , variant: "destructive" });
+      toast({ title: "Error", description: validationError, variant: "destructive" });
       return;
     }
 
@@ -53,7 +57,11 @@ export function ForceChangePasswordForm() {
         router.refresh();
       } catch (error) {
         const authNotice = toAuthNotice(error);
-        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
+        toast({
+          title: authNotice.tone === "error" ? "Error" : "Success",
+          description: authNotice.message,
+          variant: authNotice.tone === "error" ? "destructive" : "default",
+        });
       } finally {
         setPending(false);
       }

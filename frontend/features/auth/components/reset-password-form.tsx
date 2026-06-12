@@ -30,7 +30,7 @@ export function ResetPasswordForm() {
     const validationError = validateResetPasswordPayload({ resetToken, newPassword });
 
     if (validationError) {
-      toast({ title: "Error", description: validationError , variant: "destructive" });
+      toast({ title: "Error", description: validationError, variant: "destructive" });
       return;
     }
 
@@ -42,7 +42,11 @@ export function ResetPasswordForm() {
         router.replace(`/login?email=${encodeURIComponent(email)}&reset=1`);
       } catch (error) {
         const authNotice = toAuthNotice(error);
-        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
+        toast({
+          title: authNotice.tone === "error" ? "Error" : "Success",
+          description: authNotice.message,
+          variant: authNotice.tone === "error" ? "destructive" : "default",
+        });
       } finally {
         setPending(false);
       }
@@ -50,58 +54,48 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 md:px-6">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">
-              Account recovery
-            </p>
-            <h1 className="text-4xl font-black tracking-[-0.04em] text-slate-800">
-              Reset your password
-            </h1>
+    <div className="flex w-full flex-col items-center justify-center space-y-8 p-6 sm:p-12">
+      <div className="flex w-full flex-col space-y-2 text-center">
+        <CardTitle className="text-4xl font-black tracking-tight text-slate-900">
+          Reset password
+        </CardTitle>
+        <p className="text-sm font-medium text-slate-500">
+          {email
+            ? `Recovery code sent to ${email}.`
+            : "Enter the recovery code from your email."}
+        </p>
+      </div>
+
+      <div className="w-full max-w-sm space-y-6">
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700" htmlFor="new-password">
+              New password
+            </label>
+            <Input
+              id="new-password"
+              type="password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              autoComplete="new-password"
+              className="h-12 bg-white/50 transition-all focus:bg-white focus:ring-2 focus:ring-sky-500/20"
+            />
           </div>
+
+          <Button type="submit" className="w-full h-12 gap-2 mt-4 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm" disabled={pending}>
+            {pending ? "Saving..." : "Reset password"}
+            <CheckCircle2 className="h-4 w-4" />
+          </Button>
+        </form>
+
+        <div className="text-center text-sm font-medium text-slate-500">
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 rounded-sm border-2 border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-chip transition hover:border-slate-400"
+            className="text-sky-600 hover:text-sky-500 transition-colors font-semibold"
           >
             Back to login
           </Link>
         </div>
-
-        <Card>
-          <CardContent className="space-y-6 p-6 md:p-8">
-            <div className="space-y-2">
-              <CardTitle className="flex items-center gap-2 text-2xl text-slate-800">
-                <KeyRound className="h-5 w-5" />
-                Choose a new password
-              </CardTitle>
-              <p className="text-sm font-semibold text-slate-600">
-                {email ? `Recovery code sent to ${email}.` : "Enter the recovery code from your email."}
-              </p>
-            </div>
-
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <label className="text-sm font-extrabold text-slate-700" htmlFor="new-password">
-                  New password
-                </label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  value={newPassword}
-                  onChange={(event) => setNewPassword(event.target.value)}
-                  autoComplete="new-password"
-                />
-              </div>
-
-              <Button type="submit" size="lg" className="gap-2" disabled={pending}>
-                {pending ? "Saving..." : "Reset password"}
-                <CheckCircle2 className="h-4 w-4" />
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

@@ -16,13 +16,7 @@ type AuthBenefitsProps = {
   benefits: string[];
 };
 
-export function AuthBenefits({
-  badge,
-  title,
-  description,
-  items,
-  benefits,
-}: AuthBenefitsProps) {
+export function AuthBenefits({ badge, title, description, items, benefits }: AuthBenefitsProps) {
   return (
     <div className="space-y-6">
       <Badge variant="mint" className="w-fit">

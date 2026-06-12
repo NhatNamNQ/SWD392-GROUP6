@@ -1,5 +1,9 @@
 import { proxyJavaJson, toJavaErrorResponse } from "@/features/java-api/server/java-api";
-import type { CreateUserPayload, UserPayload, UserRecord } from "@/features/admin-governance/model/types";
+import type {
+  CreateUserPayload,
+  UserPayload,
+  UserRecord,
+} from "@/features/admin-governance/model/types";
 
 export async function GET(request: Request) {
   try {
@@ -43,4 +47,3 @@ export async function PATCH(request: Request) {
     return toJavaErrorResponse(error);
   }
 }
-

@@ -13,15 +13,10 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
-    return proxyJavaJson<{ message: string }>(
-      request,
-      `/api/documents/${id}`,
-      {
-        method: "DELETE",
-      },
-    );
+    return proxyJavaJson<{ message: string }>(request, `/api/documents/${id}`, {
+      method: "DELETE",
+    });
   } catch (error) {
     return toJavaErrorResponse(error);
   }
 }
-

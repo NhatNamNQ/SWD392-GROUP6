@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  clearRefreshCookie,
-  requestBackend,
-} from "@/features/auth/server/backend";
+import { clearRefreshCookie, requestBackend } from "@/features/auth/server/backend";
 import { readRequestAuthSession } from "@/features/auth/server/request-session";
 import { clearSerializedSession } from "@/features/auth/server/session";
 

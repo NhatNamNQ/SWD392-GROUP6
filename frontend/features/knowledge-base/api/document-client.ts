@@ -57,4 +57,3 @@ export function deleteDocument(documentId: string) {
     method: "DELETE",
   });
 }
-

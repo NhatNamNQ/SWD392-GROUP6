@@ -33,7 +33,7 @@ export function PasswordForm({ user }: PasswordFormProps) {
     const validationError = validateChangePasswordPayload({ oldPassword, newPassword });
 
     if (validationError) {
-      toast({ title: "Error", description: validationError , variant: "destructive" });
+      toast({ title: "Error", description: validationError, variant: "destructive" });
       return;
     }
 
@@ -42,12 +42,16 @@ export function PasswordForm({ user }: PasswordFormProps) {
     startTransition(async () => {
       try {
         const result = await changePassword({ oldPassword, newPassword });
-        toast({ title: "Success", description: result.message  });
+        toast({ title: "Success", description: result.message });
         setOldPassword("");
         setNewPassword("");
       } catch (error) {
         const authNotice = toAuthNotice(error);
-        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
+        toast({
+          title: authNotice.tone === "error" ? "Error" : "Success",
+          description: authNotice.message,
+          variant: authNotice.tone === "error" ? "destructive" : "default",
+        });
       } finally {
         setPending(false);
       }

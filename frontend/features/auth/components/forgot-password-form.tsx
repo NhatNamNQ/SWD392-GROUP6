@@ -27,7 +27,7 @@ export function ForgotPasswordForm() {
     const validationError = validateForgotPasswordPayload({ email });
 
     if (validationError) {
-      toast({ title: "Error", description: validationError , variant: "destructive" });
+      toast({ title: "Error", description: validationError, variant: "destructive" });
       return;
     }
 
@@ -36,10 +36,16 @@ export function ForgotPasswordForm() {
     startTransition(async () => {
       try {
         const result = await forgotPassword({ email });
-        router.replace(`/verify-otp?email=${encodeURIComponent(result.email)}&type=FORGET_PASSWORD`);
+        router.replace(
+          `/verify-otp?email=${encodeURIComponent(result.email)}&type=FORGET_PASSWORD`,
+        );
       } catch (error) {
         const authNotice = toAuthNotice(error);
-        toast({ title: authNotice.tone === "error" ? "Error" : "Success", description: authNotice.message, variant: authNotice.tone === "error" ? "destructive" : "default" });
+        toast({
+          title: authNotice.tone === "error" ? "Error" : "Success",
+          description: authNotice.message,
+          variant: authNotice.tone === "error" ? "destructive" : "default",
+        });
       } finally {
         setPending(false);
       }
@@ -58,7 +64,6 @@ export function ForgotPasswordForm() {
       </div>
 
       <div className="w-full max-w-sm space-y-6">
-
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700" htmlFor="email">
@@ -95,12 +100,11 @@ export function ForgotPasswordForm() {
         </form>
 
         <div className="text-center text-sm font-medium text-slate-500">
-          <Link href="/login" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
+          <Link
+            href="/login"
+            className="text-sky-600 hover:text-sky-500 transition-colors font-semibold"
+          >
             Back to login
-          </Link>
-          <span className="mx-2 text-slate-300">|</span>
-          <Link href="/register" className="text-sky-600 hover:text-sky-500 transition-colors font-semibold">
-            Create account
           </Link>
         </div>
       </div>

@@ -29,7 +29,10 @@ export function LoginForm() {
     if (searchParams.get("verified") === "1") {
       toast({ title: "Success", description: "Account verified. Sign in to continue." });
     } else if (searchParams.get("reset") === "1") {
-      toast({ title: "Success", description: "Password reset successfully. Sign in with your new password." });
+      toast({
+        title: "Success",
+        description: "Password reset successfully. Sign in with your new password.",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -45,7 +48,6 @@ export function LoginForm() {
     }
 
     setPending(true);
-
 
     startTransition(async () => {
       try {
@@ -105,8 +107,6 @@ export function LoginForm() {
       </div>
 
       <div className="w-full max-w-sm space-y-6">
-
-
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700" htmlFor="email">
@@ -176,13 +176,6 @@ export function LoginForm() {
             className="font-semibold text-sky-600 transition-colors hover:text-sky-500"
           >
             Sign up
-          </Link>
-          <span className="mx-2 text-slate-300">|</span>
-          <Link
-            href="/verify-otp"
-            className="font-semibold text-sky-600 transition-colors hover:text-sky-500"
-          >
-            Verify OTP
           </Link>
         </div>
       </div>

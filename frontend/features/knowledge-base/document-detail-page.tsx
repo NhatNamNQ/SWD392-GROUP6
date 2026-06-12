@@ -88,9 +88,7 @@ export function DocumentDetailPage({ documentId }: { documentId: string }) {
                 <DocumentStatusBadge status={document.status} />
               </div>
               {document.status === "FAILED" ? (
-                <p className="text-sm font-bold text-rose-700">
-                  Failure reason unavailable.
-                </p>
+                <p className="text-sm font-bold text-rose-700">Failure reason unavailable.</p>
               ) : null}
             </CardHeader>
             <CardContent className="space-y-4">
@@ -104,7 +102,10 @@ export function DocumentDetailPage({ documentId }: { documentId: string }) {
                 {chapters.length ? (
                   <div className="grid gap-2">
                     {chapters.map((chapter) => (
-                      <div key={chapter.id} className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                      <div
+                        key={chapter.id}
+                        className="rounded-md border border-slate-200 bg-slate-50 p-3"
+                      >
                         <p className="text-sm font-black text-slate-800">
                           {chapter.orderIndex}. {chapter.title}
                         </p>
@@ -128,4 +129,3 @@ export function DocumentDetailPage({ documentId }: { documentId: string }) {
     </main>
   );
 }
-

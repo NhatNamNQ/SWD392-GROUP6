@@ -34,23 +34,29 @@ function toMessage(error: unknown) {
   return "Course request failed.";
 }
 
-function CenteredModal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+function CenteredModal({
+  title,
+  children,
+  onClose,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between border-b-2 border-slate-200 px-6 py-4">
           <h2 className="text-xl font-black text-slate-800">{title}</h2>
-          <button 
+          <button
             type="button"
-            onClick={onClose} 
+            onClick={onClose}
             className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto max-h-[80vh]">
-          {children}
-        </div>
+        <div className="p-6 overflow-y-auto max-h-[80vh]">{children}</div>
       </div>
     </div>
   );
@@ -61,11 +67,11 @@ export function CoursesPage() {
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  
+
   // UI states
   const [isCreating, setIsCreating] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState("");
-  
+
   // Form states
   const [createForm, setCreateForm] = useState<CoursePayload>(emptyPayload);
   const [editForm, setEditForm] = useState<CoursePayload>(emptyPayload);
@@ -112,7 +118,7 @@ export function CoursesPage() {
   async function handleSelectCourse(courseId: string) {
     setSelectedCourseId(courseId);
     setIsCreating(false);
-    
+
     // Fetch full course details for editing
     try {
       const course = await fetchCourse(courseId);
@@ -137,7 +143,11 @@ export function CoursesPage() {
     event.preventDefault();
 
     if (!createForm.code.trim() || !createForm.name.trim() || !createForm.lecturerId) {
-      toast({ title: "Error", description: "Course code, name, and lecturer are required.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Course code, name, and lecturer are required.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -156,7 +166,11 @@ export function CoursesPage() {
     event.preventDefault();
 
     if (!editForm.code.trim() || !editForm.name.trim() || !editForm.lecturerId) {
-      toast({ title: "Error", description: "Course code, name, and lecturer are required.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Course code, name, and lecturer are required.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -179,8 +193,11 @@ export function CoursesPage() {
           </p>
           <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">Course Catalog</h1>
         </div>
-        <Button 
-          onClick={() => { setIsCreating(true); setSelectedCourseId(""); }} 
+        <Button
+          onClick={() => {
+            setIsCreating(true);
+            setSelectedCourseId("");
+          }}
           className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
         >
           <Plus className="mr-2 h-4 w-4" /> New Course
@@ -219,11 +236,16 @@ export function CoursesPage() {
                   {course.description || "No description provided."}
                 </p>
                 <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400 mt-2">
-                  Lecturer: <span className="text-slate-600">{course.lecturerName || "Unassigned"}</span>
+                  Lecturer:{" "}
+                  <span className="text-slate-600">{course.lecturerName || "Unassigned"}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button type="button" variant="secondary" onClick={() => handleSelectCourse(course.id)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => handleSelectCourse(course.id)}
+                >
                   <Edit2 className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
@@ -245,7 +267,9 @@ export function CoursesPage() {
                 <label className="text-xs font-bold text-slate-700">Course Code</label>
                 <Input
                   value={createForm.code}
-                  onChange={(event) => setCreateForm((current) => ({ ...current, code: event.target.value }))}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, code: event.target.value }))
+                  }
                   placeholder="e.g. SWD392"
                   autoFocus
                 />
@@ -254,7 +278,9 @@ export function CoursesPage() {
                 <label className="text-xs font-bold text-slate-700">Course Name</label>
                 <Input
                   value={createForm.name}
-                  onChange={(event) => setCreateForm((current) => ({ ...current, name: event.target.value }))}
+                  onChange={(event) =>
+                    setCreateForm((current) => ({ ...current, name: event.target.value }))
+                  }
                   placeholder="Software Architecture"
                 />
               </div>
@@ -264,7 +290,9 @@ export function CoursesPage() {
               <label className="text-xs font-bold text-slate-700">Description</label>
               <Textarea
                 value={createForm.description}
-                onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, description: event.target.value }))
+                }
                 placeholder="Course overview and objectives..."
                 className="resize-none h-24"
               />
@@ -275,7 +303,9 @@ export function CoursesPage() {
               <select
                 className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
                 value={createForm.lecturerId}
-                onChange={(event) => setCreateForm((current) => ({ ...current, lecturerId: event.target.value }))}
+                onChange={(event) =>
+                  setCreateForm((current) => ({ ...current, lecturerId: event.target.value }))
+                }
                 disabled={!lecturers.length}
               >
                 <option value="">Select a lecturer...</option>
@@ -296,7 +326,10 @@ export function CoursesPage() {
               <Button type="button" variant="secondary" onClick={() => setIsCreating(false)}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip">
+              <Button
+                type="submit"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create course
               </Button>
@@ -314,7 +347,9 @@ export function CoursesPage() {
                 <label className="text-xs font-bold text-slate-700">Course Code</label>
                 <Input
                   value={editForm.code}
-                  onChange={(event) => setEditForm((current) => ({ ...current, code: event.target.value }))}
+                  onChange={(event) =>
+                    setEditForm((current) => ({ ...current, code: event.target.value }))
+                  }
                   placeholder="e.g. SWD392"
                 />
               </div>
@@ -322,7 +357,9 @@ export function CoursesPage() {
                 <label className="text-xs font-bold text-slate-700">Course Name</label>
                 <Input
                   value={editForm.name}
-                  onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))}
+                  onChange={(event) =>
+                    setEditForm((current) => ({ ...current, name: event.target.value }))
+                  }
                   placeholder="Software Architecture"
                 />
               </div>
@@ -332,7 +369,9 @@ export function CoursesPage() {
               <label className="text-xs font-bold text-slate-700">Description</label>
               <Textarea
                 value={editForm.description}
-                onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))}
+                onChange={(event) =>
+                  setEditForm((current) => ({ ...current, description: event.target.value }))
+                }
                 placeholder="Course overview and objectives..."
                 className="resize-none h-24"
               />
@@ -343,7 +382,9 @@ export function CoursesPage() {
               <select
                 className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
                 value={editForm.lecturerId}
-                onChange={(event) => setEditForm((current) => ({ ...current, lecturerId: event.target.value }))}
+                onChange={(event) =>
+                  setEditForm((current) => ({ ...current, lecturerId: event.target.value }))
+                }
                 disabled={!lecturers.length}
               >
                 <option value="">Select a lecturer...</option>
@@ -359,7 +400,10 @@ export function CoursesPage() {
               <Button type="button" variant="secondary" onClick={handleCancelEdit}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip">
+              <Button
+                type="submit"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
+              >
                 <Save className="mr-2 h-4 w-4" />
                 Save Changes
               </Button>

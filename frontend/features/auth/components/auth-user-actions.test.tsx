@@ -28,7 +28,10 @@ describe("AuthUserActions", () => {
       "href",
       "/student",
     );
-    expect(screen.getByRole("link", { name: "Password" })).toHaveAttribute("href", "/settings/password");
+    expect(screen.getByRole("link", { name: "Password" })).toHaveAttribute(
+      "href",
+      "/settings/password",
+    );
     expect(screen.queryByRole("link", { name: "Knowledge" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Admin" })).not.toBeInTheDocument();
   });
@@ -77,10 +80,7 @@ describe("AuthUserActions", () => {
       "/student",
     );
     expect(screen.getByRole("link", { name: "Users" })).toHaveAttribute("href", "/admin/users");
-    expect(screen.getByRole("link", { name: "Courses" })).toHaveAttribute(
-      "href",
-      "/admin/courses",
-    );
+    expect(screen.getByRole("link", { name: "Courses" })).toHaveAttribute("href", "/admin/courses");
     expect(screen.getByRole("link", { name: "Roles" })).toHaveAttribute("href", "/admin/roles");
     expect(screen.queryByRole("link", { name: "Knowledge" })).not.toBeInTheDocument();
   });

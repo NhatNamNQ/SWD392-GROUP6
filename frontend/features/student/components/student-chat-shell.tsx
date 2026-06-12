@@ -4,13 +4,14 @@ import { Menu } from "lucide-react";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
-import { SiteHeader } from "@/components/shared/site-header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { AuthUserActions } from "@/features/auth/components/auth-user-actions";
 import type { AuthUser } from "@/features/auth/model/contracts";
-import { fetchChatBootstrap, fetchChatSession, sendChatMessage } from "@/features/student/api/chat-client";
+import {
+  fetchChatBootstrap,
+  fetchChatSession,
+  sendChatMessage,
+} from "@/features/student/api/chat-client";
 import {
   buildSelectionFromDraft,
   findCourseById,
@@ -40,7 +41,10 @@ function normalizeError(error: unknown) {
   return "Something went wrong while loading chat.";
 }
 
-function summarizeSession(detail: ChatSessionDetail, courseName?: string | null): ChatSessionSummary {
+function summarizeSession(
+  detail: ChatSessionDetail,
+  courseName?: string | null,
+): ChatSessionSummary {
   return {
     id: detail.id,
     courseId: detail.courseId,
@@ -112,7 +116,10 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
 
         setBootstrap(payload);
 
-        const initialDraft = setDraftSelectionFromCourse(payload.courses, payload.courses[0]?.id ?? "");
+        const initialDraft = setDraftSelectionFromCourse(
+          payload.courses,
+          payload.courses[0]?.id ?? "",
+        );
         setSelectedCourseId(initialDraft.courseId);
         setSelectedDocumentId(initialDraft.documentId);
         setSelectedChapterId(initialDraft.chapterId);
@@ -159,8 +166,9 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       return "";
     }
 
-    const document = resolvedCourse.documents.find((entry) => entry.id === selectedDocumentId)
-      ?? resolvedCourse.documents[0];
+    const document =
+      resolvedCourse.documents.find((entry) => entry.id === selectedDocumentId) ??
+      resolvedCourse.documents[0];
     return document?.id ?? "";
   }, [resolvedCourse, selectedDocumentId]);
 
@@ -188,14 +196,13 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
   }, [resolvedDocument, selectedChapterId]);
 
   const draftSelection = useMemo(
-    () =>
-      buildSelectionFromDraft(courses, resolvedCourseId, resolvedDocumentId, resolvedChapterId),
+    () => buildSelectionFromDraft(courses, resolvedCourseId, resolvedDocumentId, resolvedChapterId),
     [courses, resolvedCourseId, resolvedDocumentId, resolvedChapterId],
   );
 
   const draftScopeLabel = summarizeSelection(draftSelection);
   const activeSessionCourseName = activeSession
-    ? courseNameById.get(activeSession.courseId) ?? null
+    ? (courseNameById.get(activeSession.courseId) ?? null)
     : null;
   const activeScopeLabel = getSelectionLabel(
     draftSelection,
@@ -323,6 +330,25 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
     }
   }
 
+  const scopeLabel = activeSession
+    ? [activeSessionCourseName, activeSession.title].filter(Boolean).join(" · ") ||
+      activeSession.title
+    : (draftScopeLabel ?? "Select a course and document");
+
+  const scopeControls = (
+    <ChatScopePicker
+      activeScopeLabel={activeSession ? activeScopeLabel : null}
+      chapterValue={resolvedChapterId ?? "all"}
+      courseValue={resolvedCourseId}
+      courses={courses}
+      draftScopeLabel={draftScopeLabel}
+      documentValue={resolvedDocumentId}
+      onChapterChange={handleChapterChange}
+      onCourseChange={handleCourseChange}
+      onDocumentChange={handleDocumentChange}
+    />
+  );
+
   const sidebar = (
     <ChatHistoryList
       activeSessionId={activeSessionId}
@@ -332,72 +358,52 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       onSelectSession={(sessionId) => void openSession(sessionId)}
       sessions={filteredSessions}
       user={user}
+      scopeControls={scopeControls}
     />
   );
 
-  const scopeLabel = activeSession
-    ? [activeSessionCourseName, activeSession.title].filter(Boolean).join(" · ") ||
-      activeSession.title
-    : draftScopeLabel ?? "Select a course and document";
-
   return (
-    <div className="min-h-screen">
-      <SiteHeader variant="app" actions={user ? <AuthUserActions user={user} /> : null} />
-      <div className="px-4 py-4 md:px-5 md:py-5">
-        <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1280px] gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <div className="hidden lg:block">{sidebar}</div>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(186,230,253,0.42),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(167,243,208,0.28),transparent_20%),linear-gradient(180deg,#f8fafc_0%,#f8fafc_58%,#f1f5f9_100%)]">
+      <div className="mx-auto flex min-h-screen max-w-[1440px] gap-4 px-3 py-3 md:px-4 md:py-4">
+        <aside className="hidden w-[320px] shrink-0 lg:block">{sidebar}</aside>
 
-          <div className="flex min-w-0 flex-col gap-4">
-            <Card className="overflow-hidden">
-              <CardContent className="grid gap-3 p-4">
-                <div className="flex items-start gap-3">
-                  <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                    <SheetTrigger asChild>
-                      <Button variant="secondary" size="icon" className="lg:hidden">
-                        <Menu className="h-5 w-5" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent>
-                      <SheetHeader className="sr-only">
-                        <SheetTitle>Workspace navigation</SheetTitle>
-                      </SheetHeader>
-                      {sidebar}
-                    </SheetContent>
-                  </Sheet>
+        <div className="flex min-w-0 flex-1 flex-col rounded-[2rem] border border-slate-200/70 bg-white/55 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur">
+          <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-4 md:px-6">
+            <div className="flex min-w-0 items-center gap-3">
+              <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="secondary" size="icon" className="rounded-full lg:hidden">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-[92vw] max-w-[360px] border-l border-slate-200 bg-slate-50/95 p-0">
+                  <SheetHeader className="sr-only">
+                    <SheetTitle>Workspace navigation</SheetTitle>
+                  </SheetHeader>
+                  {sidebar}
+                </SheetContent>
+              </Sheet>
 
-                  <div>
-                    <h2 className="text-3xl font-black tracking-[-0.04em] text-slate-800 md:text-4xl">
-                      {activeSession?.title ?? "New chat"}
-                    </h2>
-                    <p className="mt-1 text-sm font-semibold text-slate-600 md:text-base">
-                      Select a course, document, and chapter before starting a new RAG session.
-                      Ongoing sessions stay pinned to their saved backend session id.
-                    </p>
-                  </div>
-                </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+                  Student workspace
+                </p>
+                <h2 className="truncate text-xl font-black tracking-[-0.04em] text-slate-800 md:text-2xl">
+                  {activeSession?.title ?? "New chat"}
+                </h2>
+              </div>
+            </div>
+          </div>
 
-                <ChatScopePicker
-                  activeScopeLabel={activeSession ? activeScopeLabel : null}
-                  chapterValue={resolvedChapterId ?? "all"}
-                  courseValue={resolvedCourseId}
-                  courses={courses}
-                  draftScopeLabel={draftScopeLabel}
-                  documentValue={resolvedDocumentId}
-                  onChapterChange={handleChapterChange}
-                  onCourseChange={handleCourseChange}
-                  onDocumentChange={handleDocumentChange}
-                />
+          <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-3 md:px-4 md:pb-4">
+            {chatError ? (
+              <div className="mx-auto mb-3 w-full max-w-5xl rounded-[1.25rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
+                {chatError}
+              </div>
+            ) : null}
 
-                {chatError ? (
-                  <div className="rounded-sm border-2 border-rose-300 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
-                    {chatError}
-                  </div>
-                ) : null}
-              </CardContent>
-            </Card>
-
-            <div className="orbit-frame flex min-h-[720px] flex-col overflow-hidden">
+            <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/88 shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
               <ChatMessageList
                 activeScopeLabel={scopeLabel}
                 loading={chatLoading || (chatSubmitting && !activeSession)}
@@ -409,14 +415,16 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
                 openCitationId={openCitationId}
                 promptSuggestions={promptSuggestions}
               />
-              <ChatComposer
-                disabled={!draftSelection && !activeSession}
-                input={chatInput}
-                loading={chatSubmitting}
-                onInputChange={setChatInput}
-                onSubmit={handleSubmit}
-                scopeLabel={scopeLabel}
-              />
+              <div className="border-t border-slate-200/80 bg-white/80">
+                <ChatComposer
+                  disabled={!draftSelection && !activeSession}
+                  input={chatInput}
+                  loading={chatSubmitting}
+                  onInputChange={setChatInput}
+                  onSubmit={handleSubmit}
+                  scopeLabel={scopeLabel}
+                />
+              </div>
             </div>
           </div>
         </div>

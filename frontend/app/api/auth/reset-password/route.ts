@@ -16,7 +16,10 @@ export async function POST(request: Request) {
   });
 
   if (!backendResponse.ok) {
-    return createAuthJsonResponse(await readBackendAuthError(backendResponse), backendResponse.status);
+    return createAuthJsonResponse(
+      await readBackendAuthError(backendResponse),
+      backendResponse.status,
+    );
   }
 
   const response = await readBackendApiResponse<null>(backendResponse);
