@@ -17,7 +17,6 @@ import java.util.UUID;
 public class DocumentResponse {
     private UUID id;
     private UUID courseId;
-    private UUID uploadedBy;
     private String originalFilename;
     private FileType fileType;
     private Long fileSizeBytes;

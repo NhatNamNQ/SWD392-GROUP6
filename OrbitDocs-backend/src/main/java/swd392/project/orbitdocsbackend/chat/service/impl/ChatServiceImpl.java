@@ -23,9 +23,7 @@ import swd392.project.orbitdocsbackend.chat.service.IChatService;
 import swd392.project.orbitdocsbackend.course.entity.Course;
 import swd392.project.orbitdocsbackend.document.entity.Chapter;
 import swd392.project.orbitdocsbackend.document.entity.Document;
-import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.enums.MessageRole;
-import swd392.project.orbitdocsbackend.identity.abstractions.services.IUserService;
 import swd392.project.orbitdocsbackend.course.service.ICourseService;
 import swd392.project.orbitdocsbackend.document.service.IDocumentService;
 import swd392.project.orbitdocsbackend.document.service.IChapterService;
@@ -43,7 +41,6 @@ public class ChatServiceImpl implements IChatService {
 
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final IUserService userService;
     private final ICourseService courseService;
     private final IDocumentService documentService;
     private final IChapterService chapterService;
@@ -58,8 +55,6 @@ public class ChatServiceImpl implements IChatService {
     @Override
     @Transactional
     public ChatResponse sendMessage(ChatRequest request, UUID userId) {
-        User user = userService.getUserEntityById(userId);
-
         ChatSession session;
         if (request.getSessionId() != null) {
             session = chatSessionRepository.findByIdAndUserIdAndActiveTrue(request.getSessionId(), userId)
@@ -70,7 +65,7 @@ public class ChatServiceImpl implements IChatService {
             // Access control: Everyone can chat on any course freely.
 
             session = ChatSession.builder()
-                    .user(user)
+                    .userId(userId)
                     .course(course)
                     .title(request.getQuery().length() > 50 ? request.getQuery().substring(0, 50) + "..." : request.getQuery())
                     .active(true)

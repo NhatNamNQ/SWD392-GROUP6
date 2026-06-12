@@ -49,7 +49,7 @@ public class User extends BaseEntity {
 
         // ─────────── Relationships ───────────
 
-        @ManyToOne(fetch = FetchType.EAGER, optional = false)
+        @ManyToOne(fetch = FetchType.LAZY, optional = false)
         @JoinColumn(name = "role_id", nullable = false)
         private Role role;
 

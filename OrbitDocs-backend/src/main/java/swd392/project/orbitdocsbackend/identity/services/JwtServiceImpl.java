@@ -56,7 +56,7 @@ public class JwtServiceImpl implements IJwtService {
                 .getPayload();
     }
 
-    public List<String> extractRoles(String token) {
+    public List<String> extractAuthorities(String token) {
         return extractClaim(token, claims -> claims.get("roles", List.class));
     }
 

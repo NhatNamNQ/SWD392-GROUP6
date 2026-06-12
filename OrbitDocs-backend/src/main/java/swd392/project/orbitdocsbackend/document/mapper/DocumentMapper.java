@@ -9,6 +9,5 @@ import swd392.project.orbitdocsbackend.document.entity.Document;
 public interface DocumentMapper {
 
     @Mapping(target = "courseId", source = "course.id")
-    @Mapping(target = "uploadedBy", source = "uploadedBy.id")
     DocumentResponse toResponse(Document document);
 }

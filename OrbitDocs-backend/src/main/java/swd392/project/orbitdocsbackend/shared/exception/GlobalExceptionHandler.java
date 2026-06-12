@@ -1,9 +1,12 @@
 package swd392.project.orbitdocsbackend.shared.exception;
 
+import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import swd392.project.orbitdocsbackend.identity.exception.auth.RequirePasswordChangeException;
 import swd392.project.orbitdocsbackend.shared.response.ApiResponse;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,6 +27,27 @@ public class GlobalExceptionHandler {
         log.error("Exception: ", exception);
         return ResponseEntity.internalServerError().body(
                 ApiResponse.error(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode(), ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                ApiResponse.error(ErrorCode.UNAUTHORIZED.getStatusCode(), ErrorCode.UNAUTHORIZED.getMessage())
+        );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.error(ErrorCode.UNAUTHENTICATED.getStatusCode(), ErrorCode.UNAUTHENTICATED.getMessage())
+        );
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ApiResponse<Void>> handleJwtException(JwtException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.error(ErrorCode.TOKEN_INVALID.getStatusCode(), ex.getMessage())
         );
     }
 
@@ -66,7 +91,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequirePasswordChangeException.class)
     public ResponseEntity<Map<String, Object>> handleRequirePasswordChange(RequirePasswordChangeException ex) {
 
-        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("errorCode", "REQUIRE_PASSWORD_CHANGE");
         response.put("message", ex.getMessage());
         response.put("tempToken", ex.getTempToken());

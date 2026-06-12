@@ -19,7 +19,6 @@ import swd392.project.orbitdocsbackend.document.service.IDocumentService;
 import swd392.project.orbitdocsbackend.document.service.IRagIntegrationService;
 import swd392.project.orbitdocsbackend.document.service.IStorageService;
 import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
-import swd392.project.orbitdocsbackend.identity.entity.User;
 import swd392.project.orbitdocsbackend.shared.enums.DocumentStatus;
 import swd392.project.orbitdocsbackend.shared.enums.FileType;
 import swd392.project.orbitdocsbackend.shared.exception.AppException;
@@ -54,10 +53,9 @@ public class DocumentServiceImpl implements IDocumentService {
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User uploadedBy = userDetails.user();
 
         // Check if uploader is the assigned lecturer of this course
-        if (course.getLecturer() == null || !course.getLecturer().getId().equals(uploadedBy.getId())) {
+        if (course.getLecturer() == null || !course.getLecturer().getId().equals(userDetails.user().getId())) {
             throw new AppException(ErrorCode.UNAUTHORIZED); // Only the assigned lecturer can upload
         }
 
@@ -111,7 +109,6 @@ public class DocumentServiceImpl implements IDocumentService {
 
             document = Document.builder()
                     .course(course)
-                    .uploadedBy(uploadedBy)
                     .originalFilename(originalFilename)
                     .storagePath(storagePath)
                     .fileType(FileType.PDF)
