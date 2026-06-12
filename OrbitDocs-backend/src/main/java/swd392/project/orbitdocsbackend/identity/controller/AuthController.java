@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import swd392.project.orbitdocsbackend.identity.abstractions.services.IAuthService;
 import swd392.project.orbitdocsbackend.identity.dto.auth.request.*;
@@ -116,7 +117,7 @@ public class AuthController {
     @PostMapping("/force-change-password")
     public ResponseEntity<ApiResponse<AuthResponse>> forceChangePassword(
             @Valid @RequestBody ForceChangePasswordRequest request,
-            org.springframework.security.core.Authentication authentication,
+            Authentication authentication,
             HttpServletResponse response) {
 
         if (authentication == null || authentication.getName() == null) {

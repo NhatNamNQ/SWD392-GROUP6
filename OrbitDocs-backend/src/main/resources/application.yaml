@@ -20,7 +20,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     defer-datasource-initialization: true # data.sql chạy SAU khi Hibernate tạo xong schema
     show-sql: true
     properties:
