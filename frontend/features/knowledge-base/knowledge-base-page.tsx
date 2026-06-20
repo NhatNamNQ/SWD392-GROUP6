@@ -63,6 +63,19 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
+  const ownedCourses = useMemo(
+    () => courses.filter((course) => course.lecturerId === user.id),
+    [courses, user.id],
+  );
+  const resolvedCourseId = useMemo(() => {
+    if (!ownedCourses.length) {
+      return "";
+    }
+
+    const currentSelection = ownedCourses.find((course) => course.id === selectedCourseId);
+    return currentSelection?.id ?? ownedCourses[0].id;
+  }, [ownedCourses, selectedCourseId]);
+
   useEffect(() => {
     let ignore = false;
 
@@ -87,7 +100,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
   }, [user.id, toast]);
 
   useEffect(() => {
-    if (!selectedCourseId) {
+    if (!resolvedCourseId) {
       return;
     }
 
@@ -95,7 +108,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
 
     startTransition(async () => {
       try {
-        const nextDocuments = await fetchCourseDocuments(selectedCourseId);
+        const nextDocuments = await fetchCourseDocuments(resolvedCourseId);
 
         if (!ignore) {
           setDocuments(nextDocuments);
@@ -114,20 +127,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     return () => {
       ignore = true;
     };
-  }, [selectedCourseId, toast]);
-
-  const ownedCourses = useMemo(
-    () => courses.filter((course) => course.lecturerId === user.id),
-    [courses, user.id],
-  );
-  const resolvedCourseId = useMemo(() => {
-    if (!ownedCourses.length) {
-      return "";
-    }
-
-    const currentSelection = ownedCourses.find((course) => course.id === selectedCourseId);
-    return currentSelection?.id ?? ownedCourses[0].id;
-  }, [ownedCourses, selectedCourseId]);
+  }, [resolvedCourseId, toast]);
 
   const filteredDocuments = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
