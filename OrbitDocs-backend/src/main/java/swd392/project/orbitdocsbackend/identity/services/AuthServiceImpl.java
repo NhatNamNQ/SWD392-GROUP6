@@ -203,7 +203,7 @@ public class AuthServiceImpl implements IAuthService {
 
         if (!user.isPasswordChanged()) {
             String tempToken = jwtService.generateToken(userDetails);
-            throw new RequirePasswordChangeException(tempToken);
+            throw new AppException(ErrorCode.REQUIRE_PASSWORD_CHANGE,tempToken);
         }
 
         String accessToken = jwtService.generateToken(userDetails);
