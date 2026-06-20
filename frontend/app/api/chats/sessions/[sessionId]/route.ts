@@ -20,7 +20,10 @@ export async function GET(request: Request, context: { params: Promise<{ session
   try {
     const session = await requireJavaRequestSession(request);
     const { sessionId } = await context.params;
-    const payload = await requestJava<ChatSessionDetail>(session, `/api/chats/sessions/${sessionId}`);
+    const payload = await requestJava<ChatSessionDetail>(
+      session,
+      `/api/chats/sessions/${sessionId}`,
+    );
     return createJavaJsonResponse(normalizeChatSessionDetail(payload));
   } catch (error) {
     return toJavaErrorResponse(error);

@@ -60,9 +60,7 @@ export function ResetPasswordForm() {
           Reset password
         </CardTitle>
         <p className="text-sm font-medium text-slate-500">
-          {email
-            ? `Recovery code sent to ${email}.`
-            : "Enter the recovery code from your email."}
+          {email ? `Recovery code sent to ${email}.` : "Enter the recovery code from your email."}
         </p>
       </div>
 
@@ -82,7 +80,11 @@ export function ResetPasswordForm() {
             />
           </div>
 
-          <Button type="submit" className="w-full h-12 gap-2 mt-4 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm" disabled={pending}>
+          <Button
+            type="submit"
+            className="w-full h-12 gap-2 mt-4 font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
+            disabled={pending}
+          >
             {pending ? "Saving..." : "Reset password"}
             <CheckCircle2 className="h-4 w-4" />
           </Button>

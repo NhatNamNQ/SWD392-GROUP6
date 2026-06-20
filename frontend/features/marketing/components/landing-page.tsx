@@ -128,7 +128,10 @@ export function LandingPage() {
                     : "bg-sky-50";
 
               return (
-                <Card key={feature.title} className="overflow-hidden shadow-sm rounded-[1.5rem] border-slate-200">
+                <Card
+                  key={feature.title}
+                  className="overflow-hidden shadow-sm rounded-[1.5rem] border-slate-200"
+                >
                   <CardHeader className={`border-b border-slate-200 ${headerTone}`}>
                     <div className="flex items-center gap-3">
                       <div className="rounded-xl border border-slate-200 bg-white p-2">
@@ -152,7 +155,10 @@ export function LandingPage() {
           </div>
           <div className="grid gap-4 p-4 md:grid-cols-3">
             {knowledgeCards.map((card, index) => (
-              <Card key={card.title} className="overflow-hidden shadow-sm rounded-[1.5rem] border-slate-200">
+              <Card
+                key={card.title}
+                className="overflow-hidden shadow-sm rounded-[1.5rem] border-slate-200"
+              >
                 <CardHeader
                   className={
                     index === 0

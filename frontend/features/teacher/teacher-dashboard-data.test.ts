@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 
-import { buildTeacherDashboardData, selectLecturerCourses } from "@/features/teacher/teacher-dashboard-data";
+import {
+  buildTeacherDashboardData,
+  selectLecturerCourses,
+} from "@/features/teacher/teacher-dashboard-data";
 import type { CourseRecord } from "@/features/course-management/model/types";
 import type { KnowledgeDocument } from "@/features/knowledge-base/model/types";
 

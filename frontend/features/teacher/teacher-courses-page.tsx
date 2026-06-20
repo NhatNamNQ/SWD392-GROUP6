@@ -92,7 +92,12 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
             Read the course records assigned to your account and use them when creating documents.
           </p>
         </div>
-        <Button type="button" variant="secondary" onClick={() => void loadCourses()} disabled={loading}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => void loadCourses()}
+          disabled={loading}
+        >
           <RefreshCcw className="mr-2 h-4 w-4" />
           Refresh
         </Button>
@@ -117,7 +122,9 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
         </Card>
         <Card>
           <CardHeader>
-            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">Chat ready</p>
+            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">
+              Chat ready
+            </p>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-black tracking-tighter text-slate-800">
@@ -127,7 +134,9 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
         </Card>
         <Card>
           <CardHeader>
-            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">Documents</p>
+            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">
+              Documents
+            </p>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-black tracking-tighter text-slate-800">
@@ -167,13 +176,13 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
           {loading ? <p className="text-sm font-bold text-slate-500">Loading courses...</p> : null}
           {visibleCourses.length ? (
             visibleCourses.map((course) => {
-              const documentCount = dashboard.courseDocuments.find(
-                (entry) => entry.course.id === course.id,
-              )?.documents.length ?? 0;
+              const documentCount =
+                dashboard.courseDocuments.find((entry) => entry.course.id === course.id)?.documents
+                  .length ?? 0;
               const indexedCount =
-                dashboard.courseDocuments.find((entry) => entry.course.id === course.id)?.documents.filter(
-                  (document) => document.status === "INDEXED",
-                ).length ?? 0;
+                dashboard.courseDocuments
+                  .find((entry) => entry.course.id === course.id)
+                  ?.documents.filter((document) => document.status === "INDEXED").length ?? 0;
 
               return (
                 <div
@@ -186,13 +195,18 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
                       <p className="text-sm font-black text-slate-800">
                         {course.code} - {course.name}
                       </p>
-                      {course.active ? <Badge variant="mint">Active</Badge> : <Badge>Inactive</Badge>}
+                      {course.active ? (
+                        <Badge variant="mint">Active</Badge>
+                      ) : (
+                        <Badge>Inactive</Badge>
+                      )}
                     </div>
                     <p className="text-sm font-semibold text-slate-500">
                       {course.description || "No description provided."}
                     </p>
                     <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
-                      Lecturer: <span className="text-slate-600">{course.lecturerName || "Unassigned"}</span>
+                      Lecturer:{" "}
+                      <span className="text-slate-600">{course.lecturerName || "Unassigned"}</span>
                     </p>
                     <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
                       {documentCount} document(s), {indexedCount} indexed

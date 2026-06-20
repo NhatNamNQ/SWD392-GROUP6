@@ -79,12 +79,13 @@ export function normalizeAuthSession(payload: BackendAuthResponse): AuthSession 
 }
 
 export function createAuthError(status: number, payload: BackendApiError | null): AuthError {
+  const data = payload?.data as Record<string, unknown> | undefined;
   return {
     status: payload?.status ?? status,
     message: payload?.message ?? FALLBACK_AUTH_MESSAGE,
     code: "AUTH_ERROR",
-    errorCode: payload?.errorCode,
-    tempToken: payload?.tempToken,
+    errorCode: payload?.errorCode ?? (data?.errorCode as string | undefined),
+    tempToken: payload?.tempToken ?? (data?.tempToken as string | undefined),
     data: payload?.data,
   };
 }

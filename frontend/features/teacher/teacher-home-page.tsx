@@ -57,7 +57,9 @@ export function TeacherHomePage({ user }: TeacherHomePageProps) {
       const allCourses = await fetchCourses();
       const ownedCourses = allCourses.filter((course) => course.lecturerId === user.id);
       const entries = await Promise.all(
-        ownedCourses.map(async (course) => [course.id, await fetchCourseDocuments(course.id)] as const),
+        ownedCourses.map(
+          async (course) => [course.id, await fetchCourseDocuments(course.id)] as const,
+        ),
       );
 
       setCourses(allCourses);
@@ -97,8 +99,17 @@ export function TeacherHomePage({ user }: TeacherHomePageProps) {
             material from the same workspace.
           </p>
         </div>
-        <Button type="button" variant="secondary" onClick={() => void loadWorkspace()} disabled={loading}>
-          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCcw className="mr-2 h-4 w-4" />}
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => void loadWorkspace()}
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCcw className="mr-2 h-4 w-4" />
+          )}
           Refresh workspace
         </Button>
       </section>
@@ -126,14 +137,17 @@ export function TeacherHomePage({ user }: TeacherHomePageProps) {
 
         <Card>
           <CardHeader>
-            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">Documents</p>
+            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">
+              Documents
+            </p>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-black tracking-tighter text-slate-800">
               {dashboard.summary.totalDocuments}
             </p>
             <p className="mt-2 text-sm font-semibold text-slate-500">
-              {dashboard.summary.indexedDocuments} indexed, {dashboard.summary.processingDocuments} processing.
+              {dashboard.summary.indexedDocuments} indexed, {dashboard.summary.processingDocuments}{" "}
+              processing.
             </p>
           </CardContent>
         </Card>
