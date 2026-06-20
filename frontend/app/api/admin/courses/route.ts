@@ -12,18 +12,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as CoursePayload;
-    return proxyJavaJson<CourseRecord>(
-      request,
-      "/api/v1/courses",
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(payload),
+    return proxyJavaJson<CourseRecord>(request, "/api/v1/courses", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
       },
-      201,
-    );
+      body: JSON.stringify(payload),
+    });
   } catch (error) {
     return toJavaErrorResponse(error);
   }
