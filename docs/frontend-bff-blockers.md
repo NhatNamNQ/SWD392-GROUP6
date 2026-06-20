@@ -4,9 +4,9 @@
 - Flow: `POST /api/auth/login` for lecturer accounts that must change password.
 - Current backend behavior: returns `403` with message `You must change your generated password before continuing` but no `tempToken`.
 - FE impact: browser cannot proceed to `/force-change-password` because the FE contract needs a bearer token for `POST /api/auth/force-change-password`.
-- FE mitigation shipped:
-  - BFF login route now returns a clear blocker message instead of a generic auth error.
-  - Login UI will surface that message to the user.
+- FE behavior:
+  - BFF login route now surfaces the backend message directly.
+  - Login UI shows the backend error and does not attempt the force-change-password flow without a token.
 - Backend change required to unblock:
   - Return the old `errorCode/tempToken` contract again, or
   - Expose an alternative authenticated force-change flow that does not depend on `tempToken`.

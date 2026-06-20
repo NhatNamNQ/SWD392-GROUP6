@@ -75,7 +75,7 @@ describe("POST /api/auth/login", () => {
     expect(cookies).toContain("orbitdocs_refresh_token=backend-refresh");
   });
 
-  test("returns a clear backend blocker when password-change login lacks a temp token", async () => {
+  test("returns the backend password-change error as-is when no temp token is provided", async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -110,13 +110,8 @@ describe("POST /api/auth/login", () => {
     await expect(response.json()).resolves.toEqual({
       status: 403,
       code: "AUTH_ERROR",
-      errorCode: "REQUIRE_PASSWORD_CHANGE",
-      tempToken: undefined,
-      data: {
-        blocker: "BACKEND_TEMP_TOKEN_MISSING",
-      },
-      message:
-        "Backend requires a password change but did not return a temporary token. The FE cannot continue this flow until the backend contract is fixed.",
+      data: null,
+      message: "You must change your generated password before continuing",
     });
   });
 });

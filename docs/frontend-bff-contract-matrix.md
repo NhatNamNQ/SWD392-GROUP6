@@ -7,7 +7,7 @@
 ## Auth
 | FE/BFF route | Java route | State | Notes |
 | --- | --- | --- | --- |
-| `POST /api/auth/login` | `POST /api/auth/login` | `aligned with caveat` | Success path uses `ApiResponse<AuthResponse>`. If BE returns password-change `403` without `tempToken`, FE now surfaces a blocker message instead of a generic auth error. |
+| `POST /api/auth/login` | `POST /api/auth/login` | `aligned with caveat` | Success path uses `ApiResponse<AuthResponse>`. If BE returns password-change `403` without `tempToken`, FE surfaces the backend error directly and does not continue to force-change-password. |
 | `POST /api/auth/refresh` | `POST /api/auth/refresh` | `aligned` | BFF reads auth envelope and mirrors refresh cookie. |
 | `POST /api/auth/logout` | `POST /api/auth/logout` | `aligned` | BFF forwards refresh cookie and clears FE cookies. |
 | `POST /api/auth/force-change-password` | `POST /api/auth/force-change-password` | `blocked by backend` | FE route is wired and covered, but the login prerequisite is blocked when BE omits `tempToken`. |
