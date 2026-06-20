@@ -13,6 +13,20 @@ type AdminApiError = {
   code: string;
 };
 
+function normalizeRole(role: RoleRecord): RoleRecord {
+  return {
+    ...role,
+    id: String(role.id),
+  };
+}
+
+function normalizeUser(user: UserRecord): UserRecord {
+  return {
+    ...user,
+    roleResponse: user.roleResponse ? normalizeRole(user.roleResponse) : null,
+  };
+}
+
 async function readJson<T>(response: Response) {
   return (await response.json()) as T;
 }
@@ -34,7 +48,7 @@ async function request<T>(input: string, init?: RequestInit) {
 }
 
 export function fetchUsers() {
-  return request<UserRecord[]>("/api/admin/users");
+  return request<UserRecord[]>("/api/admin/users").then((users) => users.map(normalizeUser));
 }
 
 export function createUser(payload: CreateUserPayload) {
@@ -74,7 +88,7 @@ export function deleteUser(userId: string) {
 }
 
 export function fetchRoles() {
-  return request<RoleRecord[]>("/api/admin/roles");
+  return request<RoleRecord[]>("/api/admin/roles").then((roles) => roles.map(normalizeRole));
 }
 
 export function createRole(payload: RolePayload) {

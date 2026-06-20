@@ -14,19 +14,23 @@ describe("POST /api/auth/login", () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
-          accessToken: "access-token",
-          refreshToken: "",
-          userResponse: {
-            id: "user-1",
-            email: "student@example.edu",
-            fullName: "Student Example",
-            active: true,
-            avatarUrl: null,
-            createdAt: "2026-06-04T08:00:00Z",
-            updatedAt: "2026-06-04T08:00:00Z",
-            roleResponse: {
-              id: "role-1",
-              name: "STUDENT",
+          status: 200,
+          message: "Login successfully",
+          data: {
+            accessToken: "access-token",
+            refreshToken: "",
+            userResponse: {
+              id: "user-1",
+              email: "student@example.edu",
+              fullName: "Student Example",
+              active: true,
+              avatarUrl: null,
+              createdAt: "2026-06-04T08:00:00Z",
+              updatedAt: "2026-06-04T08:00:00Z",
+              roleResponse: {
+                id: "role-1",
+                name: "STUDENT",
+              },
             },
           },
         }),
@@ -69,5 +73,50 @@ describe("POST /api/auth/login", () => {
     const cookies = response.headers.getSetCookie().join("\n");
     expect(cookies).toContain("orbitdocs_session=");
     expect(cookies).toContain("orbitdocs_refresh_token=backend-refresh");
+  });
+
+  test("returns a clear backend blocker when password-change login lacks a temp token", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          status: 403,
+          message: "You must change your generated password before continuing",
+          data: null,
+        }),
+        {
+          status: 403,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      ),
+    );
+
+    const { POST } = await import("@/app/api/auth/login/route");
+    const response = await POST(
+      new Request("http://localhost/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: "lecturer@example.edu",
+          password: "secret123",
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      status: 403,
+      code: "AUTH_ERROR",
+      errorCode: "REQUIRE_PASSWORD_CHANGE",
+      tempToken: undefined,
+      data: {
+        blocker: "BACKEND_TEMP_TOKEN_MISSING",
+      },
+      message:
+        "Backend requires a password change but did not return a temporary token. The FE cannot continue this flow until the backend contract is fixed.",
+    });
   });
 });

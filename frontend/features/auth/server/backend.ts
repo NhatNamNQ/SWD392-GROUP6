@@ -104,7 +104,25 @@ export async function requestBackend(path: string, init: RequestInit) {
 
 export async function readBackendAuthError(response: Response): Promise<AuthError> {
   const payload = await parseJsonBody<BackendApiError>(response);
-  return createAuthError(response.status, payload);
+  const error = createAuthError(response.status, payload);
+
+  if (
+    error.status === 403 &&
+    !error.tempToken &&
+    error.message === "You must change your generated password before continuing"
+  ) {
+    return {
+      ...error,
+      errorCode: "REQUIRE_PASSWORD_CHANGE",
+      data: {
+        blocker: "BACKEND_TEMP_TOKEN_MISSING",
+      },
+      message:
+        "Backend requires a password change but did not return a temporary token. The FE cannot continue this flow until the backend contract is fixed.",
+    };
+  }
+
+  return error;
 }
 
 export async function readBackendAuthSession(response: Response) {
