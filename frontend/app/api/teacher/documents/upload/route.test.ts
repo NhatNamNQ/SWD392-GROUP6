@@ -103,4 +103,38 @@ describe("POST /api/teacher/documents/upload", () => {
     expect(forwardedInit.headers).not.toHaveProperty("content-type");
     expect(forwardedInit.headers).not.toHaveProperty("Content-Type");
   });
+
+  test("rejects non-lecturer upload requests before calling Java", async () => {
+    const { readRequestAuthSession } = await import("@/features/auth/server/request-session");
+    vi.mocked(readRequestAuthSession).mockResolvedValue({
+      accessToken: "admin-token",
+      user: {
+        id: "admin-1",
+        email: "admin@example.edu",
+        fullName: "Admin Example",
+        role: "ADMIN",
+        avatarUrl: null,
+      },
+    });
+
+    const { POST } = await import("@/app/api/teacher/documents/upload/route");
+    const formData = new FormData();
+    formData.set("courseId", "course-1");
+    formData.set("file", new File(["pdf"], "syllabus.pdf", { type: "application/pdf" }));
+
+    const response = await POST(
+      new Request("http://localhost/api/teacher/documents/upload", {
+        method: "POST",
+        body: formData,
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      code: "AUTH_ERROR",
+      message: "Only lecturers can upload documents.",
+      status: 403,
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

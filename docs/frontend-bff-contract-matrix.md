@@ -37,7 +37,7 @@
 ## Documents
 | FE/BFF route | Java route | State | Notes |
 | --- | --- | --- | --- |
-| `POST /api/teacher/documents/upload` | `POST /api/documents/upload` | `aligned with caveat` | Upload proxy is correct for Java; downstream indexing still depends on Python RAG runtime. |
+| `POST /api/teacher/documents/upload` | `POST /api/documents/upload` | `aligned with caveat` | Upload proxy is correct for Java; BFF now blocks non-lecturers before forwarding, and downstream indexing still depends on Python RAG runtime. |
 | `GET /api/teacher/courses/[courseId]/documents` | `GET /api/documents/course/{courseId}` | `aligned` | Read-only list path matches current BE route. |
 | `GET/DELETE /api/teacher/documents/[id]` | `GET/DELETE /api/documents/{id}` | `aligned` | Proxy shape matches current document responses. |
 | `GET /api/teacher/documents/[id]/chapters` | `GET /api/documents/{documentId}/chapters` | `aligned` | FE chapter DTO matches current Java `ChapterResponse`. |

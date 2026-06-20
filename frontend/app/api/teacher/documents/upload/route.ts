@@ -8,6 +8,15 @@ import {
 export async function POST(request: Request) {
   try {
     const session = await requireJavaRequestSession(request);
+
+    if (session.user.role !== "LECTURER") {
+      throw {
+        status: 403,
+        code: "AUTH_ERROR",
+        message: "Only lecturers can upload documents.",
+      };
+    }
+
     const formData = await request.formData();
 
     const response = await requestBackend("/api/documents/upload", {
