@@ -32,6 +32,7 @@ env/
 
 # Understand Anything generated artifacts
 .understand-anything/
+.claude/
 
 # Docker & OS
 .DS_Store

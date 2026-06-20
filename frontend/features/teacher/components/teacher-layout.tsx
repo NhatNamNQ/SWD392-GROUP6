@@ -15,6 +15,7 @@ type TeacherLayoutProps = {
 
 const navigation = [
   { name: "Dashboard", href: "/teacher", icon: LayoutDashboard },
+  { name: "Courses", href: "/teacher/courses", icon: BookOpen },
   { name: "Knowledge Base", href: "/teacher/knowledge-base", icon: Files },
   { name: "Password Settings", href: "/settings/password", icon: Settings },
 ];

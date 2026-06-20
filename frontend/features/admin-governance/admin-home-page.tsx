@@ -139,32 +139,32 @@ export function AdminHomePage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 rounded-xl border-2 border-slate-700 bg-slate-800 p-6 shadow-chip text-white">
+        <div className="flex flex-col gap-4 rounded-xl border-2 border-slate-700 bg-white p-6 shadow-chip text-slate-800">
           <h2 className="text-lg font-black">Quick Actions</h2>
-          <p className="text-sm font-semibold text-slate-400 mb-2">
+          <p className="text-sm font-semibold text-slate-500 mb-2">
             Jump directly into the most common administrative tasks.
           </p>
           <div className="flex-1 space-y-3">
             <Link
               href="/admin/users"
-              className="flex items-center justify-between rounded-md border border-slate-600 bg-slate-700/50 p-3 transition-colors hover:bg-emerald-500 hover:border-emerald-400 group"
+              className="group flex items-center justify-between rounded-md border-2 border-slate-200 bg-slate-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
             >
               <span className="font-bold text-sm">Add New User</span>
-              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-emerald-600" />
             </Link>
             <Link
               href="/admin/courses"
-              className="flex items-center justify-between rounded-md border border-slate-600 bg-slate-700/50 p-3 transition-colors hover:bg-emerald-500 hover:border-emerald-400 group"
+              className="group flex items-center justify-between rounded-md border-2 border-slate-200 bg-slate-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
             >
               <span className="font-bold text-sm">Create Course</span>
-              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-emerald-600" />
             </Link>
             <Link
               href="/admin/roles"
-              className="flex items-center justify-between rounded-md border border-slate-600 bg-slate-700/50 p-3 transition-colors hover:bg-emerald-500 hover:border-emerald-400 group"
+              className="group flex items-center justify-between rounded-md border-2 border-slate-200 bg-slate-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
             >
               <span className="font-bold text-sm">Manage Roles</span>
-              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-emerald-600" />
             </Link>
           </div>
         </div>

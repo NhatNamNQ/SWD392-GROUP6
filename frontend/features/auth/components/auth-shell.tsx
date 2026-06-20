@@ -1,10 +1,6 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
-import { Sparkles } from "lucide-react";
 
 import { SiteHeader } from "@/components/shared/site-header";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 type AuthShellProps = {
   benefits: ReactNode;
@@ -22,6 +18,7 @@ export function AuthShell({ benefits, form }: AuthShellProps) {
           <div className="w-full max-w-[480px] rounded-[2rem] border border-slate-200/80 bg-white/95 shadow-[0_18px_48px_rgba(15,23,42,0.10)] backdrop-blur">
             {form}
           </div>
+          <div className="hidden">{benefits}</div>
         </main>
       </div>
     </div>
