@@ -48,7 +48,7 @@
 | `GET /api/chat/bootstrap` | composite | `aligned with caveat` | Bootstrap wiring is correct, but live chat readiness still depends on RAG runtime. |
 | `POST /api/chats` | `POST /api/chats` | `aligned with caveat` | Java route is correct; actual answer generation depends on Python + embedding runtime. |
 | `GET /api/chats/sessions` | `GET /api/chats/sessions` | `aligned` | Session DTO shape matches current Java controller. |
-| `GET /api/chats/sessions/[sessionId]` | `GET /api/chats/sessions/{sessionId}` | `aligned` | Detail DTO shape matches current Java controller. |
+| `GET /api/chats/sessions/[sessionId]` | `GET /api/chats/sessions/{sessionId}` | `aligned` | Detail DTO is proxied through the BFF, which normalizes Java `USER`/`ASSISTANT` enum values to the FE `user`/`assistant` contract. |
 
 ## Internal RAG
 | Route | State | Notes |
