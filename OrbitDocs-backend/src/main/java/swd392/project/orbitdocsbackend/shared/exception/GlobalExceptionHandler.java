@@ -89,13 +89,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RequirePasswordChangeException.class)
-    public ResponseEntity<Map<String, Object>> handleRequirePasswordChange(RequirePasswordChangeException ex) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> handleRequirePasswordChange(RequirePasswordChangeException ex) {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("errorCode", "REQUIRE_PASSWORD_CHANGE");
-        response.put("message", ex.getMessage());
-        response.put("tempToken", ex.getTempToken());
+        Map<String, Object> data = new HashMap<>();
+        data.put("tempToken", ex.getTempToken());
+        data.put("errorCode", "REQUIRE_PASSWORD_CHANGE");
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                ApiResponse.<Map<String, Object>>builder()
+                        .status(ErrorCode.REQUIRE_PASSWORD_CHANGE.getStatusCode())
+                        .message(ex.getMessage())
+                        .data(data)
+                        .build()
+        );
     }
 }
