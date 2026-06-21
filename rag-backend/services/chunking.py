@@ -16,7 +16,7 @@ class BatchedOllamaEmbeddings(Embeddings):
         results = []
         total_batches = (len(texts) + self.batch_size - 1) // self.batch_size
         for i in range(0, len(texts), self.batch_size):
-            logger.info(f"Embedding batch {i // self.batch_size + 1}/{total_batches} for SemanticChunker...")
+            logger.info(f"Embedding batch {i // self.batch_size + 1}/{total_batches}...")
             batch = texts[i:i + self.batch_size]
             results.extend(self.ollama_embeddings.embed_documents(batch))
         return results
@@ -38,7 +38,7 @@ def chunk_document(full_text: str):
     embeddings = BatchedOllamaEmbeddings(base_embeddings, batch_size=50)
     
     # Initialize Semantic Chunker
-    text_splitter = SemanticChunker(embeddings, breakpoint_threshold_amount=0.85)
+    text_splitter = SemanticChunker(embeddings,breakpoint_threshold_type="percentile", breakpoint_threshold_amount=85.0)
     
     # Split text
     return text_splitter.split_text(full_text)

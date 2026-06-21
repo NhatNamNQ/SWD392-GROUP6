@@ -31,45 +31,48 @@ def process_and_store_chunks(db: Session, document_id: str, chunks: list[str], p
     # Sort chapters by startPage to easily find which chapter a page belongs to
     sorted_chapters = sorted(chapters_info, key=lambda x: x['startPage'])
 
+    # First, save all DocumentChunks
+    doc_chunks = []
     for i, chunk_text in enumerate(chunks):
-        # 1. Determine metadata (e.g. which page it belongs to roughly)
         page_num = 1
         for p in pages_info:
-            # simple substring check to guess page (not 100% accurate if chunk crosses pages)
             if chunk_text[:50] in p['text']:
                 page_num = p['page_num']
                 break
         
-        # Determine chapter based on page_num
         chapter_title = "Document Content"
         for chap in sorted_chapters:
             if chap['startPage'] <= page_num:
                 chapter_title = chap['title']
             else:
-                break # Since it's sorted, we can break early
+                break
                 
         metadata = {
             "page_num": page_num,
             "chapter_title": chapter_title
         }
 
-        # 2. Save DocumentChunk
         doc_chunk = DocumentChunk(
             document_id=doc_uuid,
             chunk_index=i,
             content=chunk_text,
-            token_count=len(chunk_text.split()), # rough estimation
+            token_count=len(chunk_text.split()),
             metadata_=metadata
         )
-        db.add(doc_chunk)
-        db.flush() # get doc_chunk.id
+        doc_chunks.append(doc_chunk)
 
-        # 3. Save ChunkEmbedding
+    db.add_all(doc_chunks)
+    db.flush() # flush to generate IDs
+
+    # Then save all ChunkEmbeddings
+    chunk_embs = []
+    for i, doc_chunk in enumerate(doc_chunks):
         chunk_emb = ChunkEmbedding(
             chunk_id=doc_chunk.id,
             embedding=vectors[i],
             model_name=settings.embedding_model
         )
-        db.add(chunk_emb)
-
+        chunk_embs.append(chunk_emb)
+        
+    db.add_all(chunk_embs)
     db.commit()
