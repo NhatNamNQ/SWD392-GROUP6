@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OrbitDocs UI Design System & Component Library</title>
+<style>
+/* CSS Reset & Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #fbfaf6;
+  --bg-soft: #f4f1e8;
+  --surface: #fffefb;
+  --surface-2: #f5f2e9;
+  --border: rgba(60, 45, 20, 0.14);
+  --border-strong: rgba(60, 45, 20, 0.32);
+  --text-1: #2a2418;
+  --text-2: #564d3c;
+  --text-3: #76694f;
+  --accent: #2d7d6e;
+  --accent-soft: rgba(45, 125, 110, 0.08);
+  --accent-strong: #1e544a;
+  --success: #2e7d32;
+  --success-soft: rgba(46, 125, 50, 0.08);
+  --error: #c62828;
+  --error-soft: rgba(198, 40, 40, 0.08);
+  --warning: #ef6c00;
+  --warning-soft: rgba(239, 108, 0, 0.08);
+  --radius: 8px;
+  --font-sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --shadow: 0 4px 20px rgba(60, 45, 20, 0.05);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+/* ---------------- Layout & Shell ---------------- */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar-nav {
+  width: 320px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--surface-2);
+  border-right: 1px solid var(--border-strong);
+  padding: 40px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  margin-left: 320px;
+  flex: 1;
+  padding: 64px 80px;
+  max-width: 1200px;
+}
+
+/* ---------------- Sidebar Navigation List ---------------- */
+.brand-area {
+  margin-bottom: 40px;
+}
+
+.brand-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin: 0;
+}
+
+.brand-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  margin: 4px 0 0;
+}
+
+.nav-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+  margin: 24px 0 10px;
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links li {
+  margin-bottom: 4px;
+}
+
+.nav-links a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-size: 14.5px;
+  font-weight: 600;
+  transition: all 0.2s var(--ease);
+}
+
+.nav-links a:hover {
+  background: var(--surface);
+  color: var(--text-1);
+  text-decoration: none;
+  padding-left: 18px;
+}
+
+.nav-links li.active a {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+  border-left: 3px solid var(--accent);
+}
+
+/* ---------------- Sections Typography & Colors ---------------- */
+.section {
+  margin-bottom: 80px;
+  scroll-margin-top: 64px;
+}
+
+.kicker {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.h1 {
+  font-family: var(--font-serif);
+  font-size: 42px;
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -.02em;
+  margin: 0 0 16px;
+  color: var(--text-1);
+}
+
+.h2 {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -.015em;
+  margin: 0 0 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  color: var(--text-1);
+}
+
+.section-desc {
+  font-size: 18px;
+  color: var(--text-2);
+  max-width: 72ch;
+  margin-bottom: 32px;
+}
+
+/* ---------------- Style Tokens Grid ---------------- */
+.token-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.color-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+
+.color-swatch {
+  height: 80px;
+  border-radius: calc(var(--radius) - 2px);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.color-name {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 0;
+}
+
+.color-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ---------------- Component Demo Box ---------------- */
+.demo-box {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.demo-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  position: absolute;
+  top: 12px;
+  right: 16px;
+}
+
+.demo-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+
+/* Code Snippet Box */
+.code-preview {
+  background: #26211a;
+  color: #f0ece1;
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+/* ---------------- Inputs & Forms ---------------- */
+.form-group {
+  margin-bottom: 20px;
+  max-width: 480px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.input-control {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--text-1);
+  transition: all 0.2s var(--ease);
+}
+
+.input-control:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input-control:disabled {
+  background: var(--bg-soft);
+  color: var(--text-3);
+  cursor: not-allowed;
+}
+
+/* ---------------- Scope Selector Component ---------------- */
+.scope-bar {
+  display: flex;
+  gap: 12px;
+  background: var(--surface-2);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.scope-select-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 140px;
+}
+
+.scope-select {
+  width: 100%;
+  appearance: none;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  padding: 8px 32px 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.scope-select:hover {
+  border-color: var(--accent);
+}
+
+.scope-select-wrap::after {
+  content: "▾";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+/* ---------------- Chat Bubbles & Messages ---------------- */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  position: relative;
+  line-height: 1.55;
+  font-size: 15.5px;
+}
+
+.message-bubble.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #fffefb;
+  border-bottom-right-radius: 2px;
+}
+
+.message-bubble.user a {
+  color: #fffefb;
+  text-decoration: underline;
+}
+
+.message-bubble.assistant {
+  align-self: flex-start;
+  background: var(--surface-2);
+  color: var(--text-1);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 2px;
+}
+
+.message-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+}
+
+.message-bubble.user .message-meta {
+  color: rgba(255, 255, 255, 0.7);
+  justify-content: flex-end;
+}
+
+/* Citation Chip & Popover */
+.citation-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.citation-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.citation-chip:hover {
+  background: var(--bg-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.citation-popover {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 10px;
+  box-shadow: var(--shadow);
+  max-width: 480px;
+  display: none;
+}
+
+.citation-popover.active {
+  display: block;
+  animation: popIn 0.2s var(--ease);
+}
+
+.citation-header {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.citation-body {
+  font-size: 13.5px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------------- Composer Component ---------------- */
+.composer {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.composer-scope-indicator {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  background: var(--bg-soft);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.composer-scope-indicator b {
+  color: var(--accent);
+}
+
+.composer-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-family: var(--font-sans);
+  font-size: 15.5px;
+  color: var(--text-1);
+  outline: none;
+  min-height: 50px;
+}
+
+.composer-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+/* ---------------- Buttons ---------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fffefb;
+}
+
+.btn-primary:hover {
+  background: var(--accent-strong);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-1);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-soft);
+}
+
+.btn-disabled {
+  background: var(--bg-soft);
+  color: var(--text-3);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
+/* ---------------- Metrics & Cards ---------------- */
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metric-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.metric-value {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--text-1);
+  line-height: 1;
+}
+
+.metric-desc {
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+/* ---------------- Status Badges ---------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.badge-active {
+  background: var(--success-soft);
+  color: var(--success);
+  border: 1px solid rgba(46, 125, 50, 0.2);
+}
+
+.badge-processing {
+  background: var(--warning-soft);
+  color: var(--warning);
+  border: 1px solid rgba(239, 108, 0, 0.2);
+}
+
+.badge-failed {
+  background: var(--error-soft);
+  color: var(--error);
+  border: 1px solid rgba(198, 40, 40, 0.2);
+}
+
+/* ---------------- Tables ---------------- */
+.data-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14.5px;
+}
+
+.data-table th {
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-weight: 700;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-strong);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.data-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-1);
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover td {
+  background: var(--bg-soft);
+}
+
+/* ---------------- Skeleton Loader ---------------- */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-soft) 25%, var(--border) 50%, var(--bg-soft) 75%);
+  background-size: 200% 100%;
+  animation: loading-skeleton 1.5s infinite linear;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  height: 16px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.skeleton-chip {
+  height: 28px;
+  width: 100px;
+  border-radius: 14px;
+}
+
+@keyframes loading-skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---------------- Alerts ---------------- */
+.alert {
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  border-left: 4px solid;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+.alert-success {
+  background: var(--success-soft);
+  border-color: var(--success);
+  color: var(--text-1);
+}
+
+.alert-error {
+  background: var(--error-soft);
+  border-color: var(--error);
+  color: var(--text-1);
+}
+
+.alert-warning {
+  background: var(--warning-soft);
+  border-color: var(--warning);
+  color: var(--text-1);
+}
+
+/* Prompt suggestions layout */
+.prompt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.prompt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+
+.prompt-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.prompt-card-text {
+  font-size: 14px;
+  color: var(--text-2);
+  margin: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- Sidebar Style Guide Navigation -->
+  <aside class="sidebar-nav">
+    <div class="brand-area">
+      <h1 class="brand-title">OrbitDocs</h1>
+      <p class="brand-kicker">Design System v1.0</p>
+    </div>
+
+    <nav style="flex: 1;">
+      <p class="nav-section-title">Foundations</p>
+      <ul class="nav-links">
+        <li class="active"><a href="#tokens">01. Style Tokens</a></li>
+        <li><a href="#typography">02. Typography</a></li>
+      </ul>
+
+      <p class="nav-section-title">Common Components</p>
+      <ul class="nav-links">
+        <li><a href="#buttons">03. Buttons &amp; Badges</a></li>
+        <li><a href="#forms">04. Inputs &amp; Alerts</a></li>
+      </ul>
+
+      <p class="nav-section-title">Workspace UI</p>
+      <ul class="nav-links">
+        <li><a href="#student-ui">05. Student Chat</a></li>
+        <li><a href="#lecturer-ui">06. Lecturer Overview</a></li>
+        <li><a href="#loading-states">07. System States</a></li>
+      </ul>
+    </nav>
+
+    <div style="border-top: 1px solid var(--border); padding-top: 20px; font-family: var(--font-mono); font-size: 11px; color: var(--text-3);">
+      Academic Cream Theme
+    </div>
+  </aside>
+
+  <!-- Main Reference Canvas -->
+  <main class="main-content">
+    
+    <div class="section" style="margin-bottom: 48px;">
+      <p class="kicker">DOCUMENTATION &amp; SPECIFICATION</p>
+      <h1 class="h1">OrbitDocs Design System</h1>
+      <p class="section-desc">
+        A premium academic-inspired visual framework. This document presents the complete UI spec sheet, CSS variables, and components needed to align all dashboards (Student, Lecturer, Admin) across the platform.
+      </p>
+    </div>
+
+    <!-- 01. Style Tokens -->
+    <section id="tokens" class="section">
+      <h2 class="h2">01. Visual Style Tokens</h2>
+      <p class="dim" style="margin-bottom: 24px;">Configure the following CSS variables inside the global application stylesheet (e.g. <code>globals.css</code>) to establish the primary theme.</p>
+      
+      <div class="token-grid">
+        <div class="color-card">
+          <div class="color-swatch" style="background: #fbfaf6;"></div>
+          <p class="color-name">Cream Background</p>
+          <span class="color-val">--bg: #fbfaf6</span>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #f4f1e8;"></div>
+          <p class="color-name">Soft Background</p>
+          <span class="color-val">--bg-soft: #f4f1e8</span>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #fffefb;"></div>
+          <p class="color-name">Surface White</p>
+          <span class="color-val">--surface: #fffefb</span>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #f5f2e9;"></div>
+          <p class="color-name">Surface Muted</p>
+          <span class="color-val">--surface-2: #f5f2e9</span>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #2d7d6e;"></div>
+          <p class="color-name">Forest Teal</p>
+          <span class="color-val">--accent: #2d7d6e</span>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #2a2418;"></div>
+          <p class="color-name">Ink Primary Text</p>
+          <span class="color-val">--text-1: #2a2418</span>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #564d3c;"></div>
+          <p class="color-name">Muted Body Text</p>
+          <span class="color-val">--text-2: #564d3c</span>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #76694f;"></div>
+          <p class="color-name">Caption Text</p>
+          <span class="color-val">--text-3: #76694f</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02. Typography -->
+    <section id="typography" class="section">
+      <h2 class="h2">02. Typography System</h2>
+      
+      <div class="demo-box">
+        <span class="demo-title">Typography Previews</span>
+        <div class="stack">
+          <div>
+            <p class="kicker">Primary Serif Font (Fraunces)</p>
+            <h1 style="font-family: var(--font-serif); font-size: 36px; font-weight: 500; margin: 0 0 10px;">The quick brown fox jumps over the lazy dog.</h1>
+            <p class="dim" style="font-size:14px;">Used for workspace titles, main headers (h1, h2), and highlighted terms.</p>
+          </div>
+          <hr style="border: 0; border-top: 1px solid var(--border); margin: 24px 0;">
+          <div>
+            <p class="kicker">Sans-Serif Body Font (Source Sans 3)</p>
+            <p style="font-family: var(--font-sans); font-size: 16px; margin: 0 0 10px;">
+              OrbitDocs indexes multi-chapter course documentation and structures conversational scopes. Students select courses and chapters to filter context embeddings.
+            </p>
+            <p class="dim" style="font-size:14px;">Used for all standard UI labels, buttons, inputs, and general reading content.</p>
+          </div>
+          <hr style="border: 0; border-top: 1px solid var(--border); margin: 24px 0;">
+          <div>
+            <p class="kicker">Mono Technical Font (JetBrains Mono)</p>
+            <p style="font-family: var(--font-mono); font-size: 14px; margin: 0 0 10px;">
+              GET /api/v1/courses/CS302/documents/status
+            </p>
+            <p class="dim" style="font-size:14px;">Used for status tags, metadata markers, code snippets, and technical labels.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03. Buttons & Badges -->
+    <section id="buttons" class="section">
+      <h2 class="h2">03. Buttons &amp; Status Badges</h2>
+      
+      <div class="demo-box">
+        <span class="demo-title">UI Elements</span>
+        
+        <div class="demo-label">Buttons</div>
+        <div class="row" style="margin-bottom: 32px; gap: 16px;">
+          <button class="btn btn-primary">Primary Action</button>
+          <button class="btn btn-secondary">Secondary Action</button>
+          <button class="btn btn-disabled" disabled>Disabled Action</button>
+        </div>
+
+        <div class="demo-label">Status Badges (Lecturer &amp; Admin RAG queues)</div>
+        <div class="row" style="gap: 16px;">
+          <span class="badge badge-active">Active / Chat-Ready</span>
+          <span class="badge badge-processing">Processing Embeddings</span>
+          <span class="badge badge-failed">Indexing Failed</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04. Inputs & Alerts -->
+    <section id="forms" class="section">
+      <h2 class="h2">04. Inputs, Forms &amp; System Alerts</h2>
+      
+      <div class="demo-box">
+        <span class="demo-title">Form Controls</span>
+        
+        <div class="form-group">
+          <label class="form-label" for="ex-text">Standard Text Field</label>
+          <input type="text" id="ex-text" class="input-control" placeholder="Search saved conversations...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ex-select">Selector Dropdown</label>
+          <div class="scope-select-wrap" style="width: 100%;">
+            <select id="ex-select" class="scope-select">
+              <option>Select an option...</option>
+              <option>Intro to Artificial Intelligence (CS101)</option>
+              <option>Database Management Systems (SWD392)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-box">
+        <span class="demo-title">Alert Scenarios</span>
+        
+        <div class="alert alert-success">
+          <strong>File Upload Complete:</strong> 12 documents successfully chunked and indexed.
+        </div>
+        
+        <div class="alert alert-warning">
+          <strong>RAG Pipeline Alert:</strong> High latency detected in embedding services. Retrying connection...
+        </div>
+
+        <div class="alert alert-error">
+          <strong>Failed Scope:</strong> Selected course contains no readable PDF materials.
+        </div>
+      </div>
+    </section>
+
+    <!-- 05. Student Chat Workspace UI -->
+    <section id="student-ui" class="section">
+      <h2 class="h2">05. Student Chat Workspace</h2>
+      <p class="section-desc">Interactive mockup of elements inside the student workspace at <code>/student</code>.</p>
+      
+      <!-- Scope selector row -->
+      <div class="demo-box">
+        <span class="demo-title">Scope Selector Bar (Student Workspace)</span>
+        <div class="demo-label">Course &amp; File Context Filter</div>
+        <div class="scope-bar">
+          <div class="scope-select-wrap">
+            <select class="scope-select">
+              <option>CS302 - Software Design</option>
+              <option>CS101 - Intro to Programming</option>
+            </select>
+          </div>
+          <div class="scope-select-wrap">
+            <select class="scope-select">
+              <option>All Documents</option>
+              <option>LectureNotes_Week3.pdf</option>
+              <option>Syllabus_Fall2026.pdf</option>
+            </select>
+          </div>
+          <div class="scope-select-wrap">
+            <select class="scope-select">
+              <option>All Chapters</option>
+              <option>Chapter 1: Architecture</option>
+              <option>Chapter 2: Design Patterns</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Chat Mockup -->
+      <div class="demo-box">
+        <span class="demo-title">Chat Message Canvas Preview</span>
+        <div class="chat-container">
+          
+          <!-- User message -->
+          <div class="message-bubble user">
+            What is the difference between architectural patterns and design patterns?
+            <div class="message-meta">22:31</div>
+          </div>
+
+          <!-- Assistant message with citations -->
+          <div class="message-bubble assistant">
+            Architectural patterns express the fundamental structural organization schema for software systems, representing the overall system configuration. Design patterns focus on the micro-level implementation details of subsystems or components.
+            
+            <div class="citation-container">
+              <div class="citation-chip" onclick="toggleCitation('cit-demo')">
+                📄 LectureNotes_Week3.pdf · P. 14
+              </div>
+              <div class="citation-chip" onclick="toggleCitation('cit-demo-2')">
+                📄 Syllabus_Fall2026.pdf · P. 3
+              </div>
+            </div>
+
+            <!-- Citation Popover 1 -->
+            <div id="cit-demo" class="citation-popover">
+              <div class="citation-header">Source Snippet: LectureNotes_Week3.pdf (P. 14)</div>
+              <div class="citation-body">
+                "Architectural patterns differ from design patterns in scope. While design patterns provide solutions to local object-oriented structures (like Singletons or Factories), architectural patterns shape the system-wide topology, including module boundaries and delivery layers."
+              </div>
+            </div>
+
+            <!-- Citation Popover 2 -->
+            <div id="cit-demo-2" class="citation-popover">
+              <div class="citation-header">Source Snippet: Syllabus_Fall2026.pdf (P. 3)</div>
+              <div class="citation-body">
+                "Course Objective 3: Synthesize system architectures by evaluating architectural patterns (Layered, Event-Driven) against local object design principles."
+              </div>
+            </div>
+
+            <div class="message-meta">
+              <span>22:31</span>
+              <span>· Powered by OrbitDocs RAG</span>
+            </div>
+          </div>
+
+          <!-- Empty Chat Suggestion Chips -->
+          <div>
+            <div class="demo-label" style="text-align: center; margin-top: 24px;">New Chat Suggestions (Empty State)</div>
+            <div class="prompt-grid">
+              <div class="prompt-card">
+                <p class="prompt-card-text"><b>Outline Chapter 2</b></p>
+                <p class="prompt-card-text" style="font-size:12px; color:var(--text-3);">Summarize architectural constraints</p>
+              </div>
+              <div class="prompt-card">
+                <p class="prompt-card-text"><b>Syllabus policies</b></p>
+                <p class="prompt-card-text" style="font-size:12px; color:var(--text-3);">Find grading thresholds</p>
+              </div>
+              <div class="prompt-card">
+                <p class="prompt-card-text"><b>Explain API layers</b></p>
+                <p class="prompt-card-text" style="font-size:12px; color:var(--text-3);">Based on active course PDF</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Composer at bottom of chat panel -->
+          <div class="composer" style="margin-top: 32px;">
+            <div class="composer-scope-indicator">
+              Grounding Context: <b>CS302 · LectureNotes_Week3.pdf</b>
+            </div>
+            <textarea class="composer-textarea" placeholder="Type a message or request context lookup..."></textarea>
+            <div class="composer-footer">
+              <span class="dim" style="font-size: 12px; font-family: var(--font-mono);">Press enter to submit</span>
+              <button class="btn btn-primary" style="padding: 6px 14px; font-size: 13px;">Send Prompt</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 06. Lecturer Workspace UI -->
+    <section id="lecturer-ui" class="section">
+      <h2 class="h2">06. Lecturer Workspace (Control Center)</h2>
+      <p class="section-desc">Dashboard metrics and pipeline tables styled for <code>/teacher</code>.</p>
+      
+      <!-- Metrics row -->
+      <div class="demo-box" style="padding-bottom: 40px;">
+        <span class="demo-title">Overview Tiles</span>
+        <div class="metric-row">
+          <div class="metric-card">
+            <span class="metric-label">Assigned Courses</span>
+            <span class="metric-value">4</span>
+            <span class="metric-desc">Registered with active student access</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Total Documents</span>
+            <span class="metric-value">28</span>
+            <span class="metric-desc">Indexed PDFs across all courses</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Embedding Failures</span>
+            <span class="metric-value" style="color: var(--error);">1</span>
+            <span class="metric-desc">Requires lecturer file re-upload</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents list table -->
+      <div class="demo-box">
+        <span class="demo-title">Knowledge Base Table</span>
+        <div class="demo-label" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Recent Indexing Activity</span>
+          <button class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;">Refresh Queue</button>
+        </div>
+        
+        <div class="data-table-wrapper" style="margin-top: 16px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Course Mapping</th>
+                <th>Status</th>
+                <th>Upload Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: 600;">SystemArchitecture_Slides.pdf</td>
+                <td style="font-family: var(--font-mono); font-size: 13px;">CS302</td>
+                <td><span class="badge badge-active">Chat-Ready</span></td>
+                <td>Jun 22, 2026 · 14:10</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600;">DatabaseNormalization_HW1.pdf</td>
+                <td style="font-family: var(--font-mono); font-size: 13px;">SWD392</td>
+                <td><span class="badge badge-processing">Processing</span></td>
+                <td>Jun 22, 2026 · 15:32</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600;">Corrupt_Legacy_File.pdf</td>
+                <td style="font-family: var(--font-mono); font-size: 13px;">CS101</td>
+                <td><span class="badge badge-failed">Failed</span></td>
+                <td>Jun 21, 2026 · 09:12</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07. System Loading & Skeleton States -->
+    <section id="loading-states" class="section">
+      <h2 class="h2">07. System Bootstrap &amp; Loading States</h2>
+      <p class="section-desc">Skeleton elements to render while data is fetching from backend API paths during route bootstrap.</p>
+      
+      <div class="demo-box">
+        <span class="demo-title">Skeleton Loaders</span>
+        <div style="max-width: 500px;">
+          <div class="demo-label">Scope Bar Loading Bootstrap</div>
+          <div class="row" style="gap: 12px; margin-bottom: 24px;">
+            <div class="skeleton skeleton-chip" style="width: 150px;"></div>
+            <div class="skeleton skeleton-chip" style="width: 150px;"></div>
+            <div class="skeleton skeleton-chip" style="width: 150px;"></div>
+          </div>
+
+          <div class="demo-label">Message Thread Loading</div>
+          <div class="stack" style="background: var(--bg-soft); padding: 20px; border-radius: var(--radius);">
+            <div class="skeleton skeleton-text" style="width: 40%; height: 28px; align-self: flex-end; border-radius: 14px;"></div>
+            <div class="skeleton skeleton-text" style="width: 80%; height: 70px; border-radius: 4px;"></div>
+            <div class="skeleton skeleton-text" style="width: 60%; height: 16px; border-radius: 4px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+function toggleCitation(elementId) {
+  const popover = document.getElementById(elementId);
+  if (!popover) return;
+  
+  // Toggle the selected citation
+  const isActive = popover.classList.contains('active');
+  
+  // Hide all citation popovers under this chat message first
+  popover.parentElement.querySelectorAll('.citation-popover').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  if (!isActive) {
+    popover.classList.add('active');
+  }
+}
+
+// Sidebar active link indicator logic on scroll
+document.addEventListener('DOMContentLoaded', () => {
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let currentId = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      if (pageYOffset >= (sectionTop - 120)) {
+        currentId = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      const parentLi = link.parentElement;
+      parentLi.classList.remove('active');
+      if (link.getAttribute('href') === `#${currentId}`) {
+        parentLi.classList.add('active');
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -48,6 +48,9 @@ const config: Config = {
         paper:
           "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.85)), radial-gradient(circle at top left, rgba(219,234,254,0.85), transparent 45%), radial-gradient(circle at bottom right, rgba(254,240,138,0.45), transparent 38%)",
       },
+      transitionProperty: {
+        width: "width",
+      },
     },
   },
   plugins: [tailwindcssAnimate],

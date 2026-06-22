@@ -81,14 +81,14 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
   }, [lecturerCourses, query]);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-6 md:p-8 animate-in fade-in duration-500">
-      <div className="flex flex-col justify-between gap-4 border-b-2 border-slate-700 pb-6 md:flex-row md:items-end">
+    <div className="mx-auto max-w-[1600px] space-y-6 p-6 md:p-8 animate-in fade-in duration-500">
+      <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
         <div className="space-y-2">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-muted-foreground">
             Lecturer workspace
           </p>
-          <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">Courses</h1>
-          <p className="text-sm font-semibold text-slate-600">
+          <h1 className="text-4xl font-black tracking-[-0.05em] text-foreground">Courses</h1>
+          <p className="text-sm font-semibold text-muted-foreground">
             Read the course records assigned to your account and use them when creating documents.
           </p>
         </div>
@@ -104,7 +104,7 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
       </div>
 
       {error ? (
-        <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
+        <div className="rounded-md border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">
           {error}
         </div>
       ) : null}
@@ -112,44 +112,44 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
       <section className="grid gap-6 md:grid-cols-4">
         <Card>
           <CardHeader>
-            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">Assigned</p>
+            <p className="text-sm font-black uppercase tracking-[0.1em] text-muted-foreground">Assigned</p>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-black tracking-tighter text-slate-800">
+            <p className="text-4xl font-black tracking-tighter text-foreground">
               {dashboard.summary.totalCourses}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">
+            <p className="text-sm font-black uppercase tracking-[0.1em] text-muted-foreground">
               Chat ready
             </p>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-black tracking-tighter text-slate-800">
+            <p className="text-4xl font-black tracking-tighter text-foreground">
               {dashboard.summary.chatReadyCourses}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">
+            <p className="text-sm font-black uppercase tracking-[0.1em] text-muted-foreground">
               Documents
             </p>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-black tracking-tighter text-slate-800">
+            <p className="text-4xl font-black tracking-tighter text-foreground">
               {dashboard.summary.totalDocuments}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <p className="text-sm font-black uppercase tracking-[0.1em] text-slate-500">Indexed</p>
+            <p className="text-sm font-black uppercase tracking-[0.1em] text-muted-foreground">Indexed</p>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-black tracking-tighter text-slate-800">
+            <p className="text-4xl font-black tracking-tighter text-foreground">
               {dashboard.summary.indexedDocuments}
             </p>
           </CardContent>
@@ -158,10 +158,10 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
 
       <Card>
         <CardHeader className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
-          <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+          <label className="grid gap-2 text-sm font-semibold text-muted-foreground">
             Search course
             <span className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="pl-9"
                 value={query}
@@ -173,7 +173,7 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
           <Badge>{visibleCourses.length} courses</Badge>
         </CardHeader>
         <CardContent className="space-y-3">
-          {loading ? <p className="text-sm font-bold text-slate-500">Loading courses...</p> : null}
+          {loading ? <p className="text-sm font-semibold text-muted-foreground">Loading courses...</p> : null}
           {visibleCourses.length ? (
             visibleCourses.map((course) => {
               const documentCount =
@@ -187,12 +187,12 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
               return (
                 <div
                   key={course.id}
-                  className="grid gap-3 rounded-md border-2 border-slate-200 bg-white p-4 shadow-chip lg:grid-cols-[1fr_auto]"
+                  className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/20 transition duration-200 lg:grid-cols-[1fr_auto]"
                 >
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-slate-500" />
-                      <p className="text-sm font-black text-slate-800">
+                      <BookOpen className="h-4 w-4 text-primary" />
+                      <p className="text-sm font-black text-foreground">
                         {course.code} - {course.name}
                       </p>
                       {course.active ? (
@@ -201,14 +201,14 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
                         <Badge>Inactive</Badge>
                       )}
                     </div>
-                    <p className="text-sm font-semibold text-slate-500">
+                    <p className="text-sm font-semibold text-muted-foreground">
                       {course.description || "No description provided."}
                     </p>
-                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
                       Lecturer:{" "}
-                      <span className="text-slate-600">{course.lecturerName || "Unassigned"}</span>
+                      <span className="text-foreground">{course.lecturerName || "Unassigned"}</span>
                     </p>
-                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
                       {documentCount} document(s), {indexedCount} indexed
                     </p>
                   </div>
@@ -223,7 +223,7 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
               );
             })
           ) : loading ? null : (
-            <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm font-bold text-slate-500">
+            <div className="rounded-xl border border-dashed border-border bg-secondary/40 px-4 py-5 text-sm font-semibold text-muted-foreground">
               No courses are assigned to this lecturer yet.
             </div>
           )}
@@ -232,16 +232,16 @@ export function TeacherCoursesPage({ user }: TeacherCoursesPageProps) {
 
       <Card>
         <CardHeader>
-          <h2 className="text-lg font-black text-slate-800">What you can do with these courses</h2>
+          <h2 className="text-lg font-black text-foreground">What you can do with these courses</h2>
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-3">
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+          <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm font-semibold text-muted-foreground">
             Use the assigned course to upload documents in Knowledge Base.
           </div>
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+          <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm font-semibold text-muted-foreground">
             Only indexed documents are considered chat-ready.
           </div>
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+          <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm font-semibold text-muted-foreground">
             Lecturer FE uses real course APIs already exposed by the frontend.
           </div>
         </CardContent>

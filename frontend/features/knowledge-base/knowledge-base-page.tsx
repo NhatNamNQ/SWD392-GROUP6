@@ -193,13 +193,13 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-5 animate-in fade-in duration-500">
+    <div className="mx-auto max-w-[1600px] space-y-5 p-6 md:p-8 animate-in fade-in duration-500">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-muted-foreground">
             Teacher workspace
           </p>
-          <h1 className="text-4xl font-black text-slate-800">Knowledge base</h1>
+          <h1 className="text-4xl font-black text-foreground">Knowledge base</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="secondary" onClick={refreshDocuments} disabled={loading}>
@@ -226,10 +226,10 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
 
       <Card>
         <CardHeader className="grid gap-3 lg:grid-cols-[1fr_1fr_180px] lg:items-end">
-          <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+          <label className="grid gap-2 text-sm font-semibold text-muted-foreground">
             Course
             <select
-              className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip"
+              className="h-11 rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground outline-none"
               value={resolvedCourseId}
               onChange={(event) => handleCourseChange(event.target.value)}
               disabled={!ownedCourses.length}
@@ -241,10 +241,10 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
               ))}
             </select>
           </label>
-          <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+          <label className="grid gap-2 text-sm font-semibold text-muted-foreground">
             Search filename
             <span className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="pl-9"
                 value={query}
@@ -253,10 +253,10 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
               />
             </span>
           </label>
-          <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+          <label className="grid gap-2 text-sm font-semibold text-muted-foreground">
             Status
             <select
-              className="h-11 rounded-sm border-2 border-slate-300 bg-white px-3 font-bold text-slate-700 shadow-chip"
+              className="h-11 rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground outline-none"
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
             >
@@ -267,36 +267,36 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
           </label>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600">
+          <div className="rounded-xl border border-dashed border-border bg-secondary/40 px-4 py-3 text-sm font-semibold text-muted-foreground">
             {ownedCourses.length
               ? "Upload only appears for courses assigned to your lecturer account."
               : "No assigned course is available yet. Ask an admin to assign a course before uploading."}
           </div>
           {loading ? (
-            <p className="text-sm font-bold text-slate-500">Loading documents...</p>
+            <p className="text-sm font-semibold text-muted-foreground">Loading documents...</p>
           ) : resolvedCourseId && filteredDocuments.length ? (
             <div className="grid gap-3">
               {filteredDocuments.map((document) => (
                 <article
                   key={document.id}
-                  className="grid gap-3 rounded-md border-2 border-slate-200 bg-white p-4 shadow-chip md:grid-cols-[1fr_auto] md:items-center"
+                  className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/20 transition duration-200 md:grid-cols-[1fr_auto] md:items-center"
                 >
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-slate-500" />
+                      <BookOpen className="h-4 w-4 text-primary" />
                       <Link
                         href={`/teacher/knowledge-base/${document.id}`}
-                        className="text-sm font-black text-slate-800 hover:text-sky-700"
+                        className="text-sm font-black text-foreground hover:text-primary hover:underline"
                       >
                         {document.originalFilename}
                       </Link>
                       <DocumentStatusBadge status={document.status} />
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs font-bold text-slate-500">
+                    <div className="flex flex-wrap gap-2 text-xs font-bold text-muted-foreground">
                       <span>{formatSize(document.fileSizeBytes)}</span>
                       <span>{document.chunkCount ?? 0} chunks</span>
                       {document.status === "FAILED" ? (
-                        <span>Failure reason unavailable.</span>
+                        <span className="text-destructive">Failure reason unavailable.</span>
                       ) : null}
                     </div>
                   </div>
@@ -311,9 +311,9 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
               ))}
             </div>
           ) : ownedCourses.length ? (
-            <p className="text-sm font-bold text-slate-500">No documents match this view.</p>
+            <p className="text-sm font-semibold text-muted-foreground">No documents match this view.</p>
           ) : (
-            <p className="text-sm font-bold text-slate-500">
+            <p className="text-sm font-semibold text-muted-foreground">
               No assigned course is available yet. Ask an admin to assign a course before uploading.
             </p>
           )}

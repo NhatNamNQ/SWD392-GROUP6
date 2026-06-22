@@ -44,14 +44,14 @@ function CenteredModal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between border-b-2 border-slate-200 px-6 py-4">
-          <h2 className="text-xl font-black text-slate-800">{title}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
+      <div className="bg-card border border-border rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="text-xl font-semibold text-foreground">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+            className="rounded-full border border-border bg-secondary p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -185,20 +185,19 @@ export function CoursesPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 mx-auto max-w-5xl space-y-6 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-slate-700 pb-6">
+    <div className="p-6 md:p-8 mx-auto max-w-[1600px] space-y-6 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
         <div className="space-y-2">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-muted-foreground">
             Admin governance
           </p>
-          <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">Course Catalog</h1>
+          <h1 className="text-4xl font-black tracking-[-0.05em] text-foreground">Course Catalog</h1>
         </div>
         <Button
           onClick={() => {
             setIsCreating(true);
             setSelectedCourseId("");
           }}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
         >
           <Plus className="mr-2 h-4 w-4" /> New Course
         </Button>
@@ -206,10 +205,10 @@ export function CoursesPage() {
 
       <Card>
         <CardHeader className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
-          <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+          <label className="grid gap-2 text-sm font-semibold text-muted-foreground">
             Search courses
             <span className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="pl-9 max-w-md"
                 value={query}
@@ -221,23 +220,23 @@ export function CoursesPage() {
           <Badge>{visibleCourses.length} courses</Badge>
         </CardHeader>
         <CardContent className="space-y-3">
-          {loading ? <p className="text-sm font-bold text-slate-500">Loading courses...</p> : null}
+          {loading ? <p className="text-sm font-semibold text-muted-foreground">Loading courses...</p> : null}
           {visibleCourses.map((course) => (
             <article
               key={course.id}
-              className="grid gap-3 rounded-md border-2 border-slate-200 bg-white p-4 shadow-chip lg:grid-cols-[1fr_auto]"
+              className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/20 transition duration-200 lg:grid-cols-[1fr_auto]"
             >
               <div className="text-left flex flex-col justify-center">
-                <p className="text-sm font-black text-slate-800 flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-emerald-600" />
+                <p className="text-sm font-black text-foreground flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-primary" />
                   {course.code} - {course.name}
                 </p>
-                <p className="text-sm font-semibold text-slate-500 mt-1">
+                <p className="text-sm font-semibold text-muted-foreground mt-1">
                   {course.description || "No description provided."}
                 </p>
-                <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400 mt-2">
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mt-2">
                   Lecturer:{" "}
-                  <span className="text-slate-600">{course.lecturerName || "Unassigned"}</span>
+                  <span className="text-foreground">{course.lecturerName || "Unassigned"}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -253,7 +252,7 @@ export function CoursesPage() {
             </article>
           ))}
           {!loading && !visibleCourses.length ? (
-            <p className="text-sm font-bold text-slate-500">No courses found.</p>
+            <p className="text-sm font-semibold text-muted-foreground">No courses found.</p>
           ) : null}
         </CardContent>
       </Card>
@@ -264,7 +263,7 @@ export function CoursesPage() {
           <form className="space-y-5" onSubmit={handleCreate}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Course Code</label>
+                <label className="text-xs font-semibold text-muted-foreground">Course Code</label>
                 <Input
                   value={createForm.code}
                   onChange={(event) =>
@@ -275,7 +274,7 @@ export function CoursesPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Course Name</label>
+                <label className="text-xs font-semibold text-muted-foreground">Course Name</label>
                 <Input
                   value={createForm.name}
                   onChange={(event) =>
@@ -287,7 +286,7 @@ export function CoursesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Description</label>
+              <label className="text-xs font-semibold text-muted-foreground">Description</label>
               <Textarea
                 value={createForm.description}
                 onChange={(event) =>
@@ -299,9 +298,9 @@ export function CoursesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Assign Lecturer</label>
+              <label className="text-xs font-semibold text-muted-foreground">Assign Lecturer</label>
               <select
-                className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
+                className="h-11 w-full rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground outline-none"
                 value={createForm.lecturerId}
                 onChange={(event) =>
                   setCreateForm((current) => ({ ...current, lecturerId: event.target.value }))
@@ -316,7 +315,7 @@ export function CoursesPage() {
                 ))}
               </select>
               {!lecturers.length ? (
-                <p className="text-xs font-bold text-rose-500 mt-1">
+                <p className="text-xs font-semibold text-destructive mt-1">
                   You must create a lecturer account in the Users Directory first.
                 </p>
               ) : null}
@@ -326,10 +325,7 @@ export function CoursesPage() {
               <Button type="button" variant="secondary" onClick={() => setIsCreating(false)}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
-              >
+              <Button type="submit">
                 <Plus className="mr-2 h-4 w-4" />
                 Create course
               </Button>
@@ -344,7 +340,7 @@ export function CoursesPage() {
           <form className="space-y-5" onSubmit={handleUpdate}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Course Code</label>
+                <label className="text-xs font-semibold text-muted-foreground">Course Code</label>
                 <Input
                   value={editForm.code}
                   onChange={(event) =>
@@ -354,7 +350,7 @@ export function CoursesPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Course Name</label>
+                <label className="text-xs font-semibold text-muted-foreground">Course Name</label>
                 <Input
                   value={editForm.name}
                   onChange={(event) =>
@@ -366,7 +362,7 @@ export function CoursesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Description</label>
+              <label className="text-xs font-semibold text-muted-foreground">Description</label>
               <Textarea
                 value={editForm.description}
                 onChange={(event) =>
@@ -378,9 +374,9 @@ export function CoursesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Assign Lecturer</label>
+              <label className="text-xs font-semibold text-muted-foreground">Assign Lecturer</label>
               <select
-                className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
+                className="h-11 w-full rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground outline-none"
                 value={editForm.lecturerId}
                 onChange={(event) =>
                   setEditForm((current) => ({ ...current, lecturerId: event.target.value }))
@@ -400,10 +396,7 @@ export function CoursesPage() {
               <Button type="button" variant="secondary" onClick={handleCancelEdit}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
-              >
+              <Button type="submit">
                 <Save className="mr-2 h-4 w-4" />
                 Save Changes
               </Button>

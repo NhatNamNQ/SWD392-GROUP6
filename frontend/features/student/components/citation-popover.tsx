@@ -16,12 +16,12 @@ export function CitationPopover({ citation, index, open, onToggle }: CitationPop
       <button
         type="button"
         onClick={() => onToggle(citation.id)}
-        className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-extrabold text-slate-700"
+        className="rounded-full border border-border bg-card px-3 py-1 text-xs font-extrabold text-muted-foreground hover:bg-muted hover:text-primary transition"
       >
         [{index + 1}] {label}
       </button>
       {open ? (
-        <div className="absolute left-0 top-[calc(100%+0.5rem)] z-10 w-80 rounded-sm border-2 border-slate-700 bg-white p-3 text-xs font-bold text-slate-600 shadow-orbit">
+        <div className="absolute left-0 top-[calc(100%+0.5rem)] z-10 w-80 rounded-md border border-primary bg-card p-3 text-xs font-semibold text-muted-foreground shadow-lg">
           <div className="mb-2 flex flex-wrap gap-2">
             {citation.documentName ? <Badge variant="blue">{citation.documentName}</Badge> : null}
             {citation.chapterTitle ? <Badge variant="mint">{citation.chapterTitle}</Badge> : null}
@@ -30,7 +30,7 @@ export function CitationPopover({ citation, index, open, onToggle }: CitationPop
             ) : null}
           </div>
           {citation.similarityScore != null ? (
-            <p className="mb-2 text-xs font-black text-slate-800">
+            <p className="mb-2 text-xs font-black text-foreground">
               Similarity score: {citation.similarityScore.toFixed(2)}
             </p>
           ) : null}

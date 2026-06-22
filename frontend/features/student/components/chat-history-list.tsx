@@ -50,23 +50,23 @@ export function ChatHistoryList({
   scopeControls,
 }: ChatHistoryListProps) {
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/95 shadow-[0_18px_48px_rgba(15,23,42,0.10)] backdrop-blur">
-      <div className="border-b border-slate-200/80 px-5 py-5">
-        <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl border border-slate-200 bg-emerald-100 font-black text-emerald-800 shadow-sm">
-            OD
-          </div>
-          <div>
-            <h1 className="text-lg font-black tracking-[-0.03em] text-slate-800">OrbitDocs</h1>
-            <p className="text-xs font-bold text-slate-500">Chat across shared course documents</p>
-          </div>
+    /* Fill the sidebar column — no extra card border since aside already has border-r */
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
+      {/* Brand header — same height as main header bar (h-16) */}
+      <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border px-5">
+        <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 font-black text-primary text-sm">
+          OD
+        </div>
+        <div>
+          <p className="text-base font-black tracking-[-0.03em] text-foreground">OrbitDocs</p>
+          <p className="text-[11px] font-semibold text-muted-foreground">Student workspace</p>
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-4 p-5">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 p-4">
         <Button
           type="button"
-          className="shrink-0 h-12 w-full justify-start rounded-full px-4"
+          className="h-10 w-full shrink-0 justify-start rounded-md"
           onClick={onNewChat}
         >
           <MessageSquarePlus className="mr-2 h-4 w-4" />
@@ -74,19 +74,19 @@ export function ChatHistoryList({
         </Button>
 
         {scopeControls ? (
-          <div className="shrink-0 rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+          <div className="shrink-0 rounded-lg border border-border bg-secondary/50 p-3">
             {scopeControls}
           </div>
         ) : null}
 
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <p className="shrink-0 text-[11px] font-extrabold uppercase tracking-[0.16em] text-slate-500">
+          <p className="shrink-0 text-[11px] font-extrabold uppercase tracking-[0.16em] text-muted-foreground">
             Conversation history
           </p>
           <div className="relative shrink-0">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="h-11 rounded-full border border-slate-200 bg-slate-50/80 pl-9 shadow-none"
+              className="h-9 rounded-md border border-border bg-secondary/80 pl-9 shadow-none"
               type="search"
               value={historyQuery}
               onChange={(event) => onHistoryQueryChange(event.target.value)}
@@ -94,8 +94,8 @@ export function ChatHistoryList({
               aria-label="Search chats"
             />
           </div>
-          <ScrollArea className="flex-1 pr-3">
-            <div className="grid gap-2 pb-4">
+          <ScrollArea className="flex-1">
+            <div className="grid gap-1 pb-4">
               {sessions.length ? (
                 sessions.map((session) => (
                   <button
@@ -103,20 +103,22 @@ export function ChatHistoryList({
                     type="button"
                     onClick={() => onSelectSession(session.id)}
                     className={cn(
-                      "rounded-[1.35rem] border px-4 py-3 text-left shadow-sm transition",
+                      "rounded-md px-3 py-2.5 text-left transition-all",
                       session.id === activeSessionId
-                        ? "border-sky-300 bg-sky-100/85"
-                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50",
+                        ? "bg-primary/10 text-primary border-l-2 border-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
                   >
-                    <p className="text-sm font-extrabold text-slate-800">{session.title}</p>
-                    <p className="text-xs font-bold text-slate-500">
+                    <p className={cn("text-sm font-semibold truncate", session.id === activeSessionId ? "text-primary" : "text-foreground")}>
+                      {session.title}
+                    </p>
+                    <p className={cn("text-xs font-medium truncate mt-0.5", session.id === activeSessionId ? "text-primary/70" : "text-muted-foreground")}>
                       {session.courseName ?? "Course"} · {formatRelativeDate(session.lastMessageAt)}
                     </p>
                   </button>
                 ))
               ) : (
-                <div className="rounded-[1.35rem] border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm font-bold text-slate-500">
+                <div className="rounded-md border border-dashed border-border bg-secondary/40 px-4 py-5 text-sm font-semibold text-muted-foreground">
                   No saved chats yet.
                 </div>
               )}
@@ -124,58 +126,56 @@ export function ChatHistoryList({
           </ScrollArea>
         </div>
 
-        <div className="mt-auto pt-4 shrink-0">
+        {/* User menu — same bottom pattern as admin/teacher sidebar */}
+        <div className="shrink-0 border-t border-border pt-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex w-full items-center gap-3 rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4 text-left transition hover:bg-slate-100/80 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                className="flex w-full items-center gap-3 rounded-md border border-border bg-secondary/50 p-3 text-left transition hover:bg-secondary hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-extrabold text-slate-800">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  {user?.fullName?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? "?"}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-black text-foreground">
                     {user?.fullName ?? "Member"}
                   </p>
-                  <p className="truncate text-xs font-bold uppercase tracking-wider text-slate-500">
-                    {user?.role ?? "Authenticated user"}
+                  <p className="truncate text-xs font-bold text-muted-foreground">
+                    {user?.role ?? "Student"}
                   </p>
                 </div>
-                <MoreHorizontal className="h-5 w-5 shrink-0 text-slate-400" />
+                <MoreHorizontal className="h-4 w-4 shrink-0 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="center"
               side="top"
-              className="w-[280px] rounded-[1.25rem] p-2 mb-2 shadow-[0_12px_40px_rgba(15,23,42,0.12)]"
+              className="w-64 p-2 mb-2"
             >
               <DropdownMenuLabel className="px-3 py-2">
-                <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                <p className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
                   My Account
                 </p>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-2 my-1" />
+              <DropdownMenuSeparator />
               {user?.role === "LECTURER" ? (
-                <DropdownMenuItem
-                  asChild
-                  className="rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 focus:bg-sky-50 focus:text-sky-900 cursor-pointer"
-                >
+                <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 text-sm font-semibold">
                   <Link href={getRoleHomePath(user.role)}>
-                    <ArrowLeft className="mr-3 h-4 w-4 text-slate-400" />
+                    <ArrowLeft className="mr-3 h-4 w-4 text-muted-foreground" />
                     Teacher Workspace
                   </Link>
                 </DropdownMenuItem>
               ) : null}
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 focus:bg-sky-50 focus:text-sky-900 cursor-pointer"
-              >
+              <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 text-sm font-semibold">
                 <Link href="/settings/password">
-                  <Settings className="mr-3 h-4 w-4 text-slate-400" />
+                  <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
                   Change Password
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-2 my-1" />
+              <DropdownMenuSeparator />
               <div className="p-1">
-                <LogoutButton className="h-10 w-full rounded-xl text-xs font-bold" />
+                <LogoutButton className="h-9 w-full rounded-md text-xs font-bold" />
               </div>
             </DropdownMenuContent>
           </DropdownMenu>

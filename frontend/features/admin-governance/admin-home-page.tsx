@@ -1,34 +1,12 @@
+"use client";
+
+import { useEffect, useState, startTransition } from "react";
 import Link from "next/link";
 import { ArrowUpRight, BookCopy, ShieldCheck, Users, Activity } from "lucide-react";
-
-const mockMetrics = [
-  {
-    label: "Total Users",
-    value: "1,248",
-    change: "+12%",
-    trend: "up",
-    tone: "bg-sky-50",
-    textTone: "text-sky-600",
-  },
-  {
-    label: "Active Roles",
-    value: "4",
-    change: "Stable",
-    trend: "neutral",
-    tone: "bg-emerald-50",
-    textTone: "text-emerald-600",
-  },
-  {
-    label: "Active Courses",
-    value: "32",
-    change: "+4%",
-    trend: "up",
-    tone: "bg-indigo-50",
-    textTone: "text-indigo-600",
-  },
-];
-
-const mockChartData = [40, 60, 45, 80, 55, 90, 75, 100, 85, 110, 95, 120];
+import { fetchUsers, fetchRoles } from "@/features/admin-governance/api/admin-client";
+import type { UserRecord, RoleRecord } from "@/features/admin-governance/model/types";
+import { fetchCourses } from "@/features/course-management/api/course-client";
+import { useToast } from "@/hooks/use-toast";
 
 const adminActions = [
   {
@@ -36,70 +14,138 @@ const adminActions = [
     title: "Users Management",
     description: "Manage accounts, assign roles, and keep access active for the right people.",
     icon: Users,
-    tone: "bg-sky-50 text-sky-700",
-    border: "border-sky-200",
+    tone: "bg-primary/10 text-primary",
+    border: "border-primary/20",
   },
   {
     href: "/admin/courses",
     title: "Course Catalog",
     description: "Create and maintain course records that feed teacher and student workspaces.",
     icon: BookCopy,
-    tone: "bg-emerald-50 text-emerald-700",
-    border: "border-emerald-200",
+    tone: "bg-secondary text-foreground",
+    border: "border-border",
   },
   {
     href: "/admin/roles",
     title: "Role Governance",
     description: "Review the governance catalog and keep role definitions in sync.",
     icon: ShieldCheck,
-    tone: "bg-slate-100 text-slate-700",
-    border: "border-slate-300",
+    tone: "bg-muted text-muted-foreground",
+    border: "border-border",
   },
 ];
 
+type DashboardState = {
+  users: UserRecord[];
+  roles: RoleRecord[];
+  coursesCount: number;
+};
+
 export function AdminHomePage() {
+  const [data, setData] = useState<DashboardState>({
+    users: [],
+    roles: [],
+    coursesCount: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    startTransition(() => {
+      async function loadMetrics() {
+        try {
+          const [users, roles, courses] = await Promise.all([
+            fetchUsers(),
+            fetchRoles(),
+            fetchCourses(),
+          ]);
+          setData({ users, roles, coursesCount: courses.length });
+        } catch (error) {
+          console.error(error);
+          toast({
+            title: "Warning",
+            description: "Could not fetch real-time metrics. Showing cached data.",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+      void loadMetrics();
+    });
+  }, [toast]);
+
+  // Compute role distribution from real user data
+  const roleDistribution = data.roles.map((role) => ({
+    name: role.name,
+    count: data.users.filter((u) => u.roleResponse?.id === role.id).length,
+  }));
+  const maxRoleCount = Math.max(...roleDistribution.map((r) => r.count), 1);
+
+  const metricsData = [
+    {
+      label: "Total Users",
+      value: loading ? "..." : String(data.users.length),
+      sub: loading ? "" : `${data.users.filter((u) => u.active).length} active`,
+      tone: "bg-primary/10",
+      textTone: "text-primary",
+    },
+    {
+      label: "Active Roles",
+      value: loading ? "..." : String(data.roles.length),
+      sub: loading ? "" : "governance roles",
+      tone: "bg-secondary",
+      textTone: "text-muted-foreground",
+    },
+    {
+      label: "Total Courses",
+      value: loading ? "..." : String(data.coursesCount),
+      sub: loading ? "" : "in catalog",
+      tone: "bg-primary/5",
+      textTone: "text-primary",
+    },
+  ];
+
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="p-6 md:p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header Section */}
-      <section className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-slate-700 pb-6">
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
         <div className="space-y-2">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Overview</p>
-          <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-muted-foreground">Overview</p>
+          <h1 className="text-4xl font-black tracking-[-0.05em] text-foreground">
             System Dashboard
           </h1>
-          <p className="text-base font-semibold text-slate-600 max-w-xl">
-            Monitor system health, user growth, and operational metrics at a glance.
+          <p className="text-base font-semibold text-muted-foreground max-w-xl">
+            Monitor system health, user distribution, and operational metrics at a glance.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-md bg-white px-4 py-2 border-2 border-slate-700 shadow-chip">
-          <Activity className="h-5 w-5 text-emerald-600" />
-          <span className="font-bold text-slate-800">System Healthy</span>
+        <div className="flex items-center gap-2 rounded-md bg-card px-4 py-2 border border-border shadow-sm">
+          <Activity className="h-5 w-5 text-primary" />
+          <span className="font-bold text-foreground">System Healthy</span>
         </div>
       </section>
 
       {/* Metrics Row */}
       <section className="grid gap-6 md:grid-cols-3">
-        {mockMetrics.map((metric, i) => (
+        {metricsData.map((metric, i) => (
           <div
             key={metric.label}
-            className="group relative overflow-hidden rounded-xl border-2 border-slate-700 bg-white p-6 shadow-chip transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_#334155]"
+            className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/30"
             style={{ animationDelay: `${i * 100}ms` }}
           >
             <div
-              className={`absolute -right-6 -top-6 h-24 w-24 rounded-full ${metric.tone} opacity-50 transition-transform group-hover:scale-150`}
+              className={`absolute -right-6 -top-6 h-24 w-24 rounded-full ${metric.tone} opacity-30 transition-transform group-hover:scale-150`}
             />
             <div className="relative">
-              <p className="text-sm font-bold uppercase tracking-[0.1em] text-slate-500">
+              <p className="text-sm font-bold uppercase tracking-[0.1em] text-muted-foreground">
                 {metric.label}
               </p>
               <div className="mt-2 flex items-baseline gap-3">
-                <span className="text-4xl font-black tracking-tighter text-slate-800">
+                <span className="text-4xl font-black tracking-tighter text-foreground">
                   {metric.value}
                 </span>
-                <span
-                  className={`text-sm font-bold ${metric.trend === "up" ? "text-emerald-600" : "text-slate-500"}`}
-                >
-                  {metric.change}
+                <span className={`text-sm font-bold ${metric.textTone}`}>
+                  {metric.sub}
                 </span>
               </div>
             </div>
@@ -107,64 +153,70 @@ export function AdminHomePage() {
         ))}
       </section>
 
-      {/* Visual Data Section */}
+      {/* Data Section */}
       <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-        <div className="rounded-xl border-2 border-slate-700 bg-white p-6 shadow-chip">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-black text-slate-800">User Growth (30 Days)</h2>
-            <select className="rounded border-2 border-slate-300 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700 outline-none">
-              <option>Last 30 Days</option>
-              <option>This Year</option>
-            </select>
+        {/* User Distribution by Role */}
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-lg font-black text-foreground">User Distribution by Role</h2>
+            <p className="text-sm font-semibold text-muted-foreground">
+              Real-time breakdown of registered users across all governance roles.
+            </p>
           </div>
-          {/* Mock Chart Area */}
-          <div className="flex h-64 items-end gap-2 border-b-2 border-l-2 border-slate-200 pb-2 pl-2">
-            {mockChartData.map((val, i) => (
-              <div key={i} className="group relative flex flex-1 flex-col justify-end">
-                <div
-                  className="w-full rounded-t-sm bg-slate-200 transition-all group-hover:bg-emerald-400"
-                  style={{ height: `${(val / 120) * 100}%` }}
-                />
-                {/* Tooltip */}
-                <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 rounded bg-slate-800 px-2 py-1 text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">
-                  {val}
+          {loading ? (
+            <div className="flex h-40 items-center justify-center text-sm font-semibold text-muted-foreground">
+              Loading distribution…
+            </div>
+          ) : roleDistribution.length === 0 ? (
+            <div className="flex h-40 items-center justify-center text-sm font-semibold text-muted-foreground">
+              No role data available.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {roleDistribution.map((row) => (
+                <div key={row.name} className="space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-bold text-foreground">{row.name}</span>
+                    <span className="font-black text-foreground">{row.count} users</span>
+                  </div>
+                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-500"
+                      style={{ width: `${(row.count / maxRoleCount) * 100}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-2 flex justify-between text-xs font-bold text-slate-400">
-            <span>Oct 1</span>
-            <span>Oct 15</span>
-            <span>Oct 30</span>
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-4 rounded-xl border-2 border-slate-700 bg-white p-6 shadow-chip text-slate-800">
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 shadow-sm text-foreground">
           <h2 className="text-lg font-black">Quick Actions</h2>
-          <p className="text-sm font-semibold text-slate-500 mb-2">
+          <p className="text-sm font-semibold text-muted-foreground">
             Jump directly into the most common administrative tasks.
           </p>
           <div className="flex-1 space-y-3">
             <Link
               href="/admin/users"
-              className="group flex items-center justify-between rounded-md border-2 border-slate-200 bg-slate-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
+              className="group flex items-center justify-between rounded-md border border-border bg-secondary/40 p-3 transition-all hover:border-primary/40 hover:bg-secondary"
             >
-              <span className="font-bold text-sm">Add New User</span>
-              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-emerald-600" />
+              <span className="font-bold text-sm text-foreground">Add New User</span>
+              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-primary" />
             </Link>
             <Link
               href="/admin/courses"
-              className="group flex items-center justify-between rounded-md border-2 border-slate-200 bg-slate-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
+              className="group flex items-center justify-between rounded-md border border-border bg-secondary/40 p-3 transition-all hover:border-primary/40 hover:bg-secondary"
             >
-              <span className="font-bold text-sm">Create Course</span>
-              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-emerald-600" />
+              <span className="font-bold text-sm text-foreground">Create Course</span>
+              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-primary" />
             </Link>
             <Link
               href="/admin/roles"
-              className="group flex items-center justify-between rounded-md border-2 border-slate-200 bg-slate-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
+              className="group flex items-center justify-between rounded-md border border-border bg-secondary/40 p-3 transition-all hover:border-primary/40 hover:bg-secondary"
             >
-              <span className="font-bold text-sm">Manage Roles</span>
-              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-emerald-600" />
+              <span className="font-bold text-sm text-foreground">Manage Roles</span>
+              <ArrowUpRight className="h-4 w-4 opacity-50 group-hover:opacity-100 text-primary" />
             </Link>
           </div>
         </div>
@@ -172,7 +224,7 @@ export function AdminHomePage() {
 
       {/* Modules Grid */}
       <section>
-        <h2 className="mb-6 text-xl font-black text-slate-800">Governance Modules</h2>
+        <h2 className="mb-6 text-xl font-black text-foreground">Governance Modules</h2>
         <div className="grid gap-6 md:grid-cols-3">
           {adminActions.map((action) => {
             const Icon = action.icon;
@@ -180,20 +232,20 @@ export function AdminHomePage() {
               <Link
                 key={action.title}
                 href={action.href}
-                className={`group flex flex-col justify-between rounded-xl border-2 ${action.border} bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-chip`}
+                className={`group flex flex-col justify-between rounded-xl border ${action.border} bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-primary/30`}
               >
                 <div>
-                  <div className={`mb-4 inline-flex rounded-lg p-3 ${action.tone}`}>
+                  <div className={`mb-4 inline-flex rounded-lg p-3 ${action.tone} opacity-90`}>
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-black text-slate-800">{action.title}</h3>
-                  <p className="mt-2 text-sm font-semibold text-slate-600 line-clamp-2">
+                  <h3 className="text-lg font-black text-foreground">{action.title}</h3>
+                  <p className="mt-2 text-sm font-semibold text-muted-foreground line-clamp-2">
                     {action.description}
                   </p>
                 </div>
-                <div className="mt-6 flex items-center gap-2 text-sm font-bold text-slate-800">
+                <div className="mt-6 flex items-center gap-2 text-sm font-bold text-foreground">
                   Manage{" "}
-                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 text-primary" />
                 </div>
               </Link>
             );

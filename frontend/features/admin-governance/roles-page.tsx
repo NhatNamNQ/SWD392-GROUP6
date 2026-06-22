@@ -114,19 +114,18 @@ export function RolesPage() {
 
   return (
     <div className="p-6 md:p-8 mx-auto max-w-[1600px] space-y-6 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-slate-700 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
         <div className="space-y-2">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-muted-foreground">
             Admin governance
           </p>
-          <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">Role Governance</h1>
+          <h1 className="text-4xl font-black tracking-[-0.05em] text-foreground">Role Governance</h1>
         </div>
         <Button
           onClick={() => {
             setEditingRoleId("");
             setEditForm(emptyRolePayload);
           }}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
         >
           <ShieldPlus className="mr-2 h-4 w-4" /> New Role
         </Button>
@@ -138,15 +137,15 @@ export function RolesPage() {
             <CardTitle>Role list</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {loading ? <p className="text-sm font-bold text-slate-500">Loading roles...</p> : null}
+            {loading ? <p className="text-sm font-semibold text-muted-foreground">Loading roles...</p> : null}
             {roles.map((role) => (
               <article
                 key={role.id}
-                className="grid gap-3 rounded-md border-2 border-slate-200 bg-white p-4 shadow-chip md:grid-cols-[1fr_auto]"
+                className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/20 transition duration-200 md:grid-cols-[1fr_auto]"
               >
                 <button type="button" className="text-left" onClick={() => selectRole(role)}>
-                  <p className="text-sm font-black text-slate-800">{role.name}</p>
-                  <p className="text-sm font-semibold text-slate-500">
+                  <p className="text-sm font-black text-foreground">{role.name}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">
                     {role.description || "No description"}
                   </p>
                 </button>
@@ -157,7 +156,7 @@ export function RolesPage() {
               </article>
             ))}
             {!loading && !roles.length ? (
-              <p className="text-sm font-bold text-slate-500">No roles found.</p>
+              <p className="text-sm font-semibold text-muted-foreground">No roles found.</p>
             ) : null}
           </CardContent>
         </Card>

@@ -1,11 +1,12 @@
 "use client";
 
-import { Menu } from "lucide-react";
+import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import type { AuthUser } from "@/features/auth/model/contracts";
 import {
   fetchChatBootstrap,
@@ -86,6 +87,7 @@ function setDraftSelectionFromCourse(
 
 export function StudentChatShell({ user }: StudentChatShellProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [bootstrap, setBootstrap] = useState<ChatBootstrap | null>(null);
   const [historyQuery, setHistoryQuery] = useState("");
   const [chatInput, setChatInput] = useState("");
@@ -363,72 +365,105 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
   );
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(186,230,253,0.42),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(167,243,208,0.28),transparent_20%),linear-gradient(180deg,#f8fafc_0%,#f8fafc_58%,#f1f5f9_100%)]">
-      <div className="mx-auto flex min-h-screen max-w-[1440px] gap-4 px-3 py-3 md:px-4 md:py-4">
-        <aside className="hidden w-[320px] shrink-0 lg:block">{sidebar}</aside>
+    <div className="flex min-h-screen w-full bg-background font-sans">
+      {/* ── Desktop collapsible sidebar ── */}
+      <aside
+        className={cn(
+          "hidden shrink-0 border-r border-border bg-card transition-[width] duration-300 ease-in-out lg:flex lg:flex-col overflow-hidden",
+          sidebarOpen ? "w-80" : "w-0 border-r-0",
+        )}
+      >
+        {/* Inner wrapper keeps content at full width so it clips cleanly */}
+        <div className="w-80 flex-1 flex flex-col overflow-hidden">
+          {sidebar}
+        </div>
+      </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col rounded-[2rem] border border-slate-200/70 bg-white/55 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur">
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-4 md:px-6">
-            <div className="flex min-w-0 items-center gap-3">
-              <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="secondary" size="icon" className="rounded-full lg:hidden">
-                    <Menu className="h-5 w-5" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-[92vw] max-w-[360px] border-l border-slate-200 bg-slate-50/95 p-0">
-                  <SheetHeader className="sr-only">
-                    <SheetTitle>Workspace navigation</SheetTitle>
-                  </SheetHeader>
-                  {sidebar}
-                </SheetContent>
-              </Sheet>
+      {/* ── Main area ── */}
+      <main className="flex min-w-0 flex-1 flex-col">
+        {/* Header bar */}
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6">
+          <div className="flex items-center gap-3">
+            {/* Desktop toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden lg:flex"
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              {sidebarOpen ? (
+                <PanelLeftClose className="h-5 w-5" />
+              ) : (
+                <PanelLeftOpen className="h-5 w-5" />
+              )}
+            </Button>
 
-              <div className="min-w-0">
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
-                  Student workspace
-                </p>
-                <h2 className="truncate text-xl font-black tracking-[-0.04em] text-slate-800 md:text-2xl">
-                  {activeSession?.title ?? "New chat"}
-                </h2>
-              </div>
+            {/* Mobile Sheet trigger */}
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="lg:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-80 border-r border-border bg-card p-0">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Workspace navigation</SheetTitle>
+                </SheetHeader>
+                {sidebar}
+              </SheetContent>
+            </Sheet>
+
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-muted-foreground">
+                Student workspace
+              </p>
+              <h1 className="truncate text-xl font-black tracking-[-0.04em] text-foreground">
+                {activeSession?.title ?? "New chat"}
+              </h1>
             </div>
           </div>
+        </header>
 
-          <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-3 md:px-4 md:pb-4">
-            {chatError ? (
-              <div className="mx-auto mb-3 w-full max-w-5xl rounded-[1.25rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
+        {/* Chat content */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
+          {chatError ? (
+            <div className="mx-auto mt-4 w-full max-w-5xl px-4">
+              <div className="rounded-md border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-bold text-destructive">
                 {chatError}
               </div>
-            ) : null}
-
-            <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/88 shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
-              <ChatMessageList
-                activeScopeLabel={scopeLabel}
-                loading={chatLoading || (chatSubmitting && !activeSession)}
-                messages={activeSession?.messages ?? []}
-                onCitationToggle={(citationId) =>
-                  setOpenCitationId((current) => (current === citationId ? null : citationId))
-                }
-                onPromptClick={handlePromptClick}
-                openCitationId={openCitationId}
-                promptSuggestions={promptSuggestions}
-              />
-              <div className="border-t border-slate-200/80 bg-white/80">
-                <ChatComposer
-                  disabled={!draftSelection && !activeSession}
-                  input={chatInput}
-                  loading={chatSubmitting}
-                  onInputChange={setChatInput}
-                  onSubmit={handleSubmit}
-                  scopeLabel={scopeLabel}
-                />
-              </div>
             </div>
+          ) : null}
+
+          {/* Message area */}
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <ChatMessageList
+              activeScopeLabel={scopeLabel}
+              loading={chatLoading || (chatSubmitting && !activeSession)}
+              messages={activeSession?.messages ?? []}
+              onCitationToggle={(citationId) =>
+                setOpenCitationId((current) => (current === citationId ? null : citationId))
+              }
+              onPromptClick={handlePromptClick}
+              openCitationId={openCitationId}
+              promptSuggestions={promptSuggestions}
+            />
+          </div>
+
+          {/* Composer */}
+          <div className="shrink-0 border-t border-border bg-card">
+            <ChatComposer
+              disabled={!draftSelection && !activeSession}
+              input={chatInput}
+              loading={chatSubmitting}
+              onInputChange={setChatInput}
+              onSubmit={handleSubmit}
+              scopeLabel={scopeLabel}
+            />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

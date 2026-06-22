@@ -54,14 +54,14 @@ function CenteredModal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between border-b-2 border-slate-200 px-6 py-4">
-          <h2 className="text-xl font-black text-slate-800">{title}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
+      <div className="bg-card border border-border rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="text-xl font-semibold text-foreground">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+            className="rounded-full border border-border bg-secondary p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -221,20 +221,19 @@ export function UsersPage() {
     createForm.roleId && roles.find((r) => r.id === createForm.roleId)?.name === "LECTURER";
 
   return (
-    <div className="p-6 md:p-8 mx-auto max-w-5xl space-y-6 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-slate-700 pb-6">
+    <div className="p-6 md:p-8 mx-auto max-w-[1600px] space-y-6 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
         <div className="space-y-2">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-muted-foreground">
             Admin governance
           </p>
-          <h1 className="text-4xl font-black tracking-[-0.05em] text-slate-800">Users Directory</h1>
+          <h1 className="text-4xl font-black tracking-[-0.05em] text-foreground">Users Directory</h1>
         </div>
         <Button
           onClick={() => {
             setIsCreating(true);
             setSelectedUserId("");
           }}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
         >
           <UserPlus className="mr-2 h-4 w-4" /> New User
         </Button>
@@ -242,7 +241,7 @@ export function UsersPage() {
 
       <Card>
         <CardHeader className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
-          <label className="grid gap-2 text-sm font-extrabold text-slate-700">
+          <label className="grid gap-2 text-sm font-semibold text-muted-foreground">
             Search users
             <Input
               value={query}
@@ -254,25 +253,25 @@ export function UsersPage() {
           <Badge>{visibleUsers.length} users</Badge>
         </CardHeader>
         <CardContent className="space-y-3">
-          {loading ? <p className="text-sm font-bold text-slate-500">Loading users...</p> : null}
+          {loading ? <p className="text-sm font-semibold text-muted-foreground">Loading users...</p> : null}
           {visibleUsers.map((user) => {
             const isAdmin = user.roleResponse?.name === "ADMIN";
 
             return (
               <article
                 key={user.id}
-                className="grid gap-3 rounded-md border-2 border-slate-200 bg-white p-4 shadow-chip lg:grid-cols-[1fr_auto]"
+                className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/20 transition duration-200 lg:grid-cols-[1fr_auto]"
               >
                 <div className="text-left flex flex-col justify-center">
-                  <p className="text-sm font-black text-slate-800">{user.email}</p>
-                  <p className="text-sm font-semibold text-slate-500">
+                  <p className="text-sm font-black text-foreground">{user.email}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">
                     {user.fullName || "No display name"} - {user.roleResponse?.name || "No role"}
                   </p>
-                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400 mt-1">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground mt-1">
                     {user.active ? (
-                      <span className="text-emerald-600">● Active</span>
+                      <span className="text-primary">● Active</span>
                     ) : (
-                      <span className="text-rose-600">● Inactive</span>
+                      <span className="text-destructive">● Inactive</span>
                     )}
                   </p>
                 </div>
@@ -296,7 +295,7 @@ export function UsersPage() {
             );
           })}
           {!loading && !visibleUsers.length ? (
-            <p className="text-sm font-bold text-slate-500">No users found.</p>
+            <p className="text-sm font-semibold text-muted-foreground">No users found.</p>
           ) : null}
         </CardContent>
       </Card>
@@ -306,9 +305,9 @@ export function UsersPage() {
         <CenteredModal title="Create New Account" onClose={() => setIsCreating(false)}>
           <form className="space-y-5" onSubmit={handleCreate}>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Account Role</label>
+              <label className="text-xs font-semibold text-muted-foreground">Account Role</label>
               <select
-                className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
+                className="h-11 w-full rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground outline-none"
                 value={createForm.roleId}
                 onChange={(event) =>
                   setCreateForm((current) => ({ ...current, roleId: event.target.value }))
@@ -326,8 +325,8 @@ export function UsersPage() {
             {createForm.roleId && (
               <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 {isCreatingLecturer && (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-sm">
-                    <p className="text-xs font-bold text-emerald-700">
+                  <div className="p-3 bg-emerald-50/50 border border-emerald-200/50 rounded-md">
+                    <p className="text-xs font-semibold text-emerald-700">
                       Lecturers will automatically receive a credential email to activate their
                       account.
                     </p>
@@ -335,7 +334,7 @@ export function UsersPage() {
                 )}
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Email Address</label>
+                  <label className="text-xs font-semibold text-muted-foreground">Email Address</label>
                   <Input
                     value={createForm.email}
                     onChange={(event) =>
@@ -347,7 +346,7 @@ export function UsersPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Full Name</label>
+                  <label className="text-xs font-semibold text-muted-foreground">Full Name</label>
                   <Input
                     value={createForm.fullName}
                     onChange={(event) =>
@@ -359,7 +358,7 @@ export function UsersPage() {
 
                 {!isCreatingLecturer && (
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Temporary Password</label>
+                    <label className="text-xs font-semibold text-muted-foreground">Temporary Password</label>
                     <Input
                       value={createForm.password}
                       onChange={(event) =>
@@ -375,10 +374,7 @@ export function UsersPage() {
                   <Button type="button" variant="secondary" onClick={() => setIsCreating(false)}>
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-chip"
-                  >
+                  <Button type="submit">
                     <UserPlus className="mr-2 h-4 w-4" />
                     Create account
                   </Button>
@@ -394,7 +390,7 @@ export function UsersPage() {
         <CenteredModal title="Edit User" onClose={handleCancelEdit}>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Email Address</label>
+              <label className="text-xs font-semibold text-muted-foreground">Email Address</label>
               <Input
                 value={editForm.email}
                 onChange={(event) =>
@@ -405,7 +401,7 @@ export function UsersPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Full Name</label>
+              <label className="text-xs font-semibold text-muted-foreground">Full Name</label>
               <Input
                 value={editForm.fullName}
                 onChange={(event) =>
@@ -416,9 +412,9 @@ export function UsersPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Role</label>
+              <label className="text-xs font-semibold text-muted-foreground">Role</label>
               <select
-                className="h-11 w-full rounded-sm border-2 border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-chip"
+                className="h-11 w-full rounded-md border border-border bg-card px-3 text-sm font-semibold text-foreground outline-none"
                 value={editForm.roleId}
                 onChange={(event) =>
                   setEditForm((current) => ({ ...current, roleId: event.target.value }))
@@ -434,7 +430,7 @@ export function UsersPage() {
             </div>
 
             <div className="pt-2">
-              <label className="flex items-center gap-2 text-sm font-bold text-slate-700 border-2 border-slate-200 px-3 py-3 rounded-md cursor-pointer hover:bg-slate-50 transition">
+              <label className="flex items-center gap-2 text-sm font-semibold text-foreground border border-border px-3 py-3 rounded-md cursor-pointer hover:bg-muted transition">
                 <input
                   checked={editForm.active}
                   type="checkbox"
@@ -444,7 +440,7 @@ export function UsersPage() {
                       active: event.target.checked,
                     }))
                   }
-                  className="accent-emerald-600 w-4 h-4"
+                  className="accent-primary w-4 h-4"
                 />
                 Active Account
               </label>
@@ -454,7 +450,7 @@ export function UsersPage() {
               <Button type="button" variant="secondary" onClick={handleCancelEdit}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button type="submit">
                 <Save className="mr-2 h-4 w-4" />
                 Save Changes
               </Button>
