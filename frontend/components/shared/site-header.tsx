@@ -11,7 +11,7 @@ type SiteHeaderProps = {
 
 function BrandMark() {
   return (
-    <div className="grid h-10 w-10 place-items-center rounded-sm border-2 border-slate-700 bg-emerald-100 font-black text-emerald-800 shadow-chip">
+    <div className="grid h-10 w-10 place-items-center rounded-lg border border-border bg-primary/10 font-black text-primary shadow-sm">
       OD
     </div>
   );
@@ -20,8 +20,8 @@ function BrandMark() {
 function BrandCopy() {
   return (
     <div>
-      <p className="text-lg font-black text-slate-800">OrbitDocs</p>
-      <p className="text-sm font-bold text-slate-500">Student-friendly RAG workspace</p>
+      <p className="text-lg font-black text-foreground">OrbitDocs</p>
+      <p className="text-sm font-semibold text-muted-foreground">Educational RAG workspace</p>
     </div>
   );
 }
@@ -29,7 +29,7 @@ function BrandCopy() {
 export function SiteHeader({ variant, actions }: SiteHeaderProps) {
   if (variant === "app") {
     return (
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-slate-50/90 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur">
         <div className="orbit-shell flex items-center justify-between gap-3 py-3">
           <Link href="/" className="flex items-center gap-3">
             <BrandMark />
@@ -42,8 +42,8 @@ export function SiteHeader({ variant, actions }: SiteHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-slate-50/90 backdrop-blur">
-      <div className="orbit-shell grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-3">
+    <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur">
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-6 py-3">
         <Link href="/" className="flex items-center gap-3">
           <BrandMark />
           <BrandCopy />
