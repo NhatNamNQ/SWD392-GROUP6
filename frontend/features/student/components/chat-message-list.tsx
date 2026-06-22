@@ -62,7 +62,7 @@ export function ChatMessageList({
                 <div className="mt-3 flex flex-wrap gap-2">
                   {message.citations.map((citation, index) => (
                     <CitationPopover
-                      key={citation.id}
+                      key={`${citation.id}-${index}`}
                       citation={citation}
                       index={index}
                       open={openCitationId === citation.id}
