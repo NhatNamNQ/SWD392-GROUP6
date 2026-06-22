@@ -1,25 +1,29 @@
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { ChatCourseOption } from "@/features/student/model/chat-types";
 
 type ChatScopePickerProps = {
-  activeScopeLabel: string | null;
-  chapterValue: string;
+  chapterValue: string[];
   courseValue: string;
   documentValue: string;
   courses: ChatCourseOption[];
-  draftScopeLabel: string | null;
-  onChapterChange: (value: string) => void;
+  onChapterChange: (value: string[]) => void;
   onCourseChange: (value: string) => void;
   onDocumentChange: (value: string) => void;
 };
 
 export function ChatScopePicker({
-  activeScopeLabel,
   chapterValue,
   courseValue,
   documentValue,
   courses,
-  draftScopeLabel,
   onChapterChange,
   onCourseChange,
   onDocumentChange,
@@ -78,30 +82,60 @@ export function ChatScopePicker({
         </select>
       </label>
 
-      <label className={labelClass}>
+      <div className={labelClass}>
         Chapter
-        <select
-          aria-label="Chapter"
-          className={selectClass}
-          value={chapterValue}
-          onChange={(event) => onChapterChange(event.target.value)}
-          disabled={!chapterOptions.length}
-        >
-          <option value="all">All chapters</option>
-          {chapterOptions.map((chapter) => (
-            <option key={chapter.id} value={chapter.id}>
-              {chapter.orderIndex}. {chapter.title}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {(activeScopeLabel ?? draftScopeLabel) ? (
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {activeScopeLabel ? <Badge variant="mint">Session: {activeScopeLabel}</Badge> : null}
-          {draftScopeLabel ? <Badge variant="blue">New: {draftScopeLabel}</Badge> : null}
-        </div>
-      ) : null}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              disabled={!chapterOptions.length}
+              className={cn(selectClass, "justify-between font-normal h-9 px-3 py-2")}
+            >
+              <span className="truncate">
+                {chapterValue.includes("all") || chapterValue.length === 0
+                  ? "All chapters"
+                  : `${chapterValue.length} chapter(s) selected`}
+              </span>
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[15rem] max-h-[300px] overflow-y-auto">
+            <DropdownMenuCheckboxItem
+              onSelect={(e) => e.preventDefault()}
+              checked={chapterValue.includes("all") || chapterValue.length === 0}
+              onCheckedChange={(checked) => {
+                if (checked) onChapterChange(["all"]);
+              }}
+            >
+              All chapters
+            </DropdownMenuCheckboxItem>
+            {chapterOptions.map((chapter) => {
+              const isChecked = chapterValue.includes(chapter.id);
+              return (
+                <DropdownMenuCheckboxItem
+                  key={chapter.id}
+                  onSelect={(e) => e.preventDefault()}
+                  checked={isChecked}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      const newVals = chapterValue.filter((v) => v !== "all");
+                      onChapterChange([...newVals, chapter.id]);
+                    } else {
+                      const newVals = chapterValue.filter((v) => v !== chapter.id);
+                      onChapterChange(newVals.length ? newVals : ["all"]);
+                    }
+                  }}
+                >
+                  <span className="truncate">
+                    {chapter.orderIndex}. {chapter.title}
+                  </span>
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 }

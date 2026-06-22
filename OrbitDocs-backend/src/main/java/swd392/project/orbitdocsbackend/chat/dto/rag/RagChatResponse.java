@@ -16,5 +16,6 @@ public class RagChatResponse {
         private int chunk_index;
         private int page_num;
         private float distance;
+        private String excerpt;
     }
 }

@@ -75,8 +75,8 @@ export type ChatSelection = {
   courseName: string;
   documentId: string;
   documentTitle: string;
-  chapterId: string | null;
-  chapterTitle: string | null;
+  chapterIds: string[];
+  chapterTitles: string[];
 };
 
 export type ChatApiError = {

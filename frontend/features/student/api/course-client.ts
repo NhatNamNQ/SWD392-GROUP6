@@ -41,7 +41,7 @@ export function buildSelectionFromDraft(
   courses: ChatCourseOption[],
   courseId: string | null,
   documentId: string | null,
-  chapterId: string | null,
+  chapterIds: string[],
 ): ChatSelection | null {
   const course = findCourseById(courses, courseId);
 
@@ -55,15 +55,15 @@ export function buildSelectionFromDraft(
     return null;
   }
 
-  const chapter = chapterId ? findChapterById(document, chapterId) : null;
+  const chapters = chapterIds.map(id => findChapterById(document, id)).filter((c): c is NonNullable<typeof c> => c !== null);
 
   return {
     courseId: course.id,
     courseName: course.name,
     documentId: document.id,
     documentTitle: document.originalFilename,
-    chapterId: chapter?.id ?? null,
-    chapterTitle: chapter?.title ?? null,
+    chapterIds: chapters.map(c => c.id),
+    chapterTitles: chapters.map(c => c.title),
   };
 }
 
@@ -72,7 +72,11 @@ export function summarizeSelection(selection: ChatSelection | null) {
     return null;
   }
 
-  return [selection.courseName, selection.documentTitle, selection.chapterTitle ?? "All chapters"]
+  return [
+    selection.courseName, 
+    selection.documentTitle, 
+    selection.chapterTitles.length ? selection.chapterTitles.join(", ") : "All chapters"
+  ]
     .filter(Boolean)
     .join(" · ");
 }

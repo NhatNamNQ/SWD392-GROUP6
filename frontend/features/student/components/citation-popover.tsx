@@ -2,20 +2,21 @@ import { Badge } from "@/components/ui/badge";
 import type { ChatCitation } from "@/features/student/model/chat-types";
 
 type CitationPopoverProps = {
+  uniqueId: string;
   citation: ChatCitation;
   index: number;
   open: boolean;
   onToggle: (citationId: string) => void;
 };
 
-export function CitationPopover({ citation, index, open, onToggle }: CitationPopoverProps) {
+export function CitationPopover({ uniqueId, citation, index, open, onToggle }: CitationPopoverProps) {
   const label = citation.chapterTitle ?? citation.documentName ?? `Source ${index + 1}`;
 
   return (
     <div className="relative">
       <button
         type="button"
-        onClick={() => onToggle(citation.id)}
+        onClick={() => onToggle(uniqueId)}
         className="rounded-full border border-border bg-card px-3 py-1 text-xs font-extrabold text-muted-foreground hover:bg-muted hover:text-primary transition"
       >
         [{index + 1}] {label}
@@ -29,11 +30,6 @@ export function CitationPopover({ citation, index, open, onToggle }: CitationPop
               <Badge variant="default">Page {citation.pageNum}</Badge>
             ) : null}
           </div>
-          {citation.similarityScore != null ? (
-            <p className="mb-2 text-xs font-black text-foreground">
-              Similarity score: {citation.similarityScore.toFixed(2)}
-            </p>
-          ) : null}
           <p>{citation.excerpt}</p>
         </div>
       ) : null}

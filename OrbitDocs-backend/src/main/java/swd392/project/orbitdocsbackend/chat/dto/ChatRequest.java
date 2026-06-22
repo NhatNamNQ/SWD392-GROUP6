@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -13,7 +14,7 @@ public class ChatRequest {
 
     private UUID documentId; // Optional: restrict to a specific document
     
-    private UUID chapterId; // Optional: restrict to a specific chapter
+    private List<UUID> chapterIds; // Optional: restrict to specific chapters
 
     @NotBlank(message = "Query cannot be blank")
     private String query;

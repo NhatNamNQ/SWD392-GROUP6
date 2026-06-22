@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import swd392.project.orbitdocsbackend.chat.dto.ChatRequest;
 import swd392.project.orbitdocsbackend.chat.dto.ChatResponse;
 import swd392.project.orbitdocsbackend.chat.dto.ChatSessionDto;
+import swd392.project.orbitdocsbackend.chat.dto.RenameSessionRequest;
 import swd392.project.orbitdocsbackend.chat.service.IChatService;
 import swd392.project.orbitdocsbackend.identity.dto.user.CustomUserDetails;
 import swd392.project.orbitdocsbackend.shared.response.ApiResponse;
@@ -46,5 +47,12 @@ public class ChatController {
     @GetMapping("/sessions/{sessionId}")
     public ApiResponse<ChatSessionDto> getSessionDetails(@PathVariable UUID sessionId) {
         return ApiResponse.success(chatService.getSessionDetails(sessionId, getCurrentUserId()));
+    }
+
+    @PatchMapping("/sessions/{sessionId}")
+    public ApiResponse<ChatSessionDto> renameSession(
+            @PathVariable UUID sessionId,
+            @Valid @RequestBody RenameSessionRequest request) {
+        return ApiResponse.success(chatService.renameSession(sessionId, request.getNewTitle(), getCurrentUserId()));
     }
 }

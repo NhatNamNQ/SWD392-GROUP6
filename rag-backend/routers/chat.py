@@ -22,7 +22,7 @@ def verify_internal_key(x_api_key: str = Header(None)):
 class ChatRequest(BaseModel):
     document_id: str
     query: str
-    chapter_title: str | None = None
+    chapter_titles: list[str] | None = None
     top_k: int = 5
 
 class ChatResponse(BaseModel):
@@ -55,10 +55,10 @@ def chat_with_document(req: ChatRequest, db: Session = Depends(get_db)):
 
     # Metadata filtering (if chapter is specified)
     # Using JSONB contains operator to match metadata
-    if req.chapter_title:
+    if req.chapter_titles:
         # Match chapter in metadata JSON
         # metadata_ is a JSONB column, so we use the ->> operator to extract chapter_title as text
-        stmt = stmt.where(DocumentChunk.metadata_['chapter_title'].astext == req.chapter_title)
+        stmt = stmt.where(DocumentChunk.metadata_['chapter_title'].astext.in_(req.chapter_titles))
 
     stmt = stmt.order_by('distance').limit(req.top_k)
     
@@ -72,7 +72,8 @@ def chat_with_document(req: ChatRequest, db: Session = Depends(get_db)):
         citations.append({
             "chunk_index": doc_chunk.chunk_index,
             "page_num": doc_chunk.metadata_.get("page_num", 1),
-            "distance": float(distance)
+            "distance": float(distance),
+            "excerpt": doc_chunk.content
         })
 
     context_block = "\n\n---\n\n".join(context_texts)

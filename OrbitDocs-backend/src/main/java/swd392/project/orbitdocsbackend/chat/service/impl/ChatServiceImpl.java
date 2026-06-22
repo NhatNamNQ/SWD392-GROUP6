@@ -82,9 +82,11 @@ public class ChatServiceImpl implements IChatService {
                 session.getDocuments().add(doc);
             }
 
-            if (request.getChapterId() != null) {
-                Chapter chapter = chapterService.getChapterEntityById(request.getChapterId());
-                session.getChapters().add(chapter);
+            if (request.getChapterIds() != null && !request.getChapterIds().isEmpty()) {
+                for (UUID chapId : request.getChapterIds()) {
+                    Chapter chapter = chapterService.getChapterEntityById(chapId);
+                    session.getChapters().add(chapter);
+                }
             }
             session = chatSessionRepository.save(session);
         }
@@ -114,7 +116,9 @@ public class ChatServiceImpl implements IChatService {
         }
 
         if (!session.getChapters().isEmpty()) {
-            ragRequest.setChapter_title(session.getChapters().get(0).getTitle());
+            ragRequest.setChapter_titles(session.getChapters().stream()
+                    .map(Chapter::getTitle)
+                    .collect(Collectors.toList()));
         }
 
         // Call Python RAG
@@ -152,7 +156,7 @@ public class ChatServiceImpl implements IChatService {
                 MessageCitation citation = MessageCitation.builder()
                         .message(assistantMessage)
                         .similarityScore(rc.getDistance())
-                        .excerpt("Chunk " + rc.getChunk_index() + " on page " + rc.getPage_num())
+                        .excerpt(rc.getExcerpt())
                         .build();
                 citations.add(citation);
 
@@ -184,9 +188,29 @@ public class ChatServiceImpl implements IChatService {
     @Override
     @Transactional(readOnly = true)
     public ChatSessionDto getSessionDetails(UUID sessionId, UUID userId) {
-        ChatSession session = chatSessionRepository.findByIdAndUserIdAndActiveTrue(sessionId, userId)
-                .orElseThrow(() -> new RuntimeException("Session not found"));
+        ChatSession session = chatSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Chat session not found"));
+
+        if (!session.getUserId().equals(userId)) {
+            throw new RuntimeException("Access denied");
+        }
+
         return mapToSessionDtoWithMessages(session);
+    }
+
+    @Override
+    @Transactional
+    public ChatSessionDto renameSession(UUID sessionId, String newTitle, UUID userId) {
+        ChatSession session = chatSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Chat session not found"));
+
+        if (!session.getUserId().equals(userId)) {
+            throw new RuntimeException("Access denied");
+        }
+
+        session.setTitle(newTitle);
+        ChatSession savedSession = chatSessionRepository.save(session);
+        return mapToSessionDtoWithMessages(savedSession);
     }
 
     private ChatSessionDto mapToSessionDtoWithoutMessages(ChatSession session) {

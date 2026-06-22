@@ -41,7 +41,7 @@ export function fetchChatSession(sessionId: string) {
 export function sendChatMessage(payload: {
   courseId: string;
   documentId?: string;
-  chapterId?: string | null;
+  chapterIds?: string[];
   sessionId?: string;
   query: string;
 }) {
@@ -51,5 +51,15 @@ export function sendChatMessage(payload: {
       "content-type": "application/json",
     },
     body: JSON.stringify(payload),
+  });
+}
+
+export function renameChatSession(sessionId: string, newTitle: string) {
+  return request<ChatSessionDetail>(`/api/chats/sessions/${sessionId}`, {
+    method: "PATCH",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ newTitle }),
   });
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { Menu, PanelLeftClose, PanelLeftOpen, Pencil, Check, X } from "lucide-react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   fetchChatBootstrap,
   fetchChatSession,
   sendChatMessage,
+  renameChatSession,
 } from "@/features/student/api/chat-client";
 import {
   buildSelectionFromDraft,
@@ -55,17 +56,7 @@ function summarizeSession(
   };
 }
 
-function getSelectionLabel(
-  draftSelection: ReturnType<typeof buildSelectionFromDraft>,
-  activeSessionTitle: string | null,
-  activeCourseName: string | null,
-) {
-  if (activeSessionTitle) {
-    return [activeCourseName, activeSessionTitle].filter(Boolean).join(" · ");
-  }
 
-  return summarizeSelection(draftSelection) ?? "Select a course and document";
-}
 
 function setDraftSelectionFromCourse(
   courses: ChatCourseOption[],
@@ -73,7 +64,7 @@ function setDraftSelectionFromCourse(
 ): {
   courseId: string;
   documentId: string;
-  chapterId: string | null;
+  chapterIds: string[];
 } {
   const course = findCourseById(courses, courseId);
   const document = course?.documents[0] ?? null;
@@ -81,7 +72,7 @@ function setDraftSelectionFromCourse(
   return {
     courseId: course?.id ?? "",
     documentId: document?.id ?? "",
-    chapterId: document?.chapters[0]?.id ?? null,
+    chapterIds: [], // default to all chapters
   };
 }
 
@@ -96,10 +87,14 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
   const [chatError, setChatError] = useState<string | null>(null);
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [selectedDocumentId, setSelectedDocumentId] = useState("");
-  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
+  const [selectedChapterIds, setSelectedChapterIds] = useState<string[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [activeSession, setActiveSession] = useState<ChatSessionDetail | null>(null);
   const [openCitationId, setOpenCitationId] = useState<string | null>(null);
+  const [optimisticUserMessage, setOptimisticUserMessage] = useState<string | null>(null);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editingTitleValue, setEditingTitleValue] = useState("");
+  const [isRenaming, setIsRenaming] = useState(false);
 
   const deferredHistoryQuery = useDeferredValue(historyQuery);
 
@@ -124,7 +119,7 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
         );
         setSelectedCourseId(initialDraft.courseId);
         setSelectedDocumentId(initialDraft.documentId);
-        setSelectedChapterId(initialDraft.chapterId);
+        setSelectedChapterIds(initialDraft.chapterIds);
       } catch (error) {
         if (!cancelled) {
           setChatError(normalizeError(error));
@@ -182,35 +177,30 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
     return resolvedCourse.documents.find((entry) => entry.id === resolvedDocumentId) ?? null;
   }, [resolvedCourse, resolvedDocumentId]);
 
-  const resolvedChapterId = useMemo(() => {
+  const resolvedChapterIds = useMemo(() => {
     if (!resolvedDocument) {
-      return null;
+      return [];
     }
 
-    if (
-      selectedChapterId &&
-      resolvedDocument.chapters.some((chapter) => chapter.id === selectedChapterId)
-    ) {
-      return selectedChapterId;
-    }
-
-    return resolvedDocument.chapters[0]?.id ?? null;
-  }, [resolvedDocument, selectedChapterId]);
+    // Filter to ensure selected IDs actually belong to the resolved document
+    const validChapterIds = selectedChapterIds.filter((id) =>
+      resolvedDocument.chapters.some((chapter) => chapter.id === id)
+    );
+    
+    // If "all" was selected, it will be in the list, but we can just filter it.
+    // If the list is empty, it means all.
+    return validChapterIds.filter(id => id !== "all");
+  }, [resolvedDocument, selectedChapterIds]);
 
   const draftSelection = useMemo(
-    () => buildSelectionFromDraft(courses, resolvedCourseId, resolvedDocumentId, resolvedChapterId),
-    [courses, resolvedCourseId, resolvedDocumentId, resolvedChapterId],
+    () => buildSelectionFromDraft(courses, resolvedCourseId, resolvedDocumentId, resolvedChapterIds),
+    [courses, resolvedCourseId, resolvedDocumentId, resolvedChapterIds],
   );
 
   const draftScopeLabel = summarizeSelection(draftSelection);
   const activeSessionCourseName = activeSession
     ? (courseNameById.get(activeSession.courseId) ?? null)
     : null;
-  const activeScopeLabel = getSelectionLabel(
-    draftSelection,
-    activeSession?.title ?? null,
-    activeSessionCourseName,
-  );
   const filteredSessions = useMemo(() => {
     const normalizedQuery = deferredHistoryQuery.trim().toLowerCase();
 
@@ -257,6 +247,7 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       setActiveSession(null);
       setActiveSessionId(null);
       setChatInput("");
+      setOptimisticUserMessage(null);
       setOpenCitationId(null);
       setChatError(null);
       setSheetOpen(false);
@@ -267,7 +258,7 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
     const draft = setDraftSelectionFromCourse(courses, courseId);
     setSelectedCourseId(draft.courseId);
     setSelectedDocumentId(draft.documentId);
-    setSelectedChapterId(draft.chapterId);
+    setSelectedChapterIds(draft.chapterIds);
   }
 
   function handleDocumentChange(documentId: string) {
@@ -275,11 +266,11 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
     const document = course?.documents.find((entry) => entry.id === documentId) ?? null;
 
     setSelectedDocumentId(document?.id ?? "");
-    setSelectedChapterId(document?.chapters[0]?.id ?? null);
+    setSelectedChapterIds([]);
   }
 
-  function handleChapterChange(chapterId: string) {
-    setSelectedChapterId(chapterId === "all" ? null : chapterId);
+  function handleChapterChange(chapterIds: string[]) {
+    setSelectedChapterIds(chapterIds.includes("all") ? [] : chapterIds);
   }
 
   function handlePromptClick(prompt: string) {
@@ -304,6 +295,8 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       setChatSubmitting(true);
       setChatError(null);
       setOpenCitationId(null);
+      setOptimisticUserMessage(trimmed);
+      setChatInput("");
 
       const response = await sendChatMessage(
         activeSession
@@ -315,7 +308,7 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
           : {
               courseId: draftSelection!.courseId,
               documentId: draftSelection!.documentId,
-              chapterId: draftSelection!.chapterId,
+              chapterIds: draftSelection!.chapterIds,
               query: trimmed,
             },
       );
@@ -324,11 +317,30 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
       setActiveSession(detail);
       setActiveSessionId(detail.id);
       upsertSession(detail);
-      setChatInput("");
+      setOptimisticUserMessage(null);
+    } catch (error) {
+      setChatError(normalizeError(error));
+      setChatInput(trimmed);
+      setOptimisticUserMessage(null);
+    } finally {
+      setChatSubmitting(false);
+    }
+  }
+
+  async function handleRenameSession(e: React.FormEvent) {
+    e.preventDefault();
+    if (!activeSession || !editingTitleValue.trim()) return;
+
+    try {
+      setIsRenaming(true);
+      const updated = await renameChatSession(activeSession.id, editingTitleValue.trim());
+      setActiveSession(updated);
+      upsertSession(updated);
+      setIsEditingTitle(false);
     } catch (error) {
       setChatError(normalizeError(error));
     } finally {
-      setChatSubmitting(false);
+      setIsRenaming(false);
     }
   }
 
@@ -339,15 +351,13 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
 
   const scopeControls = (
     <ChatScopePicker
-      activeScopeLabel={activeSession ? activeScopeLabel : null}
-      chapterValue={resolvedChapterId ?? "all"}
+      chapterValue={resolvedChapterIds.length ? resolvedChapterIds : ["all"]}
       courseValue={resolvedCourseId}
       courses={courses}
-      draftScopeLabel={draftScopeLabel}
-      documentValue={resolvedDocumentId}
       onChapterChange={handleChapterChange}
       onCourseChange={handleCourseChange}
       onDocumentChange={handleDocumentChange}
+      documentValue={resolvedDocumentId}
     />
   );
 
@@ -365,7 +375,7 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
   );
 
   return (
-    <div className="flex min-h-screen w-full bg-background font-sans">
+    <div className="flex h-screen overflow-hidden w-full bg-background font-sans">
       {/* ── Desktop collapsible sidebar ── */}
       <aside
         className={cn(
@@ -415,13 +425,46 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
               </SheetContent>
             </Sheet>
 
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-muted-foreground">
                 Student workspace
               </p>
-              <h1 className="truncate text-xl font-black tracking-[-0.04em] text-foreground">
-                {activeSession?.title ?? "New chat"}
-              </h1>
+              {isEditingTitle ? (
+                <form onSubmit={handleRenameSession} className="flex items-center gap-2 mt-0.5">
+                  <input
+                    autoFocus
+                    disabled={isRenaming}
+                    className="h-8 rounded-md border border-input bg-transparent px-2 text-sm font-semibold shadow-sm w-full max-w-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    value={editingTitleValue}
+                    onChange={(e) => setEditingTitleValue(e.target.value)}
+                  />
+                  <Button type="submit" size="icon" variant="ghost" className="h-8 w-8 text-green-600" disabled={isRenaming}>
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive" disabled={isRenaming} onClick={() => setIsEditingTitle(false)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </form>
+              ) : (
+                <div className="flex items-center gap-2 group mt-0.5">
+                  <h1 className="truncate text-xl font-black tracking-[-0.04em] text-foreground">
+                    {activeSession?.title ?? "New chat"}
+                  </h1>
+                  {activeSession ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        setEditingTitleValue(activeSession.title);
+                        setIsEditingTitle(true);
+                      }}
+                    >
+                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                    </Button>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -440,7 +483,9 @@ export function StudentChatShell({ user }: StudentChatShellProps) {
           <div className="min-h-0 flex-1 overflow-hidden">
             <ChatMessageList
               activeScopeLabel={scopeLabel}
-              loading={chatLoading || (chatSubmitting && !activeSession)}
+              loading={chatLoading}
+              isSubmitting={chatSubmitting}
+              optimisticUserMessage={optimisticUserMessage}
               messages={activeSession?.messages ?? []}
               onCitationToggle={(citationId) =>
                 setOpenCitationId((current) => (current === citationId ? null : citationId))

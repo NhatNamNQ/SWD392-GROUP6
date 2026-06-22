@@ -13,4 +13,6 @@ public interface IChatService {
     List<ChatSessionDto> getUserSessions(UUID userId);
 
     ChatSessionDto getSessionDetails(UUID sessionId, UUID userId);
+
+    ChatSessionDto renameSession(UUID sessionId, String newTitle, UUID userId);
 }
