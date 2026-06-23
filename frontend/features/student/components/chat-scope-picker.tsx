@@ -87,7 +87,7 @@ export function ChatScopePicker({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="outline"
+              variant="secondary"
               role="combobox"
               disabled={!chapterOptions.length}
               className={cn(selectClass, "justify-between font-normal h-9 px-3 py-2")}

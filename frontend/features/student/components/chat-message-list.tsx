@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { CitationPopover } from "@/features/student/components/citation-popover";
 import { PromptSuggestions } from "@/features/student/components/prompt-suggestions";
 import type { ChatMessage } from "@/features/student/model/chat-types";
@@ -70,7 +71,7 @@ export function ChatMessageList({
                     message.content
                   ) : (
                     <div className="prose prose-sm prose-stone max-w-none prose-p:leading-7 prose-p:my-2 prose-headings:my-3 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                     </div>
                   )}
                 </div>
