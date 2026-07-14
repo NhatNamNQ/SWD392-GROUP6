@@ -81,6 +81,10 @@ public class Document extends BaseEntity {
     @Builder.Default
     private List<IndexingJob> indexingJobs = new ArrayList<>();
 
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<DocumentChunk> chunks = new ArrayList<>();
+
     // ─────────── Business helpers ───────────
 
     public boolean isIndexable() {

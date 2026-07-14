@@ -16,7 +16,7 @@ function getBackendBaseUrl() {
 }
 
 export function createAuthJsonResponse(payload: unknown, status = 200) {
-  return Response.json(payload, { status });
+  return Response.json(payload !== undefined ? payload : null, { status });
 }
 
 export function extractBackendRefreshToken(response: Response) {

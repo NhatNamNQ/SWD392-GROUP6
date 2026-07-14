@@ -23,6 +23,9 @@ import swd392.project.orbitdocsbackend.chat.service.IChatService;
 import swd392.project.orbitdocsbackend.course.entity.Course;
 import swd392.project.orbitdocsbackend.document.entity.Chapter;
 import swd392.project.orbitdocsbackend.document.entity.Document;
+import swd392.project.orbitdocsbackend.document.entity.DocumentChunk;
+import swd392.project.orbitdocsbackend.document.repository.DocumentRepository;
+import swd392.project.orbitdocsbackend.document.repository.DocumentChunkRepository;
 import swd392.project.orbitdocsbackend.shared.enums.MessageRole;
 import swd392.project.orbitdocsbackend.course.service.ICourseService;
 import swd392.project.orbitdocsbackend.document.service.IDocumentService;
@@ -44,6 +47,8 @@ public class ChatServiceImpl implements IChatService {
     private final ICourseService courseService;
     private final IDocumentService documentService;
     private final IChapterService chapterService;
+    private final DocumentRepository documentRepository;
+    private final DocumentChunkRepository documentChunkRepository;
     private final RestClient restClient = RestClient.create();
 
     @Value("${rag.internal-url}")
@@ -153,17 +158,41 @@ public class ChatServiceImpl implements IChatService {
 
         if (ragResponse.getCitations() != null) {
             for (RagChatResponse.RagCitation rc : ragResponse.getCitations()) {
+                DocumentChunk chunk = null;
+                Document document = null;
+                try {
+                    if (rc.getChunk_id() != null) {
+                        chunk = documentChunkRepository.findById(UUID.fromString(rc.getChunk_id())).orElse(null);
+                    }
+                } catch (IllegalArgumentException ignored) {}
+                try {
+                    if (rc.getDocument_id() != null) {
+                        document = documentRepository.findById(UUID.fromString(rc.getDocument_id())).orElse(null);
+                    }
+                } catch (IllegalArgumentException ignored) {}
+
                 MessageCitation citation = MessageCitation.builder()
                         .message(assistantMessage)
+                        .chunk(chunk)
+                        .document(document)
                         .similarityScore(rc.getDistance())
                         .excerpt(rc.getExcerpt())
                         .build();
                 citations.add(citation);
 
+                String docName = document != null ? document.getOriginalFilename() : null;
+                String chapterTitle = null;
+                if (chunk != null && chunk.getMetadata() != null) {
+                    chapterTitle = (String) chunk.getMetadata().get("chapter_title");
+                }
+
                 citationDtos.add(CitationDto.builder()
                         .excerpt(citation.getExcerpt())
                         .similarityScore(citation.getSimilarityScore())
                         .pageNum(rc.getPage_num())
+                        .chunkIndex(rc.getChunk_index())
+                        .documentName(docName)
+                        .chapterTitle(chapterTitle)
                         .build());
             }
         }
@@ -227,13 +256,48 @@ public class ChatServiceImpl implements IChatService {
         List<ChatMessage> messages = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(session.getId());
         
         List<ChatMessageDto> messageDtos = messages.stream().map(msg -> {
-            List<CitationDto> citationDtos = msg.getCitations().stream().map(cit -> 
-                    CitationDto.builder()
-                            .excerpt(cit.getExcerpt())
-                            .similarityScore(cit.getSimilarityScore())
-                            .pageNum(null)
-                            .build()
-            ).collect(Collectors.toList());
+            List<CitationDto> citationDtos = msg.getCitations().stream().map(cit -> {
+                Integer pageNum = null;
+                String chapterTitle = null;
+                String docName = null;
+
+                Integer chunkIndex = null;
+
+                if (cit.getChunk() != null) {
+                    chunkIndex = cit.getChunk().getChunkIndex();
+                    if (cit.getChunk().getMetadata() != null) {
+                        Object pg = cit.getChunk().getMetadata().get("page_num");
+                        if (pg == null) {
+                            pg = cit.getChunk().getMetadata().get("pageNum");
+                        }
+                        if (pg == null) {
+                            pg = cit.getChunk().getMetadata().get("page");
+                        }
+                        if (pg instanceof Number) {
+                            pageNum = ((Number) pg).intValue();
+                        } else if (pg instanceof String) {
+                            try {
+                                pageNum = Integer.parseInt((String) pg);
+                            } catch (NumberFormatException ignored) {}
+                        }
+                        
+                        chapterTitle = (String) cit.getChunk().getMetadata().get("chapter_title");
+                    }
+                }
+
+                if (cit.getDocument() != null) {
+                    docName = cit.getDocument().getOriginalFilename();
+                }
+
+                return CitationDto.builder()
+                        .excerpt(cit.getExcerpt())
+                        .similarityScore(cit.getSimilarityScore())
+                        .pageNum(pageNum)
+                        .chunkIndex(chunkIndex)
+                        .documentName(docName)
+                        .chapterTitle(chapterTitle)
+                        .build();
+            }).collect(Collectors.toList());
 
             return ChatMessageDto.builder()
                     .id(msg.getId())

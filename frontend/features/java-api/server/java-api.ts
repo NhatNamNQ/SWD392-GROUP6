@@ -30,10 +30,11 @@ function unwrapJavaPayload<T>(payload: JavaEnvelope<T> | T | null) {
     typeof payload === "object" &&
     ("data" in payload || "status" in payload || "message" in payload)
   ) {
-    return (payload as JavaEnvelope<T>).data as T;
+    const data = (payload as JavaEnvelope<T>).data;
+    return (data !== undefined ? data : null) as T;
   }
 
-  return payload as T;
+  return (payload !== undefined ? payload : null) as T;
 }
 
 export async function requireJavaRequestSession(request: Request): Promise<AuthSession> {
@@ -111,7 +112,11 @@ export async function proxyJavaJson<T>(
   init?: RequestInit,
   status = 200,
 ) {
-  const session = await requireJavaRequestSession(request);
-  const payload = await requestJava<T>(session, path, init);
-  return createJavaJsonResponse(payload, status);
+  try {
+    const session = await requireJavaRequestSession(request);
+    const payload = await requestJava<T>(session, path, init);
+    return createJavaJsonResponse(payload, status);
+  } catch (error) {
+    return toJavaErrorResponse(error);
+  }
 }

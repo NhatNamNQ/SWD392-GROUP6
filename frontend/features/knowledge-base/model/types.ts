@@ -17,6 +17,7 @@ export type KnowledgeDocument = {
   fileType: string;
   fileSizeBytes: number;
   status: DocumentStatus;
+  failureReason?: string | null;
   chunkCount: number | null;
   indexedAt: string | null;
   createdAt: string;
@@ -31,6 +32,27 @@ export type DocumentChapter = {
   description: string | null;
   createdAt: string;
   updatedAt: string | null;
+};
+
+export type DocumentChunk = {
+  id: string;
+  documentId: string;
+  chunkIndex: number;
+  content: string;
+  tokenCount: number | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+};
+
+/** Generic Spring Data page envelope */
+export type PagedResponse<T> = {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number; // current page (0-based)
+  size: number;
+  first: boolean;
+  last: boolean;
 };
 
 export type KnowledgeBaseBootstrap = {

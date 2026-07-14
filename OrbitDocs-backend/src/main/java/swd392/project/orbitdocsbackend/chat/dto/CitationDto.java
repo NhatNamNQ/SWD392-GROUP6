@@ -13,6 +13,7 @@ public class CitationDto {
     private String excerpt;
     private Float similarityScore;
     private Integer pageNum;
+    private Integer chunkIndex;
     private String documentName;
     private String chapterTitle;
 }

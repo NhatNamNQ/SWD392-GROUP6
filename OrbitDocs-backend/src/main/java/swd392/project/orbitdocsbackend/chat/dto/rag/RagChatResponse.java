@@ -13,6 +13,8 @@ public class RagChatResponse {
     @Data
     @NoArgsConstructor
     public static class RagCitation {
+        private String chunk_id;
+        private String document_id;
         private int chunk_index;
         private int page_num;
         private float distance;

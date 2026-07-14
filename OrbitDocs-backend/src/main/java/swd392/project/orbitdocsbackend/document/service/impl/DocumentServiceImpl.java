@@ -3,6 +3,7 @@ package swd392.project.orbitdocsbackend.document.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -165,5 +166,17 @@ public class DocumentServiceImpl implements IDocumentService {
     public Document getDocumentEntityById(UUID id) {
         return documentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
+    }
+
+    @Override
+    public Resource getDocumentFile(UUID id) {
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
+        try {
+            return storageService.loadFileAsResource(document.getStoragePath());
+        } catch (IOException e) {
+            log.error("Failed to load file for document {}: {}", id, e.getMessage());
+            throw new AppException(ErrorCode.FILE_STORAGE_FAILED);
+        }
     }
 }

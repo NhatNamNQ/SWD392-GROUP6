@@ -7,6 +7,7 @@ export type ChatCitation = {
   excerpt: string;
   similarityScore?: number | null;
   pageNum?: number | null;
+  chunkIndex?: number | null;
   documentName?: string | null;
   chapterTitle?: string | null;
 };

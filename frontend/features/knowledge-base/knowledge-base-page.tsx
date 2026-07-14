@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { BookOpen, FileUp, RefreshCcw, Search, Trash2 } from "lucide-react";
-import { startTransition, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 import { Badge } from "@/components/ui/badge";
@@ -14,8 +14,8 @@ import {
   deleteDocument,
   fetchCourseDocuments,
   fetchKnowledgeCourses,
-  uploadDocument,
 } from "@/features/knowledge-base/api/document-client";
+import { useUploadProgress } from "@/features/knowledge-base/context/UploadProgressContext";
 import type {
   CourseOption,
   DocumentStatus,
@@ -61,6 +61,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
   const [statusFilter, setStatusFilter] = useState<"ALL" | DocumentStatus>("ALL");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const { startUpload, uploads, clearUpload } = useUploadProgress();
   const { toast } = useToast();
 
   const ownedCourses = useMemo(
@@ -129,17 +130,7 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     };
   }, [resolvedCourseId, toast]);
 
-  const filteredDocuments = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return documents.filter((document) => {
-      const matchesQuery = document.originalFilename.toLowerCase().includes(normalizedQuery);
-      const matchesStatus = statusFilter === "ALL" || document.status === statusFilter;
-      return matchesQuery && matchesStatus;
-    });
-  }, [documents, query, statusFilter]);
-
-  async function refreshDocuments() {
+  const refreshDocuments = useCallback(async () => {
     if (!resolvedCourseId) {
       return;
     }
@@ -152,7 +143,29 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [resolvedCourseId, toast]);
+
+  const prevUploadsLength = useRef(uploads.length);
+  const prevFinishedCount = useRef(uploads.filter(u => u.status === "SUCCESS" || u.status === "ERROR").length);
+
+  useEffect(() => {
+    const currentFinishedCount = uploads.filter(u => u.status === "SUCCESS" || u.status === "ERROR").length;
+    if (uploads.length !== prevUploadsLength.current || currentFinishedCount !== prevFinishedCount.current) {
+      prevUploadsLength.current = uploads.length;
+      prevFinishedCount.current = currentFinishedCount;
+      refreshDocuments();
+    }
+  }, [uploads, refreshDocuments]);
+
+  const filteredDocuments = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return documents.filter((document) => {
+      const matchesQuery = document.originalFilename.toLowerCase().includes(normalizedQuery);
+      const matchesStatus = statusFilter === "ALL" || document.status === statusFilter;
+      return matchesQuery && matchesStatus;
+    });
+  }, [documents, query, statusFilter]);
 
   function handleCourseChange(courseId: string) {
     setLoading(true);
@@ -167,11 +180,9 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     }
 
     setUploading(true);
-
     try {
-      await uploadDocument(resolvedCourseId, file);
+      await startUpload(resolvedCourseId, file);
       await refreshDocuments();
-      toast({ title: "Success", description: "Document uploaded and indexing was triggered." });
     } catch (error) {
       toast({ title: "Error", description: toMessage(error), variant: "destructive" });
     } finally {
@@ -274,41 +285,178 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
           </div>
           {loading ? (
             <p className="text-sm font-semibold text-muted-foreground">Loading documents...</p>
-          ) : resolvedCourseId && filteredDocuments.length ? (
+          ) : resolvedCourseId && (filteredDocuments.length || uploads.some(u => u.status === "UPLOADING")) ? (
             <div className="grid gap-3">
-              {filteredDocuments.map((document) => (
-                <article
-                  key={document.id}
-                  className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/20 transition duration-200 md:grid-cols-[1fr_auto] md:items-center"
-                >
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-primary" />
-                      <Link
-                        href={`/teacher/knowledge-base/${document.id}`}
-                        className="text-sm font-black text-foreground hover:text-primary hover:underline"
-                      >
-                        {document.originalFilename}
-                      </Link>
-                      <DocumentStatusBadge status={document.status} />
+              {/* Render active uploads that are not yet created in the DB (status === "UPLOADING") */}
+              {uploads
+                .filter((u) => u.status === "UPLOADING")
+                .map((upload) => {
+                  const displayProgress = Math.round(upload.uploadPercent * 0.3);
+                  const uploadedMb = ((upload.fileSize * upload.uploadPercent) / (1024 * 1024 * 100)).toFixed(2);
+                  const totalMb = (upload.fileSize / (1024 * 1024)).toFixed(2);
+                  const statusText = `Đang tải tài liệu lên máy chủ... (${uploadedMb} MB / ${totalMb} MB)`;
+
+                  return (
+                    <article
+                      key={upload.id}
+                      className="grid gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 shadow-sm transition duration-200"
+                    >
+                      <div className="space-y-3 w-full">
+                        <div className="flex items-center justify-between text-xs font-black">
+                          <span className="truncate text-foreground max-w-[80%]" title={upload.fileName}>
+                            {upload.fileName}
+                          </span>
+                          <span className="text-primary">{displayProgress}%</span>
+                        </div>
+                        <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted/60">
+                          <div
+                            className="h-full bg-primary transition-all duration-300"
+                            style={{ width: `${displayProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-[11px] font-bold text-primary/80 animate-pulse">
+                          {statusText}
+                        </p>
+                      </div>
+                    </article>
+                  );
+                })}
+
+              {/* Render the standard documents list */}
+              {filteredDocuments.map((document) => {
+                // Find if there is an active processing, success, or error background task for this document
+                const activeUpload = uploads.find(
+                  (u) => u.id === document.id || (u.fileName === document.originalFilename && u.status !== "UPLOADING")
+                );
+
+                if (activeUpload && (activeUpload.status === "PROCESSING" || activeUpload.status === "SUCCESS" || activeUpload.status === "ERROR")) {
+                  let displayProgress = Math.round(activeUpload.processingProgress);
+                  let statusText = "";
+
+                  if (activeUpload.status === "PROCESSING") {
+                    if (displayProgress < 55) {
+                      statusText = "Đang phân tích cấu trúc & bóc tách nội dung PDF...";
+                    } else if (displayProgress < 85) {
+                      statusText = "Đang phân đoạn văn bản & Tạo vector nhúng (Embedding)...";
+                    } else {
+                      statusText = "Đang lưu trữ cơ sở dữ liệu vector và tối ưu hóa chỉ mục RAG...";
+                    }
+                  } else if (activeUpload.status === "SUCCESS") {
+                    displayProgress = 100;
+                    statusText = `Hoàn thành! Đã bóc tách thành công ${activeUpload.chunkCount ?? 0} phân đoạn.`;
+                  } else {
+                    displayProgress = Math.max(30, displayProgress);
+                    statusText = activeUpload.errorMsg || "Đã xảy ra lỗi trong quá trình xử lý tài liệu.";
+                  }
+
+                  const isError = activeUpload.status === "ERROR";
+                  const isSuccess = activeUpload.status === "SUCCESS";
+
+                  return (
+                    <article
+                      key={document.id}
+                      className={`grid gap-3 rounded-xl border p-4 shadow-sm transition duration-200 ${
+                        isError
+                          ? "border-destructive/20 bg-destructive/5"
+                          : isSuccess
+                            ? "border-emerald-500/20 bg-emerald-500/5"
+                            : "border-primary/20 bg-primary/5"
+                      }`}
+                    >
+                      <div className="space-y-3 w-full">
+                        <div className="flex items-center justify-between text-xs font-black">
+                          <span className="truncate text-foreground max-w-[80%]" title={document.originalFilename}>
+                            {document.originalFilename}
+                          </span>
+                          <span
+                            className={
+                              isError
+                                ? "text-destructive"
+                                : isSuccess
+                                  ? "text-emerald-500"
+                                  : "text-primary"
+                            }
+                          >
+                            {displayProgress}%
+                          </span>
+                        </div>
+                        <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted/60">
+                          <div
+                            className={`h-full transition-all duration-300 ${
+                              isError
+                                ? "bg-destructive"
+                                : isSuccess
+                                  ? "bg-emerald-500 animate-in fade-in duration-500"
+                                  : "bg-primary"
+                            }`}
+                            style={{ width: `${displayProgress}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <p
+                            className={`text-[11px] font-bold ${
+                              isError
+                                ? "text-destructive"
+                                : isSuccess
+                                  ? "text-emerald-500"
+                                  : "text-primary/80 animate-pulse"
+                            }`}
+                          >
+                            {statusText}
+                          </p>
+                          {isError && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="h-7 px-2.5 text-[11px] font-black text-destructive hover:bg-destructive/10"
+                              onClick={() => clearUpload(activeUpload.id)}
+                            >
+                              Đóng
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                }
+
+                // If not actively uploading/processing in the background (or if it is SUCCESS which will render normally)
+                return (
+                  <article
+                    key={document.id}
+                    className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/20 transition duration-200 md:grid-cols-[1fr_auto] md:items-center"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-primary" />
+                        <Link
+                          href={`/teacher/knowledge-base/${document.id}`}
+                          className="text-sm font-black text-foreground hover:text-primary hover:underline"
+                        >
+                          {document.originalFilename}
+                        </Link>
+                        <DocumentStatusBadge status={document.status} />
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-xs font-bold text-muted-foreground">
+                        <span>{formatSize(document.fileSizeBytes)}</span>
+                        <span>{document.chunkCount ?? 0} chunks</span>
+                        {document.status === "FAILED" ? (
+                          <span className="text-destructive">
+                            {document.failureReason || "Failure reason unavailable."}
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs font-bold text-muted-foreground">
-                      <span>{formatSize(document.fileSizeBytes)}</span>
-                      <span>{document.chunkCount ?? 0} chunks</span>
-                      {document.status === "FAILED" ? (
-                        <span className="text-destructive">Failure reason unavailable.</span>
-                      ) : null}
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="default">{document.fileType}</Badge>
+                      <Button type="button" variant="ghost" onClick={() => handleDelete(document.id)}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="default">{document.fileType}</Badge>
-                    <Button type="button" variant="ghost" onClick={() => handleDelete(document.id)}>
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </Button>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
           ) : ownedCourses.length ? (
             <p className="text-sm font-semibold text-muted-foreground">No documents match this view.</p>

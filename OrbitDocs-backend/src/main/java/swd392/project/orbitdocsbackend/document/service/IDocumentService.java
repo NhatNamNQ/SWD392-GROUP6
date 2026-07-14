@@ -1,5 +1,6 @@
 package swd392.project.orbitdocsbackend.document.service;
 
+import org.springframework.core.io.Resource;
 import swd392.project.orbitdocsbackend.document.dto.request.DocumentUploadRequest;
 import swd392.project.orbitdocsbackend.document.dto.response.DocumentResponse;
 import swd392.project.orbitdocsbackend.document.entity.Document;
@@ -13,4 +14,5 @@ public interface IDocumentService {
     DocumentResponse getDocumentById(UUID id);
     void deleteDocument(UUID id);
     Document getDocumentEntityById(UUID id);
+    Resource getDocumentFile(UUID id);
 }

@@ -1,6 +1,8 @@
 package swd392.project.orbitdocsbackend.document.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,5 +68,29 @@ public class LocalStorageServiceImpl implements IStorageService {
             targetLocation = baseDir.resolve(storagePath).normalize();
         }
         Files.deleteIfExists(targetLocation);
+    }
+
+    @Override
+    public Resource loadFileAsResource(String storagePath) throws IOException {
+        if (storagePath == null || storagePath.trim().isEmpty()) {
+            throw new IOException("Storage path cannot be empty");
+        }
+
+        Path baseDir = Paths.get("").toAbsolutePath();
+        if (!baseDir.endsWith("OrbitDocs-backend") && Files.exists(baseDir.resolve("OrbitDocs-backend"))) {
+            baseDir = baseDir.resolve("OrbitDocs-backend");
+        }
+
+        Path filePath = Paths.get(storagePath).isAbsolute()
+                ? Paths.get(storagePath)
+                : baseDir.resolve(storagePath).normalize();
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (resource.exists() && resource.isReadable()) {
+            return resource;
+        } else {
+            throw new IOException("File not found or not readable at path: " + storagePath);
+        }
     }
 }

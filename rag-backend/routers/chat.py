@@ -70,6 +70,8 @@ def chat_with_document(req: ChatRequest, db: Session = Depends(get_db)):
     for doc_chunk, distance in results:
         context_texts.append(doc_chunk.content)
         citations.append({
+            "chunk_id": str(doc_chunk.id),
+            "document_id": str(doc_chunk.document_id),
             "chunk_index": doc_chunk.chunk_index,
             "page_num": doc_chunk.metadata_.get("page_num", 1),
             "distance": float(distance),
