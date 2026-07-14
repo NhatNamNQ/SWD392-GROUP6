@@ -18,6 +18,7 @@ build/
 *.class
 *.jar
 *.war
+*.pdf
 
 # Python
 __pycache__/
