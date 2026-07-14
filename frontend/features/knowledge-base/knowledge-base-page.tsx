@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DocumentStatusBadge } from "@/features/knowledge-base/components/status-badge";
+import { DeleteConfirmModal } from "@/features/knowledge-base/components/delete-confirm-modal";
 import {
   deleteDocument,
   fetchCourseDocuments,
@@ -63,6 +64,8 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
   const [uploading, setUploading] = useState(false);
   const { startUpload, uploads, clearUpload } = useUploadProgress();
   const { toast } = useToast();
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+  const [deletingDocName, setDeletingDocName] = useState<string | null>(null);
 
   const ownedCourses = useMemo(
     () => courses.filter((course) => course.lecturerId === user.id),
@@ -197,9 +200,12 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
     try {
       await deleteDocument(documentId);
       setDocuments((current) => current.filter((document) => document.id !== documentId));
-      toast({ title: "Success", description: "Document deleted." });
+      toast({ title: "Thành công", description: "Tài liệu đã được xóa." });
     } catch (error) {
-      toast({ title: "Error", description: toMessage(error), variant: "destructive" });
+      toast({ title: "Lỗi", description: toMessage(error), variant: "destructive" });
+    } finally {
+      setDeletingDocId(null);
+      setDeletingDocName(null);
     }
   }
 
@@ -449,7 +455,14 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="default">{document.fileType}</Badge>
-                      <Button type="button" variant="ghost" onClick={() => handleDelete(document.id)}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          setDeletingDocId(document.id);
+                          setDeletingDocName(document.originalFilename);
+                        }}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </Button>
@@ -467,6 +480,20 @@ export function KnowledgeBasePage({ user }: KnowledgeBasePageProps) {
           )}
         </CardContent>
       </Card>
+
+      <DeleteConfirmModal
+        isOpen={deletingDocId !== null}
+        documentName={deletingDocName ?? ""}
+        onClose={() => {
+          setDeletingDocId(null);
+          setDeletingDocName(null);
+        }}
+        onConfirm={() => {
+          if (deletingDocId) {
+            handleDelete(deletingDocId);
+          }
+        }}
+      />
     </div>
   );
 }
