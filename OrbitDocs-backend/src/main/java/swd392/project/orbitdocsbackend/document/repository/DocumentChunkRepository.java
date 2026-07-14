@@ -10,6 +10,5 @@ import java.util.List;
 @Repository
 public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, UUID> {
     List<DocumentChunk> findByDocumentId(UUID documentId);
-    List<DocumentChunk> findByDocumentIdOrderByChunkIndexAsc(UUID documentId);
 }
 

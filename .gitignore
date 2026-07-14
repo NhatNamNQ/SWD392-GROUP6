@@ -25,7 +25,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 .venv/
-.venv311/
 venv/
 ENV/
 env/

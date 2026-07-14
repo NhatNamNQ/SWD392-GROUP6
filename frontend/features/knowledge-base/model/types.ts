@@ -42,14 +42,3 @@ export type KnowledgeBaseError = {
   code: string;
   message: string;
 };
-
-export type DocumentChunk = {
-  id: string;
-  documentId: string;
-  chunkIndex: number;
-  content: string;
-  tokenCount: number | null;
-  metadata: Record<string, unknown>;
-  createdAt: string;
-};
-
