@@ -36,6 +36,16 @@ function unwrapJavaPayload<T>(payload: JavaEnvelope<T> | T | null) {
   return payload as T;
 }
 
+function sanitizeJsonValue(value: unknown): unknown {
+  if (value === undefined) {
+    return null;
+  }
+
+  return JSON.parse(
+    JSON.stringify(value, (_key, entry) => (typeof entry === "bigint" ? entry.toString() : entry)),
+  ) as unknown;
+}
+
 export async function requireJavaRequestSession(request: Request): Promise<AuthSession> {
   const session = await readRequestAuthSession(request);
 
@@ -51,7 +61,7 @@ export async function requireJavaRequestSession(request: Request): Promise<AuthS
 }
 
 export function createJavaJsonResponse(payload: unknown, status = 200) {
-  return createAuthJsonResponse(payload, status);
+  return createAuthJsonResponse(sanitizeJsonValue(payload), status);
 }
 
 export function toJavaErrorResponse(error: unknown) {

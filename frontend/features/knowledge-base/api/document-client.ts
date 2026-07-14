@@ -1,6 +1,7 @@
 import type {
   CourseOption,
   DocumentChapter,
+  DocumentChunk,
   KnowledgeBaseError,
   KnowledgeDocument,
 } from "@/features/knowledge-base/model/types";
@@ -52,8 +53,13 @@ export function fetchDocumentChapters(documentId: string) {
   return request<DocumentChapter[]>(`/api/teacher/documents/${documentId}/chapters`);
 }
 
+export function fetchDocumentChunks(documentId: string) {
+  return request<DocumentChunk[]>(`/api/teacher/documents/${documentId}/chunks`);
+}
+
 export function deleteDocument(documentId: string) {
   return request<{ message?: string }>(`/api/teacher/documents/${documentId}`, {
     method: "DELETE",
   });
 }
+
